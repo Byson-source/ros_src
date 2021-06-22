@@ -792,6 +792,175 @@ custom_srv_genpy/fast:
 .PHONY : custom_srv_genpy/fast
 
 #=============================================================================
+# Target rules for targets named new_ros_generate_messages
+
+# Build rule for target.
+new_ros_generate_messages: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 new_ros_generate_messages
+.PHONY : new_ros_generate_messages
+
+# fast build rule for target.
+new_ros_generate_messages/fast:
+	$(MAKE) -f new_ros/CMakeFiles/new_ros_generate_messages.dir/build.make new_ros/CMakeFiles/new_ros_generate_messages.dir/build
+.PHONY : new_ros_generate_messages/fast
+
+#=============================================================================
+# Target rules for targets named _new_ros_generate_messages_check_deps_IoTSensor
+
+# Build rule for target.
+_new_ros_generate_messages_check_deps_IoTSensor: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _new_ros_generate_messages_check_deps_IoTSensor
+.PHONY : _new_ros_generate_messages_check_deps_IoTSensor
+
+# fast build rule for target.
+_new_ros_generate_messages_check_deps_IoTSensor/fast:
+	$(MAKE) -f new_ros/CMakeFiles/_new_ros_generate_messages_check_deps_IoTSensor.dir/build.make new_ros/CMakeFiles/_new_ros_generate_messages_check_deps_IoTSensor.dir/build
+.PHONY : _new_ros_generate_messages_check_deps_IoTSensor/fast
+
+#=============================================================================
+# Target rules for targets named new_ros_gennodejs
+
+# Build rule for target.
+new_ros_gennodejs: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 new_ros_gennodejs
+.PHONY : new_ros_gennodejs
+
+# fast build rule for target.
+new_ros_gennodejs/fast:
+	$(MAKE) -f new_ros/CMakeFiles/new_ros_gennodejs.dir/build.make new_ros/CMakeFiles/new_ros_gennodejs.dir/build
+.PHONY : new_ros_gennodejs/fast
+
+#=============================================================================
+# Target rules for targets named _new_ros_generate_messages_check_deps_AddTwoPoints
+
+# Build rule for target.
+_new_ros_generate_messages_check_deps_AddTwoPoints: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _new_ros_generate_messages_check_deps_AddTwoPoints
+.PHONY : _new_ros_generate_messages_check_deps_AddTwoPoints
+
+# fast build rule for target.
+_new_ros_generate_messages_check_deps_AddTwoPoints/fast:
+	$(MAKE) -f new_ros/CMakeFiles/_new_ros_generate_messages_check_deps_AddTwoPoints.dir/build.make new_ros/CMakeFiles/_new_ros_generate_messages_check_deps_AddTwoPoints.dir/build
+.PHONY : _new_ros_generate_messages_check_deps_AddTwoPoints/fast
+
+#=============================================================================
+# Target rules for targets named new_ros_genlisp
+
+# Build rule for target.
+new_ros_genlisp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 new_ros_genlisp
+.PHONY : new_ros_genlisp
+
+# fast build rule for target.
+new_ros_genlisp/fast:
+	$(MAKE) -f new_ros/CMakeFiles/new_ros_genlisp.dir/build.make new_ros/CMakeFiles/new_ros_genlisp.dir/build
+.PHONY : new_ros_genlisp/fast
+
+#=============================================================================
+# Target rules for targets named new_ros_generate_messages_py
+
+# Build rule for target.
+new_ros_generate_messages_py: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 new_ros_generate_messages_py
+.PHONY : new_ros_generate_messages_py
+
+# fast build rule for target.
+new_ros_generate_messages_py/fast:
+	$(MAKE) -f new_ros/CMakeFiles/new_ros_generate_messages_py.dir/build.make new_ros/CMakeFiles/new_ros_generate_messages_py.dir/build
+.PHONY : new_ros_generate_messages_py/fast
+
+#=============================================================================
+# Target rules for targets named new_ros_gencpp
+
+# Build rule for target.
+new_ros_gencpp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 new_ros_gencpp
+.PHONY : new_ros_gencpp
+
+# fast build rule for target.
+new_ros_gencpp/fast:
+	$(MAKE) -f new_ros/CMakeFiles/new_ros_gencpp.dir/build.make new_ros/CMakeFiles/new_ros_gencpp.dir/build
+.PHONY : new_ros_gencpp/fast
+
+#=============================================================================
+# Target rules for targets named new_ros_generate_messages_cpp
+
+# Build rule for target.
+new_ros_generate_messages_cpp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 new_ros_generate_messages_cpp
+.PHONY : new_ros_generate_messages_cpp
+
+# fast build rule for target.
+new_ros_generate_messages_cpp/fast:
+	$(MAKE) -f new_ros/CMakeFiles/new_ros_generate_messages_cpp.dir/build.make new_ros/CMakeFiles/new_ros_generate_messages_cpp.dir/build
+.PHONY : new_ros_generate_messages_cpp/fast
+
+#=============================================================================
+# Target rules for targets named new_ros_generate_messages_lisp
+
+# Build rule for target.
+new_ros_generate_messages_lisp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 new_ros_generate_messages_lisp
+.PHONY : new_ros_generate_messages_lisp
+
+# fast build rule for target.
+new_ros_generate_messages_lisp/fast:
+	$(MAKE) -f new_ros/CMakeFiles/new_ros_generate_messages_lisp.dir/build.make new_ros/CMakeFiles/new_ros_generate_messages_lisp.dir/build
+.PHONY : new_ros_generate_messages_lisp/fast
+
+#=============================================================================
+# Target rules for targets named new_ros_generate_messages_eus
+
+# Build rule for target.
+new_ros_generate_messages_eus: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 new_ros_generate_messages_eus
+.PHONY : new_ros_generate_messages_eus
+
+# fast build rule for target.
+new_ros_generate_messages_eus/fast:
+	$(MAKE) -f new_ros/CMakeFiles/new_ros_generate_messages_eus.dir/build.make new_ros/CMakeFiles/new_ros_generate_messages_eus.dir/build
+.PHONY : new_ros_generate_messages_eus/fast
+
+#=============================================================================
+# Target rules for targets named new_ros_geneus
+
+# Build rule for target.
+new_ros_geneus: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 new_ros_geneus
+.PHONY : new_ros_geneus
+
+# fast build rule for target.
+new_ros_geneus/fast:
+	$(MAKE) -f new_ros/CMakeFiles/new_ros_geneus.dir/build.make new_ros/CMakeFiles/new_ros_geneus.dir/build
+.PHONY : new_ros_geneus/fast
+
+#=============================================================================
+# Target rules for targets named new_ros_generate_messages_nodejs
+
+# Build rule for target.
+new_ros_generate_messages_nodejs: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 new_ros_generate_messages_nodejs
+.PHONY : new_ros_generate_messages_nodejs
+
+# fast build rule for target.
+new_ros_generate_messages_nodejs/fast:
+	$(MAKE) -f new_ros/CMakeFiles/new_ros_generate_messages_nodejs.dir/build.make new_ros/CMakeFiles/new_ros_generate_messages_nodejs.dir/build
+.PHONY : new_ros_generate_messages_nodejs/fast
+
+#=============================================================================
+# Target rules for targets named new_ros_genpy
+
+# Build rule for target.
+new_ros_genpy: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 new_ros_genpy
+.PHONY : new_ros_genpy
+
+# fast build rule for target.
+new_ros_genpy/fast:
+	$(MAKE) -f new_ros/CMakeFiles/new_ros_genpy.dir/build.make new_ros/CMakeFiles/new_ros_genpy.dir/build
+.PHONY : new_ros_genpy/fast
+
+#=============================================================================
 # Target rules for targets named run_tests_depthimage_to_laserscan_gtest
 
 # Build rule for target.
@@ -2646,6 +2815,19 @@ help:
 	@echo "... custom_srv_generate_messages_nodejs"
 	@echo "... custom_srv_gennodejs"
 	@echo "... custom_srv_genpy"
+	@echo "... new_ros_generate_messages"
+	@echo "... _new_ros_generate_messages_check_deps_IoTSensor"
+	@echo "... new_ros_gennodejs"
+	@echo "... _new_ros_generate_messages_check_deps_AddTwoPoints"
+	@echo "... new_ros_genlisp"
+	@echo "... new_ros_generate_messages_py"
+	@echo "... new_ros_gencpp"
+	@echo "... new_ros_generate_messages_cpp"
+	@echo "... new_ros_generate_messages_lisp"
+	@echo "... new_ros_generate_messages_eus"
+	@echo "... new_ros_geneus"
+	@echo "... new_ros_generate_messages_nodejs"
+	@echo "... new_ros_genpy"
 	@echo "... run_tests_depthimage_to_laserscan_gtest"
 	@echo "... libtest"
 	@echo "... DepthImageToLaserScanROS"
