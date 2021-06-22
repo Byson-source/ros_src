@@ -78,6 +78,8 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/home/ayumi/catkin_ws/src/depthimage_to_laserscan/package.xml"
   "/home/ayumi/catkin_ws/src/new_ros/CMakeLists.txt"
   "/home/ayumi/catkin_ws/src/new_ros/package.xml"
+  "/home/ayumi/catkin_ws/src/new_ros/scripts/follower_listener.py"
+  "/home/ayumi/catkin_ws/src/new_ros/scripts/tf_broadcaster.py"
   "/home/ayumi/catkin_ws/src/oir/CMakeLists.txt"
   "/home/ayumi/catkin_ws/src/oir/package.xml"
   "/home/ayumi/catkin_ws/src/oir/script/irritational.py"
