@@ -1,0 +1,8 @@
+prefix=/home/ayumi/catkin_ws/install
+
+Name: basicros
+Description: Description of basicros
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: rospy std_msgs message_runtime
