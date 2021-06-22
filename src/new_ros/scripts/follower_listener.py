@@ -3,21 +3,23 @@ import math
 import rospy
 import tf_broadcaster
 import tf
-from geometry_msgs import Twist
-from turtlesim import Pose
+from geometry_msgs.msg import Twist
+import turtlesim.srv
 
-rate=rospy.Rate(10)
-command=Twist()
+
 
 
 if __name__ == '__main__':
+    rospy.init_node('turtle_tf_listener')
+    rate = rospy.Rate(10)
+    command = Twist()
     transform_listener=tf.TransformListener()
 
     rospy.wait_for_service('spawn')
-    spawner=rospy.ServiceProxy('spawn')
+    spawner=rospy.ServiceProxy('spawn',turtlesim.srv.Spawn)
     spawner(4,2,0,'turtle2')
 
-    rospy.init_node('listener',anonymous=True)
+
     cmd=rospy.Publisher('turtle2/cmd_vel', Twist, queue_size=1)
     while not rospy.is_shutdown():
         try:
