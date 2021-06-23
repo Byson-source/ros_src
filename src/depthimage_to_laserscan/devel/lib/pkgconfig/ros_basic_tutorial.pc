@@ -1,0 +1,8 @@
+prefix=/home/ayumi/catkin_ws/devel
+
+Name: ros_basic_tutorial
+Description: Description of ros_basic_tutorial
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

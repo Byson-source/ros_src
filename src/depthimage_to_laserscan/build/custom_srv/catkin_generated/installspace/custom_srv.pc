@@ -1,0 +1,8 @@
+prefix=/home/ayumi/catkin_ws/install
+
+Name: custom_srv
+Description: Description of custom_srv
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib -lcustom_srv
+Requires: rospy std_msgs message_runtime
