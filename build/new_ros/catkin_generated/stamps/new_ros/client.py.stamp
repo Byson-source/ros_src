@@ -2,12 +2,14 @@ import sys
 import rospy
 from new_ros.srv import *
 
-def add_two_ints_client(x,y)
+def add_two_ints_client(x,y):
     rospy.wait_for_service('add_two_ints')
     try:
-        add_two_ints=rospy.ServiceProxy('add_two_ints',AddTwoInts)
+        add_two_ints=rospy.ServiceProxy('add_two_ints',AddTwoPoints)
+        """↓ここで送信と受信を同時に行っている！！"""
         respl=add_two_ints(x,y)
         return respl.sum
+
     except rospy.ServiceException(e):
         print('Service failed:%s'%e)
 

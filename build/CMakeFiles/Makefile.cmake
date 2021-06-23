@@ -82,6 +82,8 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/home/ayumi/catkin_ws/src/depthimage_to_laserscan/package.xml"
   "/home/ayumi/catkin_ws/src/new_ros/CMakeLists.txt"
   "/home/ayumi/catkin_ws/src/new_ros/package.xml"
+  "/home/ayumi/catkin_ws/src/new_ros/scripts/bug-0.py"
+  "/home/ayumi/catkin_ws/src/new_ros/scripts/bug0_listener.py"
   "/home/ayumi/catkin_ws/src/new_ros/scripts/first_course/client.py"
   "/home/ayumi/catkin_ws/src/new_ros/scripts/first_course/server.py"
   "/home/ayumi/catkin_ws/src/new_ros/scripts/follower_listener.py"

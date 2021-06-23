@@ -1,0 +1,16 @@
+<launch>
+    <include file="$(find turtlebot3_gazebo)/launch/turtlebot3_stage_4.launch"/>
+
+    <node pkg="new_ros" type="bug-0.py" name="tf_waffle" respawn="false">
+     <param name="turtle" type="string" value="waffle"/>
+        <param name="goal_x" type="string" value="waffle"/>
+    </node>
+    <node pkg="new_ros" type="bug-0.py" name="tf_goal" respawn="false">
+     <param name="turtle" type="string" value="turtle2"/>
+    </node>
+
+    <node pkg="new_ros" type="follower_listener.py" name="listener"/>
+</launch>
+
+
+/home/ayumi/catkin_ws/src/turtlebot3_simulations/turtlebot3_gazebo/launch

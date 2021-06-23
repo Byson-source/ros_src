@@ -112,3 +112,11 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/new_ros" TYPE PROGRAM FILES "/home/ayumi/catkin_ws/build/new_ros/catkin_generated/installspace/server.py")
 endif()
 
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/new_ros" TYPE PROGRAM FILES "/home/ayumi/catkin_ws/build/new_ros/catkin_generated/installspace/bug-0.py")
+endif()
+
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/new_ros" TYPE PROGRAM FILES "/home/ayumi/catkin_ws/build/new_ros/catkin_generated/installspace/bug0_listener.py")
+endif()
+
