@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/basicros" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/basicros/ros_practice" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/depthimage_to_laserscan" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/realsense-ros" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/robo/script" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/ros_course_part2" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/turtlebot3" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/turtlebot3_msgs" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/turtlebot3_simulations" vcs="Git" />
+  </component>
+</project>
