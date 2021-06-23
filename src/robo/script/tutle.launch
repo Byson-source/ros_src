@@ -1,0 +1,4 @@
+<launch>
+    <node pkg='turtlesim' type='turtlesim_node' name='Robot'/>
+    <node pkg='turtlesim' type='turtle_teleop_key' name='Controller' output='screen'/>
+</launch>
