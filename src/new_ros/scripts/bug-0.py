@@ -4,52 +4,69 @@ import tf
 import time
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Twist
-
 from sensor_msgs.msg import LaserScan
 
-# def pose_callback(data):
-#     transform_broadcaster = tf2_ros.TransformBroadcaster()
-#     q=data.pose.pose.orientation
-#     pos=data.pose.pose.position
-#     t=TransformStamped()
-#
-#     (t.transform.translation.x,t.transform.translation.y,t.transform.translation.z)=(pos.x,pos.y,0)
-#     (t.transform.rotation.x,t.transform.rotation.y,t.transform.rotation.z,t.transform.rotation.w)=(q.x,q.y,q.z,q.w)
-#     t.header.stamp=rospy.Time.now()
-#     t.header.frame_id='world'
-#     t.child_frame_id='A'
-    # rotation_quaternion=(q.x,q.y,q.z,q.w)
-    # translation_vector=(pos.x,pos.y,0)
-    # current_time=rospy.Time.now()
+right_distance,left_distance,distance,min_index,distance,present_x,present_y,present_yaw,goal_yaw=0,0,0,0,0,0,0,0,0
+
+def perceive(data):
+    global present_x,present_y,present_yaw,goal_yaw
+
+    present_x = data.pose.pose.position.x
+    present_y = data.pose.pose.position.y
+
+    r = data.pose.pose.orientation
+
+    present_yaw = tf.transformations.euler_from_quaternion((r.x, r.y, r.z, r.w))[2]
+    goal_yaw = math.atan2(goal_y - present_y, goal_x - present_x)
 
 
-    # transform_broadcaster.sendTransform(translation_vector, rotation_quaternion,"odom", "world")
-    # transform_broadcaster.sendTransform(t)
 
-def straight_to_goal(data):
-    cmd=Twist()
-    present_x=data.pose.pose.position.x
-    present_y=data.pose.pose.position.y
+def scan_result(data):
+    global distance,min_index
+    scan_score=[i for i in scan.ranges if not math.isnan(i)]
+    right_side = scan_score[85:96]
+    left_side = scan_score[265:275]
 
-    r=data.pose.pose.orientation
+    Scan_score=scan_score[:5]+scan_score[355:]
 
-    present_yaw=tf.transformations.euler_from_quaternion((r.x,r.y,r.z,r.w))[2]
-    goal_yaw=math.atan2(goal_y-present_y,goal_x-present_x)
+
+    distance=min(Scan_score)
+    right_distance = min(right_side)
+    left_distance=min(left_side)
+
+    min_index=Scan_score.index(distance)
+
+
+
+
+
+def straight_to_goal():
+    global present_yaw,goal_yaw,present_x,present_y,command
+    global present_x
 
     if math.sqrt((goal_x-present_x)**2+(goal_y-present_y)**2)>=0.5:
         cmd.linear.x =0.5
-        cmd.angular.z = (goal_yaw - present_yaw) * 0.4
     else:
         cmd.linear.x = math.sqrt((goal_x - present_x) ** 2 + (goal_y - present_y) ** 2)
-
-
 
     command.publish(cmd)
     rate.sleep()
 
-def turn_right(data):
-    print(data)
 
+def turn():
+    global present_yaw, goal_yaw, present_x, present_y, command
+    cmd.angular.z = goal_yaw - present_yaw
+
+    command.publish(cmd)
+    rate.sleep()
+
+def change_direction():
+    print('a')
+    # global min_index
+    # if min_index<=5:
+    #     # 90+min_index
+    # else:
+    #     # 95-min_index
 
 if __name__ == '__main__':
     rospy.init_node('test')
@@ -58,8 +75,18 @@ if __name__ == '__main__':
     goal_y = int(input('What is the y of target?>>>>'))
 
     rate=rospy.Rate(10)
+    cmd=Twist()
+    scan=LaserScan()
 
-
-    rospy.Subscriber('/odom',Odometry,straight_to_goal)
+    rospy.Subscriber('/odom',Odometry,perceive)
+    rospy.Subscriber('/scan',LaserScan,scan_result)
     command=rospy.Publisher('cmd_vel',Twist,queue_size=1)
+    status=0
+    while True:
+        if status==0 and distance>3:
+            straight_to_goal()
+            turn()
+        elif distance<=3:
+            status+=1
     rospy.spin()
+
