@@ -3,7 +3,7 @@ import actionlib
 from move_base_msgs.msg import MoveBaseAction,MoveBaseGoal
 from math import radians,degrees
 from actionlib_msgs.msg import *
-from geometruy_msgs.msg import Point
+from geometry_msgs.msg import Point
 
 def move_to_goal(x,y):
     ac=actionlib.SimpleActionClient("move_base",MoveBaseAction)

@@ -1,26 +1,26 @@
 import math
 import rospy
 import tf
-from gazebo_msgs.msg import ModelStates
+from nav_msgs.msg import Odometry
 import turtlesim.srv
 
 if __name__ == '__main__':
 
     rospy.init_node('bug_listener')
     rate=rospy.Rate(10)
-    command=ModelStates()
+    command=Odometry()
     transform_listener = tf.TransformListener()
 
-    cmd=rospy.Publisher('gazebo/model_states',ModelStates,queue_size=1)
+    cmd=rospy.Publisher('odom',Odometry,queue_size=1)
 
     while not rospy.is_shutdown():
         try:
-            (translation,rotation)=transform_listener.lookupTransform('waffle_frame','goal_frame',rospy.Time(0))
+            (translation,rotation)=transform_listener.lookupTransform('world','odom',rospy.Time(0))
         except (tf.LookupException,tf.ConnectivityException,tf.ExtrapolationException):
             continue
 
 
-        print(command.twist)
+        print(command.pose.pose)
         # cmd_x=translation[0]
         # cmd_y=translation[1]
         #
