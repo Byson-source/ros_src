@@ -42,20 +42,7 @@ def scan_result(data):
 def straight_to_goal():
     global present_yaw,goal_yaw,present_x,present_y,command,status
 
-    if math.sqrt((goal_x-present_x)**2+(goal_y-present_y)**2)>=0.5:
-        cmd.linear.x =0.5
-    else:
-        cmd.linear.x = 0
-        status=4
-
-    command.publish(cmd)
-    rate.sleep()
-
-def turn():
-    global present_yaw, goal_yaw, present_x, present_y, command
-    cmd.angular.z = goal_yaw - present_yaw
-    if math.sqrt((goal_x - present_x) ** 2 + (goal_y - present_y) ** 2) <= 0.5:
-        cmd.angular.z=0
+    cmd.linear.x=0.5
     command.publish(cmd)
     rate.sleep()
 
@@ -79,9 +66,6 @@ def stop():
 if __name__ == '__main__':
     rospy.init_node('test')
 
-    goal_x=int(input('What is the x of target?>>>>'))
-    goal_y = int(input('What is the y of target?>>>>'))
-
     rate=rospy.Rate(10)
     cmd=Twist()
     scan=LaserScan()
@@ -96,7 +80,6 @@ if __name__ == '__main__':
 #障害物がないときに目標地点にまっすぐ移動する。
         if status==0:
             straight_to_goal()
-            turn()
 
             if distance<=0.7:
                 stop()
@@ -120,7 +103,7 @@ if __name__ == '__main__':
                 print('ideal_direction:%f,present_yaw:%f'%(ideal_direction,present_yaw))
                 print()
                 change_direction()
-                if abs(present_yaw-ideal_direction)<=1/180*math.pi:
+                if 0<(present_yaw-ideal_direction)<=1/180*math.pi:
                     print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
                     stop()
                     phase1_iteration=0
@@ -130,6 +113,9 @@ if __name__ == '__main__':
             if right_distance>1:
                 stop()
                 status=0
+            elif distance<=0.7:
+                stop()
+                status=1
         else:
             break
 

@@ -160,7 +160,7 @@ include_directories(
 catkin_install_python(PROGRAMS
   scripts/follower_listener.py scripts/tf_broadcaster.py scripts/framea_frameb.py
   scripts/first_course/client.py scripts/first_course/server.py scripts/bug-0.py
-  scripts/bug0_listener.py scripts/test.py
+  scripts/bug0_listener.py scripts/test.py scripts/slam_test.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
