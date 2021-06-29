@@ -6,7 +6,10 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
 
+"""angular.z>0の場合、反時計回り！"""
+
 right_distance,left_distance,distance,min_index,distance,present_x,present_y,present_yaw,goal_yaw=0,0,0,0,0,0,0,0,0
+right_min_index=0
 
 def perceive(data):
     global present_x,present_y,present_yaw,goal_yaw
@@ -22,27 +25,22 @@ def perceive(data):
 
 
 def scan_result(data):
-    global distance,min_index
-    scan_score=[i for i in scan.ranges if not math.isnan(i)]
-    right_side = scan_score[85:96]
-    left_side = scan_score[265:275]
+    global distance,min_index,right_distance,right_min_index
 
+    scan_score=[i for i in data.ranges if not math.isnan(i)]
+
+
+    right_side = scan_score[265:276]
     Scan_score=scan_score[:5]+scan_score[355:]
 
-
     distance=min(Scan_score)
-    right_distance = min(right_side)
-    left_distance=min(left_side)
+    min_index = Scan_score.index(distance)
 
-    min_index=Scan_score.index(distance)
-
-
-
-
+    right_distance = min(right_side)#右側のセンシング
+    right_min_index=right_side.index(min(right_side))
 
 def straight_to_goal():
     global present_yaw,goal_yaw,present_x,present_y,command
-    global present_x
 
     if math.sqrt((goal_x-present_x)**2+(goal_y-present_y)**2)>=0.5:
         cmd.linear.x =0.5
@@ -52,7 +50,6 @@ def straight_to_goal():
     command.publish(cmd)
     rate.sleep()
 
-
 def turn():
     global present_yaw, goal_yaw, present_x, present_y, command
     cmd.angular.z = goal_yaw - present_yaw
@@ -60,13 +57,22 @@ def turn():
     command.publish(cmd)
     rate.sleep()
 
+def go_straight():
+    cmd.linear.x=0.5
+    command.publish(cmd)
+    rate.sleep()
+
 def change_direction():
-    print('a')
-    # global min_index
-    # if min_index<=5:
-    #     # 90+min_index
-    # else:
-    #     # 95-min_index
+    """反時計回り"""
+    cmd.angular.z=0.5
+    command.publish(cmd)
+    rate.sleep()
+
+def stop():
+    cmd.angular.z=0
+    cmd.linear.x=0
+    command.publish(cmd)
+    rate.sleep()
 
 if __name__ == '__main__':
     rospy.init_node('test')
@@ -82,11 +88,46 @@ if __name__ == '__main__':
     rospy.Subscriber('/scan',LaserScan,scan_result)
     command=rospy.Publisher('cmd_vel',Twist,queue_size=1)
     status=0
-    while True:
-        if status==0 and distance>3:
+    phase1_iteration=0
+    while not rospy.is_shutdown():
+        # print(status)
+#障害物がないときに目標地点にまっすぐ移動する。
+        if status==0:
             straight_to_goal()
             turn()
-        elif distance<=3:
-            status+=1
+
+            if distance<=0.7:
+                stop()
+                status+=1
+#壁に面したときの方向転換
+        elif status==1:
+            phase1_iteration+=1
+            if phase1_iteration==1:
+                if 0<=min_index<5:
+                    ideal_direction=present_yaw+90+min_index
+                else:
+                    ideal_direction=present_yaw+95-min_index
+
+                if ideal_direction > 360:
+                    ideal_direction -= 360
+
+
+                ideal_direction=math.radians(ideal_direction)
+
+            else:
+                print('ideal_direction:%f,present_yaw:%f'%(ideal_direction,present_yaw))
+                print()
+                change_direction()
+                if abs(present_yaw-ideal_direction)<=1/180*math.pi:
+                    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+                    stop()
+                    phase1_iteration=0
+                    status+=1
+        else:
+            go_straight()
+            if right_distance>1:
+                stop()
+                status=0
+
     rospy.spin()
 
