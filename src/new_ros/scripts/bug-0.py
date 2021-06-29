@@ -40,12 +40,13 @@ def scan_result(data):
     right_min_index=right_side.index(min(right_side))
 
 def straight_to_goal():
-    global present_yaw,goal_yaw,present_x,present_y,command
+    global present_yaw,goal_yaw,present_x,present_y,command,status
 
     if math.sqrt((goal_x-present_x)**2+(goal_y-present_y)**2)>=0.5:
         cmd.linear.x =0.5
     else:
-        cmd.linear.x = math.sqrt((goal_x - present_x) ** 2 + (goal_y - present_y) ** 2)
+        cmd.linear.x = 0
+        status=4
 
     command.publish(cmd)
     rate.sleep()
@@ -53,7 +54,8 @@ def straight_to_goal():
 def turn():
     global present_yaw, goal_yaw, present_x, present_y, command
     cmd.angular.z = goal_yaw - present_yaw
-
+    if math.sqrt((goal_x - present_x) ** 2 + (goal_y - present_y) ** 2) <= 0.5:
+        cmd.angular.z=0
     command.publish(cmd)
     rate.sleep()
 
@@ -90,7 +92,7 @@ if __name__ == '__main__':
     status=0
     phase1_iteration=0
     while not rospy.is_shutdown():
-        # print(status)
+        print(status)
 #障害物がないときに目標地点にまっすぐ移動する。
         if status==0:
             straight_to_goal()
@@ -123,11 +125,13 @@ if __name__ == '__main__':
                     stop()
                     phase1_iteration=0
                     status+=1
-        else:
+        elif status==2:
             go_straight()
             if right_distance>1:
                 stop()
                 status=0
+        else:
+            break
 
     rospy.spin()
 
