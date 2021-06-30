@@ -1,3 +1,9 @@
+"""
+TO DO LIST
+1:Change the algorithm for object avoidance
+2:Change the algorithm to "turn"
+"""
+
 import rospy
 import math
 import tf
@@ -12,7 +18,7 @@ where_is_wall,right_distance,left_distance,distance,present_x,present_y,present_
 right_min_index,distance=0,2
 
 def perceive(data):
-    global present_x,present_y,present_yaw
+    global present_x,present_y,present_yaw,goal_yaw
 
     present_x = data.pose.pose.position.x
     present_y = data.pose.pose.position.y
@@ -20,6 +26,7 @@ def perceive(data):
     r = data.pose.pose.orientation
 
     present_yaw = tf.transformations.euler_from_quaternion((r.x, r.y, r.z, r.w))[2]
+    goal_yaw = math.atan2(goal_y - present_y, goal_x - present_x)
 
 
 
@@ -40,12 +47,25 @@ def scan_result(data):
 def straight_to_goal():
     global present_yaw,goal_yaw,present_x,present_y,command,status
 
-    cmd.linear.x=0.5
+    if math.sqrt((goal_x-present_x)**2+(goal_y-present_y)**2)>=0.5:
+        cmd.linear.x =0.2
+    else:
+        cmd.linear.x = 0
+        status=4
+
+    command.publish(cmd)
+    rate.sleep()
+
+def turn():
+    global present_yaw, goal_yaw, present_x, present_y, command
+    cmd.angular.z = goal_yaw - present_yaw
+    if math.sqrt((goal_x - present_x) ** 2 + (goal_y - present_y) ** 2) <= 0.5:
+        cmd.angular.z=0
     command.publish(cmd)
     rate.sleep()
 
 def go_straight():
-    cmd.linear.x=0.5
+    cmd.linear.x=0.2
     command.publish(cmd)
     rate.sleep()
 
@@ -64,7 +84,10 @@ def stop():
 if __name__ == '__main__':
     rospy.init_node('test')
 
-    rate=rospy.Rate(10)
+    goal_x = int(input('What is the x of target?>>>>'))
+    goal_y = int(input('What is the y of target?>>>>'))
+
+    rate=rospy.Rate(100)
     cmd=Twist()
     scan=LaserScan()
     scan.range_max=10
@@ -78,19 +101,23 @@ if __name__ == '__main__':
         print("status:%s"%(status))
 #障害物がないときに目標地点にまっすぐ移動する。
         if status==0:
-            straight_to_goal()
-
             if distance<=1:
                 stop()
                 status+=1
+                target_where_is_wall=where_is_wall
+                continue
+            straight_to_goal()
+            turn()
+
+
 #壁に面したときの方向転換
         elif status==1:
             phase1_iteration+=1
             if phase1_iteration==1:
-                if 0<=where_is_wall<=90:
-                    ideal_direction=present_yaw+math.radians(90+where_is_wall)
+                if 0<=target_where_is_wall<=90:
+                    ideal_direction=present_yaw+math.radians(90+target_where_is_wall)
                 else:
-                    ideal_direction=present_yaw+math.radians(where_is_wall-270)
+                    ideal_direction=present_yaw+math.radians(target_where_is_wall-270)
 
                 if ideal_direction > math.pi:
                     ideal_direction=-2*math.pi+ideal_direction
@@ -101,7 +128,7 @@ if __name__ == '__main__':
             else:
                 print('ideal_direction:%f,present_yaw:%f'%(ideal_direction,present_yaw))
                 change_direction()
-                if 0<(present_yaw-ideal_direction)<=1/180*math.pi:
+                if 0<(present_yaw-ideal_direction)<=1/360*math.pi:
                     print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
                     stop()
                     phase1_iteration=0
