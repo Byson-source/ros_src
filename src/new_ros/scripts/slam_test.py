@@ -8,11 +8,11 @@ from sensor_msgs.msg import LaserScan
 
 """angular.z>0の場合、反時計回り！"""
 
-right_distance,left_distance,distance,min_index,distance,present_x,present_y,present_yaw,goal_yaw=0,0,0,0,0,0,0,0,0
-right_min_index=0
+where_is_wall,right_distance,left_distance,distance,present_x,present_y,present_yaw,goal_yaw=0,0,0,0,0,0,0,0
+right_min_index,distance=0,2
 
 def perceive(data):
-    global present_x,present_y,present_yaw,goal_yaw
+    global present_x,present_y,present_yaw
 
     present_x = data.pose.pose.position.x
     present_y = data.pose.pose.position.y
@@ -20,21 +20,19 @@ def perceive(data):
     r = data.pose.pose.orientation
 
     present_yaw = tf.transformations.euler_from_quaternion((r.x, r.y, r.z, r.w))[2]
-    goal_yaw = math.atan2(goal_y - present_y, goal_x - present_x)
 
 
 
 def scan_result(data):
-    global distance,min_index,right_distance,right_min_index
+    global distance,right_distance,right_min_index,where_is_wall
 
     scan_score=[i for i in data.ranges if not math.isnan(i)]
 
-
+    where_is_wall=scan_score.index(min(scan_score))
     right_side = scan_score[265:276]
-    Scan_score=scan_score[:5]+scan_score[355:]
+    Scan_score=scan_score[:10]+scan_score[350:]
 
     distance=min(Scan_score)
-    min_index = Scan_score.index(distance)
 
     right_distance = min(right_side)#右側のセンシング
     right_min_index=right_side.index(min(right_side))
@@ -53,7 +51,7 @@ def go_straight():
 
 def change_direction():
     """反時計回り"""
-    cmd.angular.z=0.3
+    cmd.angular.z=0.2
     command.publish(cmd)
     rate.sleep()
 
@@ -69,6 +67,7 @@ if __name__ == '__main__':
     rate=rospy.Rate(10)
     cmd=Twist()
     scan=LaserScan()
+    scan.range_max=10
 
     rospy.Subscriber('/odom',Odometry,perceive)
     rospy.Subscriber('/scan',LaserScan,scan_result)
@@ -76,32 +75,31 @@ if __name__ == '__main__':
     status=0
     phase1_iteration=0
     while not rospy.is_shutdown():
-        print(status)
+        print("status:%s"%(status))
 #障害物がないときに目標地点にまっすぐ移動する。
         if status==0:
             straight_to_goal()
 
-            if distance<=0.7:
+            if distance<=1:
                 stop()
                 status+=1
 #壁に面したときの方向転換
         elif status==1:
             phase1_iteration+=1
             if phase1_iteration==1:
-                if 0<=min_index<5:
-                    ideal_direction=present_yaw+90+min_index
+                if 0<=where_is_wall<=90:
+                    ideal_direction=present_yaw+math.radians(90+where_is_wall)
                 else:
-                    ideal_direction=present_yaw+95-min_index
+                    ideal_direction=present_yaw+math.radians(where_is_wall-270)
 
-                if ideal_direction > 360:
-                    ideal_direction -= 360
+                if ideal_direction > math.pi:
+                    ideal_direction=-2*math.pi+ideal_direction
+                elif ideal_direction<-math.pi:
+                    ideal_direction=2*math.pi+ideal_direction
 
-
-                ideal_direction=math.radians(ideal_direction)
 
             else:
                 print('ideal_direction:%f,present_yaw:%f'%(ideal_direction,present_yaw))
-                print()
                 change_direction()
                 if 0<(present_yaw-ideal_direction)<=1/180*math.pi:
                     print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
@@ -120,4 +118,6 @@ if __name__ == '__main__':
             break
 
     rospy.spin()
+
+
 

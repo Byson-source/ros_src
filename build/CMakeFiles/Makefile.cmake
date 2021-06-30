@@ -88,6 +88,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/home/ayumi/catkin_ws/src/new_ros/scripts/first_course/server.py"
   "/home/ayumi/catkin_ws/src/new_ros/scripts/follower_listener.py"
   "/home/ayumi/catkin_ws/src/new_ros/scripts/framea_frameb.py"
+  "/home/ayumi/catkin_ws/src/new_ros/scripts/slam_test.py"
   "/home/ayumi/catkin_ws/src/new_ros/scripts/test.py"
   "/home/ayumi/catkin_ws/src/new_ros/scripts/tf_broadcaster.py"
   "/home/ayumi/catkin_ws/src/oir/CMakeLists.txt"
