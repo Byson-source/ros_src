@@ -14,7 +14,7 @@ from sensor_msgs.msg import LaserScan
 
 LEFT_EDGE=[39,44]
 RIGHT_EDGE=[45,50]
-
+LIMIT_RANGE=3.5
 """
 angular.z>0の場合、反時計回り！
 デフォルトのセンサーの最小値は3.5
@@ -50,7 +50,7 @@ def straight_to_goal():
     global present_yaw,goal_yaw,present_x,present_y,command,status
 
     if math.sqrt((goal_x-present_x)**2+(goal_y-present_y)**2)>=0.5:
-        cmd.linear.x =0.2
+        cmd.linear.x =0.1
     else:
         cmd.linear.x = 0
         status=4
@@ -67,7 +67,7 @@ def turn():
     rate.sleep()
 
 def go_straight():
-    cmd.linear.x=0.2
+    cmd.linear.x=0.1
     command.publish(cmd)
     rate.sleep()
 
@@ -91,7 +91,7 @@ if __name__ == '__main__':
 
     # goal_x = int(input('What is the x of target?>>>>'))
     # goal_y = int(input('What is the y of target?>>>>'))
-    goal_x=20
+    goal_x=50
     goal_y=0
 
     rate=rospy.Rate(100)
@@ -102,15 +102,20 @@ if __name__ == '__main__':
     rospy.Subscriber('/scan',LaserScan,scan_result)
     command=rospy.Publisher('cmd_vel',Twist,queue_size=1)
     status=0
-    phase1_iteration=0
+    status1_iteration=0
+    status2_iteration=0
+
     while not rospy.is_shutdown():
         print("status:%s"%(status))
 #障害物がないときに目標地点にまっすぐ移動する。
         if status==0:
-            if distance<=1:
+
+            status2_iteration=0
+
+            if distance<=0.6:
                 target_where_is_wall=where_is_wall
                 stop()
-                if LEFT_EDGE[0]<=target_where_is_wall<=LEFT_EDGE[1] or RIGHT_EDGE[0]<=target_where_is_wall<=RIGHT_EDGE[1]:
+                if (LEFT_EDGE[0]<=target_where_is_wall<=LEFT_EDGE[1] or RIGHT_EDGE[0]<=target_where_is_wall<=RIGHT_EDGE[1]):
                     status=3
                 else:
                     status=1
@@ -121,9 +126,9 @@ if __name__ == '__main__':
 
 #壁に面したときの方向転換
         elif status==1:
-            phase1_iteration+=1
+            status1_iteration+=1
 
-            if phase1_iteration==1:
+            if status1_iteration==1:
                 if 0<=target_where_is_wall<=44:
                     ideal_direction=present_yaw+math.radians(90+target_where_is_wall)
                 else:
@@ -141,16 +146,23 @@ if __name__ == '__main__':
                 if 0<(present_yaw-ideal_direction)<=1/360*math.pi:
                     print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
                     stop()
-                    phase1_iteration=0
+                    status1_iteration=0
                     status+=1
         elif status==2:
             go_straight()
-            # print("distance:%s,min_index:%s"%(distance,where_is_wall))
+            print('GO STRAIGHT!!')
+            status2_iteration+=1
+            if status2_iteration==1:
+                t1=time.time()
 
-            if distance>5:
+            if distance>LIMIT_RANGE:
+                t2=time.time()
                 stop()
-                status=0
-            elif distance<=0.7:
+                if t2-t1>10:
+                    print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+                    status=0
+
+            elif distance<=0.7 and (0<=where_is_wall<=5 or 85<=where_is_wall<=89):
                 stop()
                 status=1
 
