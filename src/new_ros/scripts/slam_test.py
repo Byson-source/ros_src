@@ -14,8 +14,8 @@ from sensor_msgs.msg import LaserScan
 
 """angular.z>0の場合、反時計回り！"""
 
-where_is_wall,right_distance,left_distance,distance,present_x,present_y,present_yaw,goal_yaw=0,0,0,0,0,0,0,0
-right_min_index,distance=0,2
+distance,present_x,present_y,present_yaw,goal_yaw=0,0,0,0,0
+distance=2
 
 def perceive(data):
     global present_x,present_y,present_yaw,goal_yaw
@@ -31,18 +31,14 @@ def perceive(data):
 
 
 def scan_result(data):
-    global distance,right_distance,right_min_index,where_is_wall
+    global distance
 
     scan_score=[i for i in data.ranges if not math.isnan(i)]
 
-    where_is_wall=scan_score.index(min(scan_score))
-    right_side = scan_score[265:276]
-    Scan_score=scan_score[:10]+scan_score[350:]
+    Scan_score=scan_score[:45]+scan_score[315:]
 
     distance=min(Scan_score)
 
-    right_distance = min(right_side)#右側のセンシング
-    right_min_index=right_side.index(min(right_side))
 
 def straight_to_goal():
     global present_yaw,goal_yaw,present_x,present_y,command,status
