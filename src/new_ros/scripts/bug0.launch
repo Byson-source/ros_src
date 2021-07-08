@@ -12,5 +12,3 @@
     <node pkg="new_ros" type="follower_listener.py" name="listener"/>
 </launch>
 
-
-/home/ayumi/catkin_ws/src/turtlebot3_simulations/turtlebot3_gazebo/launch

@@ -12,15 +12,10 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
 
-LEFT_EDGE=[39,44]
-RIGHT_EDGE=[45,50]
-LIMIT_RANGE=3.5
-"""
-angular.z>0の場合、反時計回り！
-デフォルトのセンサーの最小値は3.5
-"""
+"""angular.z>0の場合、反時計回り！"""
 
-where_is_wall,distance,present_x,present_y,present_yaw,goal_yaw=0,2,0,0,0,0
+distance,present_x,present_y,present_yaw,goal_yaw=0,0,0,0,0
+distance=2
 
 def perceive(data):
     global present_x,present_y,present_yaw,goal_yaw
@@ -36,21 +31,20 @@ def perceive(data):
 
 
 def scan_result(data):
-    global distance,where_is_wall
+    global distance
 
     scan_score=[i for i in data.ranges if not math.isnan(i)]
 
     Scan_score=scan_score[:45]+scan_score[315:]
 
     distance=min(Scan_score)
-    where_is_wall=Scan_score.index(distance)
 
 
 def straight_to_goal():
     global present_yaw,goal_yaw,present_x,present_y,command,status
 
     if math.sqrt((goal_x-present_x)**2+(goal_y-present_y)**2)>=0.5:
-        cmd.linear.x =0.1
+        cmd.linear.x =0.2
     else:
         cmd.linear.x = 0
         status=4
@@ -67,16 +61,13 @@ def turn():
     rate.sleep()
 
 def go_straight():
-    cmd.linear.x=0.1
+    cmd.linear.x=0.2
     command.publish(cmd)
     rate.sleep()
 
-def change_direction(x=0):
+def change_direction():
     """反時計回り"""
-    if x==0:
-        cmd.angular.z=0.2
-    else:
-        cmd.angular.z = -0.2
+    cmd.angular.z=0.2
     command.publish(cmd)
     rate.sleep()
 
@@ -89,36 +80,27 @@ def stop():
 if __name__ == '__main__':
     rospy.init_node('test')
 
-    # goal_x = int(input('What is the x of target?>>>>'))
-    # goal_y = int(input('What is the y of target?>>>>'))
-    goal_x=50
-    goal_y=0
+    goal_x = int(input('What is the x of target?>>>>'))
+    goal_y = int(input('What is the y of target?>>>>'))
 
     rate=rospy.Rate(100)
     cmd=Twist()
     scan=LaserScan()
+    scan.range_max=10
 
     rospy.Subscriber('/odom',Odometry,perceive)
     rospy.Subscriber('/scan',LaserScan,scan_result)
     command=rospy.Publisher('cmd_vel',Twist,queue_size=1)
     status=0
-    status1_iteration=0
-    status2_iteration=0
-
+    phase1_iteration=0
     while not rospy.is_shutdown():
         print("status:%s"%(status))
 #障害物がないときに目標地点にまっすぐ移動する。
         if status==0:
-
-            status2_iteration=0
-
-            if distance<=0.6:
-                target_where_is_wall=where_is_wall
+            if distance<=1:
                 stop()
-                if (LEFT_EDGE[0]<=target_where_is_wall<=LEFT_EDGE[1] or RIGHT_EDGE[0]<=target_where_is_wall<=RIGHT_EDGE[1]):
-                    status=3
-                else:
-                    status=1
+                status+=1
+                target_where_is_wall=where_is_wall
                 continue
             straight_to_goal()
             turn()
@@ -126,13 +108,12 @@ if __name__ == '__main__':
 
 #壁に面したときの方向転換
         elif status==1:
-            status1_iteration+=1
-
-            if status1_iteration==1:
-                if 0<=target_where_is_wall<=44:
+            phase1_iteration+=1
+            if phase1_iteration==1:
+                if 0<=target_where_is_wall<=90:
                     ideal_direction=present_yaw+math.radians(90+target_where_is_wall)
                 else:
-                    ideal_direction=present_yaw+math.radians(target_where_is_wall)
+                    ideal_direction=present_yaw+math.radians(target_where_is_wall-270)
 
                 if ideal_direction > math.pi:
                     ideal_direction=-2*math.pi+ideal_direction
@@ -146,34 +127,15 @@ if __name__ == '__main__':
                 if 0<(present_yaw-ideal_direction)<=1/360*math.pi:
                     print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
                     stop()
-                    status1_iteration=0
+                    phase1_iteration=0
                     status+=1
         elif status==2:
             go_straight()
-            print('GO STRAIGHT!!')
-            status2_iteration+=1
-            if status2_iteration==1:
-                print('C')
-                t1=time.time()
-
-            if distance>LIMIT_RANGE:
-                print('B')
-                t2=time.time()
-                if t2-t1>10:
-                    print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
-                    stop()
-                    status=0
-
-            elif distance<=0.7 and (0<=where_is_wall<=5 or 85<=where_is_wall<=89):
-                print('A')
+            if right_distance>1:
                 stop()
-                status=1
-
-        # 最小距離が測れないとき
-        elif status == 3:
-            change_direction(1)
-            if where_is_wall>=50:
-                target_where_is_wall=where_is_wall
+                status=0
+            elif distance<=0.7:
+                stop()
                 status=1
         else:
             break
