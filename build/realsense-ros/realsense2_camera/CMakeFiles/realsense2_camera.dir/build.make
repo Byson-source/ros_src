@@ -109,7 +109,7 @@ realsense2_camera_EXTERNAL_OBJECTS =
 /home/ayumi/catkin_ws/devel/lib/librealsense2_camera.so: realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera.dir/src/base_realsense_node.cpp.o
 /home/ayumi/catkin_ws/devel/lib/librealsense2_camera.so: realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera.dir/src/t265_realsense_node.cpp.o
 /home/ayumi/catkin_ws/devel/lib/librealsense2_camera.so: realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera.dir/build.make
-/home/ayumi/catkin_ws/devel/lib/librealsense2_camera.so: /usr/lib/x86_64-linux-gnu/librealsense2.so.2.47.0
+/home/ayumi/catkin_ws/devel/lib/librealsense2_camera.so: /usr/lib/x86_64-linux-gnu/librealsense2.so.2.48.0
 /home/ayumi/catkin_ws/devel/lib/librealsense2_camera.so: /opt/ros/noetic/lib/libnodeletlib.so
 /home/ayumi/catkin_ws/devel/lib/librealsense2_camera.so: /opt/ros/noetic/lib/libbondcpp.so
 /home/ayumi/catkin_ws/devel/lib/librealsense2_camera.so: /usr/lib/x86_64-linux-gnu/libuuid.so
