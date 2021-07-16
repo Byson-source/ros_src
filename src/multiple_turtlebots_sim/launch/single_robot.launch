@@ -3,5 +3,10 @@
     <arg name="init_pose"/>
     
     <node pkg="gazebo_ros" type="spawn_model" name="spawn_minibot_model"
-          args
+          args="$(arg init_pose) -urdf -param /robot_description -model $(arg robot_name)"
+          respawn="false" output="screen"/>
+
+    <node pkg="robot_state_publisher" type="state_publisher"
+          name="robot_state_publisher" output="screen"/>
+
 </launch>
