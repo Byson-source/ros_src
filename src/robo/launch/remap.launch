@@ -1,0 +1,5 @@
+<launch>
+    <remap from="chatter" to="A"/>
+    <node pkg="robo" type="talker.py" name="talker"/>
+    <node pkg="robo" type="listener.py" name="listener"/>
+</launch>

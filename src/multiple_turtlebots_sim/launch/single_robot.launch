@@ -1,0 +1,7 @@
+<launch>
+    <arg name="robot_name"/>
+    <arg name="init_pose"/>
+    
+    <node pkg="gazebo_ros" type="spawn_model" name="spawn_minibot_model"
+          args
+</launch>

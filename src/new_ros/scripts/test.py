@@ -1,3 +1,4 @@
+import sys
 import rospy
 import math
 import tf
@@ -14,7 +15,7 @@ def stop(data):
     rate.sleep()
 
 def go_straight():
-    cmd.linear.x=0.5
+    cmd.linear.x=speed
     command.publish(cmd)
     rate.sleep()
 
@@ -36,8 +37,9 @@ if __name__ == '__main__':
     rospy.init_node('test')
     rate = rospy.Rate(10)
     cmd = Twist()
-    scan = LaserScan()
 
+    speed=float(rospy.myargv(argv=sys.argv)[1])
+    scan = LaserScan()
     rospy.Subscriber('/scan', LaserScan, scan_result)
     command = rospy.Publisher('cmd_vel', Twist, queue_size=1)
     while True:

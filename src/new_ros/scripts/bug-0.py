@@ -5,6 +5,7 @@ TO DO LIST
 """
 
 import rospy
+import sys
 import math
 import tf
 import time
@@ -51,6 +52,7 @@ def straight_to_goal():
 
     if math.sqrt((goal_x-present_x)**2+(goal_y-present_y)**2)>=0.5:
         cmd.linear.x =0.1
+        print(cmd.linear.x)
     else:
         cmd.linear.x = 0
         status=4
