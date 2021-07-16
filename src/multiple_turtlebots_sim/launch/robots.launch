@@ -1,6 +1,5 @@
 <launch>
-    <param name="robot_description"
-           command="$(find xacro)/xacro.py $(find turtlebot_description)/robots/kobuki_hexagons_asus_xtion_pro.urdf.xacro"/>
+    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_waffle.urdf.xacro" />
     <group ns="robot1">
         <param name="tf_prefix" value="robot1_tf"/>
         <include file="$(find multiple_turtlebots_sim)/launch/single_robot.launch">
