@@ -1,0 +1,8 @@
+prefix=/home/ayumi/catkin_ws/install
+
+Name: pi_robot_pkg
+Description: Description of pi_robot_pkg
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

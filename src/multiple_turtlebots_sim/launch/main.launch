@@ -1,8 +1,28 @@
 <launch>
     <param name="/use_sim_time" value="true"/>
 
-    <node name="gazebo" pkg="gazebo_ros" type="gazebo"
-          args="~/catkin_ws/src/turtlebot3_simulations/turtlebot3_gazebo/worlds/turtlebot3_house.world"
-          respawn="false" output="screen"/>
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/turtlebot3_house.world"/>
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="true"/>
+        <arg name="headless" value="false"/>
+        <arg name="debug" value="false"/>
+    </include>
     <include file="$(find multiple_turtlebots_sim)/launch/robots.launch"/>
+
+    <group ns="robot1">
+        <include file="$(find turtlebot3_slam)/launch/turtlebot3_gmapping.launch"/>
+    </group>
+    <group ns="robot2">
+        <include file="$(find turtlebot3_slam)/launch/turtlebot3_gmapping.launch"/>
+    </group>
+    <group ns="robot3">
+        <include file="$(find turtlebot3_slam)/launch/turtlebot3_gmapping.launch"/>
+    </group>
+
+    <!---rviz-->
+    <node pkg="rviz" type="rviz" name="rviz" required="true"
+          args="-d $(find multi_robots_nav)/rviz/turtlebots_rrt_exploration.rviz"/>
+
 </launch>
