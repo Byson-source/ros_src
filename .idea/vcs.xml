@@ -5,11 +5,13 @@
     <mapping directory="$PROJECT_DIR$/src/basicros" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/basicros/ros_practice" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/depthimage_to_laserscan" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/joystick_drivers" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/realsense-ros" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/robo/script" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/ros_course_part2" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/rtabmap_ros" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/slam_gmapping" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/teleop_twist_joy" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/turtlebot3" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/turtlebot3_msgs" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/turtlebot3_simulations" vcs="Git" />

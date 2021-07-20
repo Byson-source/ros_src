@@ -10,7 +10,6 @@
       <param name="autorepeat_rate" value="20" />
     </node>
   </group>
-    <node pkg="pathplanning" type="transmitter.py" name="OperationCOM"/>
-  <include file="$(find clover_driver)/launch/ayumi_clover_driver.launch"/>
+    <node pkg="realtime_slam" type="transmitter.py" name="OperationCOM"/>
 </launch>
 

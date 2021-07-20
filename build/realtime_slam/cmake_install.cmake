@@ -52,3 +52,7 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/realtime_slam" TYPE FILE FILES "/home/ayumi/catkin_ws/src/realtime_slam/package.xml")
 endif()
 
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/realtime_slam" TYPE PROGRAM FILES "/home/ayumi/catkin_ws/build/realtime_slam/catkin_generated/installspace/transmitter.py")
+endif()
+

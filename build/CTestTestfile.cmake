@@ -5,6 +5,7 @@
 # This file includes the relevant testing commands required for 
 # testing this directory and lists subdirectories to be tested as well.
 subdirs("gtest")
+subdirs("joystick_drivers/joystick_drivers")
 subdirs("realsense-ros/realsense2_description")
 subdirs("slam_gmapping/slam_gmapping")
 subdirs("turtlebot3/turtlebot3")
@@ -21,6 +22,8 @@ subdirs("realtime_slam")
 subdirs("robo")
 subdirs("actionlib_tutorial")
 subdirs("depthimage_to_laserscan")
+subdirs("joystick_drivers/joy")
+subdirs("teleop_twist_joy")
 subdirs("slam_gmapping/gmapping")
 subdirs("realsense-ros/realsense2_camera")
 subdirs("ros_course_part2")

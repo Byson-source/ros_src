@@ -489,3 +489,17 @@ make[1]: ディレクトリ '/home/ayumi/catkin_ws/build/CMakeFiles/CMakeTmp' �
 
 
 
+Determining if files linux/joystick.h exist passed with the following output:
+Change Dir: /home/ayumi/catkin_ws/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_2096c/fast && /usr/bin/make -f CMakeFiles/cmTC_2096c.dir/build.make CMakeFiles/cmTC_2096c.dir/build
+make[1]: ディレクトリ '/home/ayumi/catkin_ws/build/CMakeFiles/CMakeTmp' に入ります
+Building C object CMakeFiles/cmTC_2096c.dir/HAVE_LINUX_JOYSTICK_H.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_2096c.dir/HAVE_LINUX_JOYSTICK_H.c.o   -c /home/ayumi/catkin_ws/build/CMakeFiles/CheckIncludeFiles/HAVE_LINUX_JOYSTICK_H.c
+Linking C executable cmTC_2096c
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2096c.dir/link.txt --verbose=1
+/usr/bin/cc      CMakeFiles/cmTC_2096c.dir/HAVE_LINUX_JOYSTICK_H.c.o  -o cmTC_2096c 
+make[1]: ディレクトリ '/home/ayumi/catkin_ws/build/CMakeFiles/CMakeTmp' から出ます
+
+
+
