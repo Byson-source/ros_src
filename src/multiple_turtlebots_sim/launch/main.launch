@@ -9,17 +9,18 @@
         <arg name="headless" value="false"/>
         <arg name="debug" value="false"/>
     </include>
+
     <include file="$(find multiple_turtlebots_sim)/launch/robots.launch"/>
 
-    <group ns="robot1">
-        <include file="$(find turtlebot3_slam)/launch/turtlebot3_gmapping.launch"/>
-    </group>
-    <group ns="robot2">
-        <include file="$(find turtlebot3_slam)/launch/turtlebot3_gmapping.launch"/>
-    </group>
-    <group ns="robot3">
-        <include file="$(find turtlebot3_slam)/launch/turtlebot3_gmapping.launch"/>
-    </group>
+    <include file="$(find multiple_turtlebots_sim)/launch/gmapping_robot1.launch"/>
+
+    <include file="$(find multiple_turtlebots_sim)/launch/gmapping_robot2.launch"/>
+
+    <include file="$(find multiple_turtlebots_sim)/launch/gmapping_robot3.launch"/>
+
+ <!---  Merge of maps -->
+    <!---<include file="$(find multiple_turtlebots_sim)/launch/map_merge.launch"/>-->
+
 
     <!---rviz-->
     <node pkg="rviz" type="rviz" name="rviz" required="true"
