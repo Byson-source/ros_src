@@ -2,7 +2,7 @@
 import rospy
 from sensor_msgs.msg import Joy
 from geometry_msgs.msg import Twist
-axes,buttons=[0,0],[0,0]
+axes,buttons=[0,0,0,0,0,0],[0,0,0,0,0,0,0,0]
 def perceive(data):
     global axes,buttons
     axes=data.axes
@@ -11,7 +11,8 @@ def perceive(data):
 
 def transmit():
     global axes,buttons
-    if buttons[0]==1:
+#When you push □
+    if buttons[3]==1:
         if axes[-1]==1.0:
             cmd.linear.x=0.5
         elif axes[-1]==-1.0:
@@ -23,7 +24,8 @@ def transmit():
         else:
             cmd.linear.x = 0
             cmd.angular.z = 0
-    elif buttons[1]==1:
+#When you push X
+    elif buttons[0]==1:
         if axes[-1]==1.0:
             cmd.linear.x=1.5
         elif axes[-1]==-1.0:

@@ -12,18 +12,18 @@
 
     <include file="$(find multiple_turtlebots_sim)/launch/robots.launch"/>
 
-    <include file="$(find multiple_turtlebots_sim)/launch/gmapping_robot1.launch"/>
+    <!--<include file="$(find multiple_turtlebots_sim)/launch/gmapping_robot1.launch"/>
 
     <include file="$(find multiple_turtlebots_sim)/launch/gmapping_robot2.launch"/>
 
-    <include file="$(find multiple_turtlebots_sim)/launch/gmapping_robot3.launch"/>
+    <include file="$(find multiple_turtlebots_sim)/launch/gmapping_robot3.launch"/>-->
 
  <!---  Merge of maps -->
     <!---<include file="$(find multiple_turtlebots_sim)/launch/map_merge.launch"/>-->
 
 
     <!---rviz-->
-    <node pkg="rviz" type="rviz" name="rviz" required="true"
-          args="-d $(find multi_robots_nav)/rviz/turtlebots_rrt_exploration.rviz"/>
+    <!--<node pkg="rviz" type="rviz" name="rviz" required="true"
+          args="-d $(find multi_robots_nav)/rviz/turtlebots_rrt_exploration.rviz"/>-->
 
 </launch>

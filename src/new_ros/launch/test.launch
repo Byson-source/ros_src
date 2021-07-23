@@ -1,4 +1,8 @@
 <launch>
-    <arg name="speed"/>
-    <node pkg="new_ros" name="a" type="test.py" args="$(arg speed)"/>
+    <node pkg="new_ros" type="framea_frameb.py" name="converter"/>
+    <node pkg="tf" type="tf_remap" name="tf_remapper" output="screen">
+        <rosparam param="mappings">
+            [{old: frame_a, new: /camera_rgb_optical_frame},{old: frame_b, new: /camera_optris_frame}]
+        </rosparam>
+    </node>
 </launch>
