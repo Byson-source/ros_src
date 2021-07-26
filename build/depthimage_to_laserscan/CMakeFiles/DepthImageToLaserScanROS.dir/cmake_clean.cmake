@@ -2,6 +2,7 @@ file(REMOVE_RECURSE
   "/home/ayumi/catkin_ws/devel/lib/libDepthImageToLaserScanROS.pdb"
   "/home/ayumi/catkin_ws/devel/lib/libDepthImageToLaserScanROS.so"
   "CMakeFiles/DepthImageToLaserScanROS.dir/src/DepthImageToLaserScanROS.cpp.o"
+  "CMakeFiles/DepthImageToLaserScanROS.dir/src/DepthImageToLaserScanROS.cpp.o.d"
 )
 
 # Per-language clean rules from dependency scanning.

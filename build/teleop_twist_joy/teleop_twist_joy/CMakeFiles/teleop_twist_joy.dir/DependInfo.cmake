@@ -1,26 +1,14 @@
+
+# Consider dependencies only in project.
+set(CMAKE_DEPENDS_IN_PROJECT_ONLY OFF)
+
 # The set of languages for which implicit dependencies are needed:
 set(CMAKE_DEPENDS_LANGUAGES
-  "CXX"
-  )
-# The set of files for implicit dependencies of each language:
-set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/ayumi/catkin_ws/src/teleop_twist_joy/teleop_twist_joy/src/teleop_twist_joy.cpp" "/home/ayumi/catkin_ws/build/teleop_twist_joy/teleop_twist_joy/CMakeFiles/teleop_twist_joy.dir/src/teleop_twist_joy.cpp.o"
-  )
-set(CMAKE_CXX_COMPILER_ID "GNU")
-
-# Preprocessor definitions for this target.
-set(CMAKE_TARGET_DEFINITIONS_CXX
-  "ROSCONSOLE_BACKEND_LOG4CXX"
-  "ROS_BUILD_SHARED_LIBS=1"
-  "ROS_PACKAGE_NAME=\"teleop_twist_joy\""
-  "teleop_twist_joy_EXPORTS"
   )
 
-# The include file search paths:
-set(CMAKE_CXX_TARGET_INCLUDE_PATH
-  "/home/ayumi/catkin_ws/src/teleop_twist_joy/teleop_twist_joy/include"
-  "/opt/ros/noetic/include"
-  "/opt/ros/noetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp"
+# The set of dependency files which are needed:
+set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/ayumi/catkin_ws/src/teleop_twist_joy/teleop_twist_joy/src/teleop_twist_joy.cpp" "teleop_twist_joy/teleop_twist_joy/CMakeFiles/teleop_twist_joy.dir/src/teleop_twist_joy.cpp.o" "gcc" "teleop_twist_joy/teleop_twist_joy/CMakeFiles/teleop_twist_joy.dir/src/teleop_twist_joy.cpp.o.d"
   )
 
 # Targets to which this target links.

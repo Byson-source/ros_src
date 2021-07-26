@@ -2,6 +2,7 @@ file(REMOVE_RECURSE
   "/home/ayumi/catkin_ws/devel/lib/teleop_twist_joy/teleop_node"
   "/home/ayumi/catkin_ws/devel/lib/teleop_twist_joy/teleop_node.pdb"
   "CMakeFiles/teleop_twist_joy_node.dir/src/teleop_node.cpp.o"
+  "CMakeFiles/teleop_twist_joy_node.dir/src/teleop_node.cpp.o.d"
 )
 
 # Per-language clean rules from dependency scanning.

@@ -1,0 +1,13 @@
+<launch>
+    <include file="$(find realsense2_camera)/launch/clover_rs_camera.launch">
+        <arg name="camera" value="robot1/camera"/>
+    </include>
+    <group ns="robot1">
+        <include file="$(find rtabmap_ros)/launch/ayumi_rtabmap.launch">
+            <arg name="camera" value="/robot1"/>
+            <arg name="base_link_frame" value="robot1/base_link"/>
+            <arg name="map_frame" value="robot1/map"/>
+            <arg name="odom_frame" value="robot1/odom"/>
+        </include>
+    </group>
+</launch>

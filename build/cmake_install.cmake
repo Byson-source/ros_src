@@ -37,6 +37,11 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
   set(CMAKE_CROSSCOMPILING "FALSE")
 endif()
 
+# Set default install directory permissions.
+if(NOT DEFINED CMAKE_OBJDUMP)
+  set(CMAKE_OBJDUMP "/usr/bin/objdump")
+endif()
+
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   
       if (NOT EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}")
@@ -56,7 +61,7 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-file(INSTALL DESTINATION "/home/ayumi/catkin_ws/install" TYPE PROGRAM FILES "/home/ayumi/catkin_ws/build/catkin_generated/installspace/_setup_util.py")
+  file(INSTALL DESTINATION "/home/ayumi/catkin_ws/install" TYPE PROGRAM FILES "/home/ayumi/catkin_ws/build/catkin_generated/installspace/_setup_util.py")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
@@ -68,7 +73,7 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-file(INSTALL DESTINATION "/home/ayumi/catkin_ws/install" TYPE PROGRAM FILES "/home/ayumi/catkin_ws/build/catkin_generated/installspace/env.sh")
+  file(INSTALL DESTINATION "/home/ayumi/catkin_ws/install" TYPE PROGRAM FILES "/home/ayumi/catkin_ws/build/catkin_generated/installspace/env.sh")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
@@ -80,7 +85,7 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-file(INSTALL DESTINATION "/home/ayumi/catkin_ws/install" TYPE FILE FILES
+  file(INSTALL DESTINATION "/home/ayumi/catkin_ws/install" TYPE FILE FILES
     "/home/ayumi/catkin_ws/build/catkin_generated/installspace/setup.bash"
     "/home/ayumi/catkin_ws/build/catkin_generated/installspace/local_setup.bash"
     )
@@ -95,7 +100,7 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-file(INSTALL DESTINATION "/home/ayumi/catkin_ws/install" TYPE FILE FILES
+  file(INSTALL DESTINATION "/home/ayumi/catkin_ws/install" TYPE FILE FILES
     "/home/ayumi/catkin_ws/build/catkin_generated/installspace/setup.sh"
     "/home/ayumi/catkin_ws/build/catkin_generated/installspace/local_setup.sh"
     )
@@ -110,7 +115,7 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-file(INSTALL DESTINATION "/home/ayumi/catkin_ws/install" TYPE FILE FILES
+  file(INSTALL DESTINATION "/home/ayumi/catkin_ws/install" TYPE FILE FILES
     "/home/ayumi/catkin_ws/build/catkin_generated/installspace/setup.zsh"
     "/home/ayumi/catkin_ws/build/catkin_generated/installspace/local_setup.zsh"
     )
@@ -125,7 +130,7 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-file(INSTALL DESTINATION "/home/ayumi/catkin_ws/install" TYPE FILE FILES "/home/ayumi/catkin_ws/build/catkin_generated/installspace/.rosinstall")
+  file(INSTALL DESTINATION "/home/ayumi/catkin_ws/install" TYPE FILE FILES "/home/ayumi/catkin_ws/build/catkin_generated/installspace/.rosinstall")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
@@ -144,6 +149,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   include("/home/ayumi/catkin_ws/build/my_mapping_launcher/cmake_install.cmake")
   include("/home/ayumi/catkin_ws/build/new_ros/cmake_install.cmake")
   include("/home/ayumi/catkin_ws/build/oir/cmake_install.cmake")
+  include("/home/ayumi/catkin_ws/build/PointToScan/cmake_install.cmake")
   include("/home/ayumi/catkin_ws/build/realtime_slam/cmake_install.cmake")
   include("/home/ayumi/catkin_ws/build/robo/cmake_install.cmake")
   include("/home/ayumi/catkin_ws/build/actionlib_tutorial/cmake_install.cmake")
@@ -153,6 +159,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   include("/home/ayumi/catkin_ws/build/slam_gmapping/gmapping/cmake_install.cmake")
   include("/home/ayumi/catkin_ws/build/realsense-ros/realsense2_camera/cmake_install.cmake")
   include("/home/ayumi/catkin_ws/build/ros_course_part2/cmake_install.cmake")
+  include("/home/ayumi/catkin_ws/build/pointcloud_to_laserscan-1.4.1/cmake_install.cmake")
   include("/home/ayumi/catkin_ws/build/turtlebot3/turtlebot3_bringup/cmake_install.cmake")
   include("/home/ayumi/catkin_ws/build/turtlebot3/turtlebot3_example/cmake_install.cmake")
   include("/home/ayumi/catkin_ws/build/turtlebot3_simulations/turtlebot3_fake/cmake_install.cmake")

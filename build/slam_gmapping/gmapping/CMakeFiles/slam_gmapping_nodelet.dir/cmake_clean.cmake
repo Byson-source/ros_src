@@ -2,7 +2,9 @@ file(REMOVE_RECURSE
   "/home/ayumi/catkin_ws/devel/lib/libslam_gmapping_nodelet.pdb"
   "/home/ayumi/catkin_ws/devel/lib/libslam_gmapping_nodelet.so"
   "CMakeFiles/slam_gmapping_nodelet.dir/src/nodelet.cpp.o"
+  "CMakeFiles/slam_gmapping_nodelet.dir/src/nodelet.cpp.o.d"
   "CMakeFiles/slam_gmapping_nodelet.dir/src/slam_gmapping.cpp.o"
+  "CMakeFiles/slam_gmapping_nodelet.dir/src/slam_gmapping.cpp.o.d"
 )
 
 # Per-language clean rules from dependency scanning.
