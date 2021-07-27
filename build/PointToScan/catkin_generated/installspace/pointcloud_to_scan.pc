@@ -1,0 +1,8 @@
+prefix=/home/ayumi/catkin_ws/install
+
+Name: pointcloud_to_scan
+Description: Description of pointcloud_to_scan
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
