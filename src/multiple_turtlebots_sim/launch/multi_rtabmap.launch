@@ -1,0 +1,4 @@
+<launch>
+    <include file="$(find multiple_turtlebots_sim)/launch/demo.launch"/>
+
+</launch>
