@@ -18,16 +18,16 @@ for_topic="/robot1"-->
   <arg name="color_topic"             default="$(arg for_topic)/camera/rgb/image_raw"/>
   <arg name="depth_topic"             default="$(arg for_topic)/camera/depth/image_raw"/>
   <arg name="camera_info_topic"       default="$(arg for_topic)/camera/rgb/camera_info"/>
-  <arg name="odom_topic"              default="$(arg for_topic)/visual_odometry"/> <!-- when using only VO -->
+  <arg name="odom_topic"              default="$(arg for_topic)/odom"/> <!-- when using only VO -->
 
   <arg name="map_frame"               default="$(arg for_frame)map"/>
-  <arg name="frame_id"                default="$(arg for_frame)base_link"/> <!-- base/rover's frame -->
+  <arg name="frame_id"                default="$(arg for_frame)base_footprint"/> <!-- base/rover's frame -->
 
   <arg name="with_camera" default="true"/>
   <arg name="localization" default="false"/>
   <arg name="database_path" default="~/.ros/rtabmap.db"/>
   <arg     if="$(arg localization)" name="rtabmap_args" default=""/>
-  <arg unless="$(arg localization)" name="rtabmap_args" default="-d"/>
+  <arg unless="$(arg localization)" name="rtabmap_args" default="--delete_db_on_start"/>
 
   <!-- Turtlebot3 -->
   <include file="$(find turtlebot3_bringup)/launch/turtlebot3_remote.launch">
@@ -36,73 +36,14 @@ for_topic="/robot1"-->
   </include>
 
   <group ns="rtabmap">
-    <node if="$(eval model=='waffle')" pkg="rtabmap_ros" type="rgbd_sync" name="rgbd_sync" output="screen">
-      <remap from="rgb/image"         to="$(arg color_topic)"/>
-      <remap from="depth/image"       to="$(arg depth_topic)"/>
-      <remap from="rgb/camera_info"   to="$(arg camera_info_topic)"/>
-    </node>
-
-    <!-- RGB-D Odometry -->
-    <node  name="rgbd_odometry" pkg="rtabmap_ros" type="rgbd_odometry" output="screen" args="$(arg rtabmap_args)">
-
-        <remap from="rgb/image"         to="$(arg color_topic)"/>
-        <remap from="depth/image"       to="$(arg depth_topic)"/>
-        <remap from="rgb/camera_info"   to="$(arg camera_info_topic)"/>
-        <remap from="rgbd_image"        to="$(arg for_topic)/rgbd_image"/>
-        <remap from="odom"              to="$(arg for_topic)/visual_odometry"/> <!-- VO output topic -->
-
-        <param name="frame_id"                      type="string"   value="$(arg frame_id)"/>
-        <param name="odom_frame_id"                 type="string"   value="$(arg odom_frame)"/> <!-- VO frame -->
-        <param name="ground_truth_base_frame_id"    type="string"   value=""/>
-        <param name="wait_for_transform_duration"   type="double"   value="0.25"/>
-        <param name="approx_sync"                   type="bool"     value="false"/>
-        <param name="queue_size"                    type="int"      value="10"/>
-        <param name="subscribe_rgbd"                type="bool"     value="true"/>
-        <param name="guess_min_translation"         type="double"   value="0"/>
-        <param name="guess_min_rotation"            type="double"   value="0"/>
-
-
-        <!-- RTABMAP RGBD Odometry parameters -->
-        <param name="Odom/Strategy"                 type="string"   value="1"/>     <!-- def:0(F2M) -->
-        <param name="Odom/ResetCountdown"           type="string"   value="1"/>     <!-- def:0 -->
-        <param name="Odom/GuessSmoothingDelay"      type="string"   value="0.00"/>  <!-- def:0.00 -->
-        <param name="Odom/VisKeyFrameThr"           type="string"   value="150"/>   <!-- def:150 -->
-        <param name="Odom/KeyFrameThr"              type="string"   value="0.3"/>   <!-- def:0.3 -->
-        <!--param name="Odom/Holonomic"                type="string"   value="true"/-->
-        <param name="Vis/CorType"                   type="string"   value="0"/>     <!-- def:0(Features Matching) -->
-        <param name="OdomF2M/Maxsize"               type="string"   value="1000"/>  <!-- def:2000 -->
-
-        <!-- Visual Features Registration parameters -->
-        <param name="Vis/EstimationType"            type="string"   value="1"/>     <!-- def:1(3D->2D PnP) -->
-        <param name="Vis/MinInliers"                type="string"   value="20"/>    <!-- def:20 -->
-        <param name="Vis/Iterations"                type="string"   value="300"/>   <!-- def:300 -->
-        <param name="Vis/BundleAdjustment"          type="string"   value="0"/>     <!-- def:1 (g2o) -->
-
-        <!-- Visual Features Matching parameters -->
-        <param name="Vis/CorNNType"                 type="string"   value="1"/>     <!-- def:1(FLANN KdTree) -->
-        <param name="Vis/CorNNDR"                   type="string"   value="0.8"/>   <!-- def:0.8 -->
-        <param name="Vis/CorGuessWinSize"           type="string"   value="20"/>    <!-- def:20 -->
-
-        <!-- Motion Estimation: 3D to 2D (PnP) parameters -->
-        <param name="Vis/PnPReprojError"            type="string"   value="2.0"/>   <!-- def:2.0 -->
-
-        <!-- Visual Features Extraction parameters -->
-        <param name="Vis/FeatureType"               type="string"   value="8"/>     <!-- def:8(GFTT+ORB) -->
-        <param name="Vis/MaxFeatures"               type="string"   value="600"/>   <!-- def:1000 -->
-        <param name="Vis/MaxDepth"                  type="string"   value="0"/>     <!-- def:0 -->
-        <param name="Vis/MinDepth"                  type="string"   value="0"/>     <!-- def:0 -->
-        <param name="Vis/DepthAsMask"               type="string"   value="true"/>  <!-- def:true -->
-        <param name="Vis/RoiRatios"                 type="string"   value="0.0 0.0 0.0 0.0"/>
-        <param name="Vis/GridRows"                  type="string"   value="1"/>     <!-- def:1 -->
-        <param name="Vis/GridCols"                  type="string"   value="1"/>     <!-- def:1 -->
-    </node>
-
-
+      <node if="$(eval model=='waffle')" pkg="rtabmap_ros" type="rgbd_sync" name="rgbd_sync" output="screen">
+          <remap from="rgb/image"         to="/camera/rgb/image_raw"/>
+          <remap from="depth/image"       to="/camera/depth/image_raw"/>
+          <remap from="rgb/camera_info"   to="/camera/rgb/camera_info"/>
+      </node>
     <node name="rtabmap" pkg="rtabmap_ros" type="rtabmap" output="screen" args="$(arg rtabmap_args)">
       <param name="map_frame_id"         type="string" value="$(arg map_frame)"/>
       <param name="frame_id"            type="string" value="$(arg frame_id)"/>
-
-      <remap from="rgbd_image"        to="$(arg for_topic)/rgbd_image"/>
       <remap from="odom"              to="$(arg odom_topic)"/> <!-- Odom input topic -->
 
       <param name="database_path"       type="string" value="$(arg database_path)"/>
@@ -121,7 +62,6 @@ for_topic="/robot1"-->
 
       <!-- inputs -->
       <remap from="scan"            to="$(arg for_topic)/scan"/>
-      <remap from="rgbd_image"       to="$(arg for_topic)/rgbd_image"/>
 
       <!-- output -->
       <remap from="grid_map" to="$(arg for_topic)/map"/>
@@ -132,7 +72,7 @@ for_topic="/robot1"-->
       <param name="GridGlobal/MinSize"           type="string" value="20"/>
 
       <!-- localization mode -->
-      <param     if="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="false"/>
+      <param     if="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="true"/>
       <param unless="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="true"/>
     </node>
 
@@ -149,7 +89,7 @@ for_topic="/robot1"-->
   </group>
 
   <!-- rviz -->
-  <!--<group if="$(arg open_rviz)">
+  <group if="$(arg open_rviz)">
     <node pkg="rviz" type="rviz" name="rviz" required="true"/>
-  </group>-->
+  </group>
 </launch>
