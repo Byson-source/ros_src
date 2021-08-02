@@ -8,6 +8,8 @@
     <mapping directory="$PROJECT_DIR$/src/depthimage_to_laserscan" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/joystick_drivers" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/joystick_subdrivers" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/map-merge" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/perception_pcl" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/pointcloud_to_laserscan" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/realsense-ros" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/robo/script" vcs="Git" />

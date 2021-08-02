@@ -298,7 +298,7 @@ _catkin_empty_exported_target: cmake_check_build_system
 
 # fast build rule for target.
 _catkin_empty_exported_target/fast:
-	$(MAKE) $(MAKESILENT) -f teleop_twist_joy/joystick_drivers/CMakeFiles/_catkin_empty_exported_target.dir/build.make teleop_twist_joy/joystick_drivers/CMakeFiles/_catkin_empty_exported_target.dir/build
+	$(MAKE) $(MAKESILENT) -f custom_rviz_config/CMakeFiles/_catkin_empty_exported_target.dir/build.make custom_rviz_config/CMakeFiles/_catkin_empty_exported_target.dir/build
 .PHONY : _catkin_empty_exported_target/fast
 
 #=============================================================================
@@ -3136,43 +3136,121 @@ run_tests_gmapping_rostest_test_basic_localization_stage_replay2.launch/fast:
 .PHONY : run_tests_gmapping_rostest_test_basic_localization_stage_replay2.launch/fast
 
 #=============================================================================
-# Target rules for targets named realsense2_camera_gencpp
+# Target rules for targets named _run_tests_map_merge_3d_roslaunch-check_launch
 
 # Build rule for target.
-realsense2_camera_gencpp: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 realsense2_camera_gencpp
-.PHONY : realsense2_camera_gencpp
+_run_tests_map_merge_3d_roslaunch-check_launch: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _run_tests_map_merge_3d_roslaunch-check_launch
+.PHONY : _run_tests_map_merge_3d_roslaunch-check_launch
 
 # fast build rule for target.
-realsense2_camera_gencpp/fast:
-	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_gencpp.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_gencpp.dir/build
-.PHONY : realsense2_camera_gencpp/fast
+_run_tests_map_merge_3d_roslaunch-check_launch/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_roslaunch-check_launch.dir/build.make map-merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_roslaunch-check_launch.dir/build
+.PHONY : _run_tests_map_merge_3d_roslaunch-check_launch/fast
 
 #=============================================================================
-# Target rules for targets named std_srvs_generate_messages_eus
+# Target rules for targets named run_tests_map_merge_3d_roslaunch-check_launch
 
 # Build rule for target.
-std_srvs_generate_messages_eus: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 std_srvs_generate_messages_eus
-.PHONY : std_srvs_generate_messages_eus
+run_tests_map_merge_3d_roslaunch-check_launch: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 run_tests_map_merge_3d_roslaunch-check_launch
+.PHONY : run_tests_map_merge_3d_roslaunch-check_launch
 
 # fast build rule for target.
-std_srvs_generate_messages_eus/fast:
-	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/std_srvs_generate_messages_eus.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/std_srvs_generate_messages_eus.dir/build
-.PHONY : std_srvs_generate_messages_eus/fast
+run_tests_map_merge_3d_roslaunch-check_launch/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_roslaunch-check_launch.dir/build.make map-merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_roslaunch-check_launch.dir/build
+.PHONY : run_tests_map_merge_3d_roslaunch-check_launch/fast
 
 #=============================================================================
-# Target rules for targets named realsense2_camera_generate_messages
+# Target rules for targets named _run_tests_map_merge_3d_roslaunch-check
 
 # Build rule for target.
-realsense2_camera_generate_messages: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 realsense2_camera_generate_messages
-.PHONY : realsense2_camera_generate_messages
+_run_tests_map_merge_3d_roslaunch-check: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _run_tests_map_merge_3d_roslaunch-check
+.PHONY : _run_tests_map_merge_3d_roslaunch-check
 
 # fast build rule for target.
-realsense2_camera_generate_messages/fast:
-	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages.dir/build
-.PHONY : realsense2_camera_generate_messages/fast
+_run_tests_map_merge_3d_roslaunch-check/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_roslaunch-check.dir/build.make map-merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_roslaunch-check.dir/build
+.PHONY : _run_tests_map_merge_3d_roslaunch-check/fast
+
+#=============================================================================
+# Target rules for targets named run_tests_map_merge_3d_roslaunch-check
+
+# Build rule for target.
+run_tests_map_merge_3d_roslaunch-check: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 run_tests_map_merge_3d_roslaunch-check
+.PHONY : run_tests_map_merge_3d_roslaunch-check
+
+# fast build rule for target.
+run_tests_map_merge_3d_roslaunch-check/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_roslaunch-check.dir/build.make map-merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_roslaunch-check.dir/build
+.PHONY : run_tests_map_merge_3d_roslaunch-check/fast
+
+#=============================================================================
+# Target rules for targets named clean_test_results_map_merge_3d
+
+# Build rule for target.
+clean_test_results_map_merge_3d: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 clean_test_results_map_merge_3d
+.PHONY : clean_test_results_map_merge_3d
+
+# fast build rule for target.
+clean_test_results_map_merge_3d/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/clean_test_results_map_merge_3d.dir/build.make map-merge/map_merge_3d/CMakeFiles/clean_test_results_map_merge_3d.dir/build
+.PHONY : clean_test_results_map_merge_3d/fast
+
+#=============================================================================
+# Target rules for targets named _run_tests_map_merge_3d_gtest_test_map_merging
+
+# Build rule for target.
+_run_tests_map_merge_3d_gtest_test_map_merging: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _run_tests_map_merge_3d_gtest_test_map_merging
+.PHONY : _run_tests_map_merge_3d_gtest_test_map_merging
+
+# fast build rule for target.
+_run_tests_map_merge_3d_gtest_test_map_merging/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_gtest_test_map_merging.dir/build.make map-merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_gtest_test_map_merging.dir/build
+.PHONY : _run_tests_map_merge_3d_gtest_test_map_merging/fast
+
+#=============================================================================
+# Target rules for targets named _run_tests_map_merge_3d_gtest
+
+# Build rule for target.
+_run_tests_map_merge_3d_gtest: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _run_tests_map_merge_3d_gtest
+.PHONY : _run_tests_map_merge_3d_gtest
+
+# fast build rule for target.
+_run_tests_map_merge_3d_gtest/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_gtest.dir/build.make map-merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_gtest.dir/build
+.PHONY : _run_tests_map_merge_3d_gtest/fast
+
+#=============================================================================
+# Target rules for targets named pcl_msgs_generate_messages_lisp
+
+# Build rule for target.
+pcl_msgs_generate_messages_lisp: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 pcl_msgs_generate_messages_lisp
+.PHONY : pcl_msgs_generate_messages_lisp
+
+# fast build rule for target.
+pcl_msgs_generate_messages_lisp/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_lisp.dir/build.make map-merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_lisp.dir/build
+.PHONY : pcl_msgs_generate_messages_lisp/fast
+
+#=============================================================================
+# Target rules for targets named map_merge_node
+
+# Build rule for target.
+map_merge_node: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 map_merge_node
+.PHONY : map_merge_node
+
+# fast build rule for target.
+map_merge_node/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/map_merge_node.dir/build.make map-merge/map_merge_3d/CMakeFiles/map_merge_node.dir/build
+.PHONY : map_merge_node/fast
 
 #=============================================================================
 # Target rules for targets named std_srvs_generate_messages_cpp
@@ -3184,47 +3262,73 @@ std_srvs_generate_messages_cpp: cmake_check_build_system
 
 # fast build rule for target.
 std_srvs_generate_messages_cpp/fast:
-	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/std_srvs_generate_messages_cpp.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/std_srvs_generate_messages_cpp.dir/build
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_cpp.dir/build.make map-merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_cpp.dir/build
 .PHONY : std_srvs_generate_messages_cpp/fast
 
 #=============================================================================
-# Target rules for targets named _realsense2_camera_generate_messages_check_deps_Extrinsics
+# Target rules for targets named pcl_msgs_generate_messages_py
 
 # Build rule for target.
-_realsense2_camera_generate_messages_check_deps_Extrinsics: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _realsense2_camera_generate_messages_check_deps_Extrinsics
-.PHONY : _realsense2_camera_generate_messages_check_deps_Extrinsics
+pcl_msgs_generate_messages_py: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 pcl_msgs_generate_messages_py
+.PHONY : pcl_msgs_generate_messages_py
 
 # fast build rule for target.
-_realsense2_camera_generate_messages_check_deps_Extrinsics/fast:
-	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/_realsense2_camera_generate_messages_check_deps_Extrinsics.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/_realsense2_camera_generate_messages_check_deps_Extrinsics.dir/build
-.PHONY : _realsense2_camera_generate_messages_check_deps_Extrinsics/fast
+pcl_msgs_generate_messages_py/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_py.dir/build.make map-merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_py.dir/build
+.PHONY : pcl_msgs_generate_messages_py/fast
 
 #=============================================================================
-# Target rules for targets named std_srvs_generate_messages_nodejs
+# Target rules for targets named nodelet_topic_tools_gencfg
 
 # Build rule for target.
-std_srvs_generate_messages_nodejs: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 std_srvs_generate_messages_nodejs
-.PHONY : std_srvs_generate_messages_nodejs
+nodelet_topic_tools_gencfg: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 nodelet_topic_tools_gencfg
+.PHONY : nodelet_topic_tools_gencfg
 
 # fast build rule for target.
-std_srvs_generate_messages_nodejs/fast:
-	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/std_srvs_generate_messages_nodejs.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/std_srvs_generate_messages_nodejs.dir/build
-.PHONY : std_srvs_generate_messages_nodejs/fast
+nodelet_topic_tools_gencfg/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/nodelet_topic_tools_gencfg.dir/build.make map-merge/map_merge_3d/CMakeFiles/nodelet_topic_tools_gencfg.dir/build
+.PHONY : nodelet_topic_tools_gencfg/fast
 
 #=============================================================================
-# Target rules for targets named _realsense2_camera_generate_messages_check_deps_IMUInfo
+# Target rules for targets named run_tests_map_merge_3d
 
 # Build rule for target.
-_realsense2_camera_generate_messages_check_deps_IMUInfo: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _realsense2_camera_generate_messages_check_deps_IMUInfo
-.PHONY : _realsense2_camera_generate_messages_check_deps_IMUInfo
+run_tests_map_merge_3d: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 run_tests_map_merge_3d
+.PHONY : run_tests_map_merge_3d
 
 # fast build rule for target.
-_realsense2_camera_generate_messages_check_deps_IMUInfo/fast:
-	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/_realsense2_camera_generate_messages_check_deps_IMUInfo.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/_realsense2_camera_generate_messages_check_deps_IMUInfo.dir/build
-.PHONY : _realsense2_camera_generate_messages_check_deps_IMUInfo/fast
+run_tests_map_merge_3d/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d.dir/build.make map-merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d.dir/build
+.PHONY : run_tests_map_merge_3d/fast
+
+#=============================================================================
+# Target rules for targets named pcl_msgs_generate_messages_cpp
+
+# Build rule for target.
+pcl_msgs_generate_messages_cpp: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 pcl_msgs_generate_messages_cpp
+.PHONY : pcl_msgs_generate_messages_cpp
+
+# fast build rule for target.
+pcl_msgs_generate_messages_cpp/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_cpp.dir/build.make map-merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_cpp.dir/build
+.PHONY : pcl_msgs_generate_messages_cpp/fast
+
+#=============================================================================
+# Target rules for targets named test_map_merging
+
+# Build rule for target.
+test_map_merging: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_map_merging
+.PHONY : test_map_merging
+
+# fast build rule for target.
+test_map_merging/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/test_map_merging.dir/build.make map-merge/map_merge_3d/CMakeFiles/test_map_merging.dir/build
+.PHONY : test_map_merging/fast
 
 #=============================================================================
 # Target rules for targets named std_srvs_generate_messages_lisp
@@ -3236,86 +3340,60 @@ std_srvs_generate_messages_lisp: cmake_check_build_system
 
 # fast build rule for target.
 std_srvs_generate_messages_lisp/fast:
-	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/std_srvs_generate_messages_lisp.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/std_srvs_generate_messages_lisp.dir/build
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_lisp.dir/build.make map-merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_lisp.dir/build
 .PHONY : std_srvs_generate_messages_lisp/fast
 
 #=============================================================================
-# Target rules for targets named realsense2_camera_generate_messages_py
+# Target rules for targets named pcl_ros_gencfg
 
 # Build rule for target.
-realsense2_camera_generate_messages_py: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 realsense2_camera_generate_messages_py
-.PHONY : realsense2_camera_generate_messages_py
+pcl_ros_gencfg: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 pcl_ros_gencfg
+.PHONY : pcl_ros_gencfg
 
 # fast build rule for target.
-realsense2_camera_generate_messages_py/fast:
-	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages_py.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages_py.dir/build
-.PHONY : realsense2_camera_generate_messages_py/fast
+pcl_ros_gencfg/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/pcl_ros_gencfg.dir/build.make map-merge/map_merge_3d/CMakeFiles/pcl_ros_gencfg.dir/build
+.PHONY : pcl_ros_gencfg/fast
 
 #=============================================================================
-# Target rules for targets named realsense2_camera_generate_messages_cpp
+# Target rules for targets named pcl_msgs_generate_messages_eus
 
 # Build rule for target.
-realsense2_camera_generate_messages_cpp: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 realsense2_camera_generate_messages_cpp
-.PHONY : realsense2_camera_generate_messages_cpp
+pcl_msgs_generate_messages_eus: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 pcl_msgs_generate_messages_eus
+.PHONY : pcl_msgs_generate_messages_eus
 
 # fast build rule for target.
-realsense2_camera_generate_messages_cpp/fast:
-	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages_cpp.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages_cpp.dir/build
-.PHONY : realsense2_camera_generate_messages_cpp/fast
+pcl_msgs_generate_messages_eus/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_eus.dir/build.make map-merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_eus.dir/build
+.PHONY : pcl_msgs_generate_messages_eus/fast
 
 #=============================================================================
-# Target rules for targets named realsense2_camera_generate_messages_eus
+# Target rules for targets named pcl_msgs_generate_messages_nodejs
 
 # Build rule for target.
-realsense2_camera_generate_messages_eus: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 realsense2_camera_generate_messages_eus
-.PHONY : realsense2_camera_generate_messages_eus
+pcl_msgs_generate_messages_nodejs: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 pcl_msgs_generate_messages_nodejs
+.PHONY : pcl_msgs_generate_messages_nodejs
 
 # fast build rule for target.
-realsense2_camera_generate_messages_eus/fast:
-	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages_eus.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages_eus.dir/build
-.PHONY : realsense2_camera_generate_messages_eus/fast
+pcl_msgs_generate_messages_nodejs/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_nodejs.dir/build.make map-merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_nodejs.dir/build
+.PHONY : pcl_msgs_generate_messages_nodejs/fast
 
 #=============================================================================
-# Target rules for targets named realsense2_camera_generate_messages_nodejs
+# Target rules for targets named std_srvs_generate_messages_nodejs
 
 # Build rule for target.
-realsense2_camera_generate_messages_nodejs: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 realsense2_camera_generate_messages_nodejs
-.PHONY : realsense2_camera_generate_messages_nodejs
+std_srvs_generate_messages_nodejs: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 std_srvs_generate_messages_nodejs
+.PHONY : std_srvs_generate_messages_nodejs
 
 # fast build rule for target.
-realsense2_camera_generate_messages_nodejs/fast:
-	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages_nodejs.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages_nodejs.dir/build
-.PHONY : realsense2_camera_generate_messages_nodejs/fast
-
-#=============================================================================
-# Target rules for targets named realsense2_camera_geneus
-
-# Build rule for target.
-realsense2_camera_geneus: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 realsense2_camera_geneus
-.PHONY : realsense2_camera_geneus
-
-# fast build rule for target.
-realsense2_camera_geneus/fast:
-	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_geneus.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_geneus.dir/build
-.PHONY : realsense2_camera_geneus/fast
-
-#=============================================================================
-# Target rules for targets named realsense2_camera_generate_messages_lisp
-
-# Build rule for target.
-realsense2_camera_generate_messages_lisp: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 realsense2_camera_generate_messages_lisp
-.PHONY : realsense2_camera_generate_messages_lisp
-
-# fast build rule for target.
-realsense2_camera_generate_messages_lisp/fast:
-	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages_lisp.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages_lisp.dir/build
-.PHONY : realsense2_camera_generate_messages_lisp/fast
+std_srvs_generate_messages_nodejs/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_nodejs.dir/build.make map-merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_nodejs.dir/build
+.PHONY : std_srvs_generate_messages_nodejs/fast
 
 #=============================================================================
 # Target rules for targets named std_srvs_generate_messages_py
@@ -3327,34 +3405,177 @@ std_srvs_generate_messages_py: cmake_check_build_system
 
 # fast build rule for target.
 std_srvs_generate_messages_py/fast:
-	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/std_srvs_generate_messages_py.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/std_srvs_generate_messages_py.dir/build
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_py.dir/build.make map-merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_py.dir/build
 .PHONY : std_srvs_generate_messages_py/fast
 
 #=============================================================================
-# Target rules for targets named realsense2_camera_genlisp
+# Target rules for targets named topic_tools_generate_messages_cpp
 
 # Build rule for target.
-realsense2_camera_genlisp: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 realsense2_camera_genlisp
-.PHONY : realsense2_camera_genlisp
+topic_tools_generate_messages_cpp: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 topic_tools_generate_messages_cpp
+.PHONY : topic_tools_generate_messages_cpp
 
 # fast build rule for target.
-realsense2_camera_genlisp/fast:
-	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_genlisp.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_genlisp.dir/build
-.PHONY : realsense2_camera_genlisp/fast
+topic_tools_generate_messages_cpp/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_cpp.dir/build.make map-merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_cpp.dir/build
+.PHONY : topic_tools_generate_messages_cpp/fast
 
 #=============================================================================
-# Target rules for targets named realsense2_camera_gennodejs
+# Target rules for targets named _run_tests_map_merge_3d
 
 # Build rule for target.
-realsense2_camera_gennodejs: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 realsense2_camera_gennodejs
-.PHONY : realsense2_camera_gennodejs
+_run_tests_map_merge_3d: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _run_tests_map_merge_3d
+.PHONY : _run_tests_map_merge_3d
 
 # fast build rule for target.
-realsense2_camera_gennodejs/fast:
-	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_gennodejs.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_gennodejs.dir/build
-.PHONY : realsense2_camera_gennodejs/fast
+_run_tests_map_merge_3d/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d.dir/build.make map-merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d.dir/build
+.PHONY : _run_tests_map_merge_3d/fast
+
+#=============================================================================
+# Target rules for targets named topic_tools_generate_messages_eus
+
+# Build rule for target.
+topic_tools_generate_messages_eus: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 topic_tools_generate_messages_eus
+.PHONY : topic_tools_generate_messages_eus
+
+# fast build rule for target.
+topic_tools_generate_messages_eus/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_eus.dir/build.make map-merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_eus.dir/build
+.PHONY : topic_tools_generate_messages_eus/fast
+
+#=============================================================================
+# Target rules for targets named registration_visualisation
+
+# Build rule for target.
+registration_visualisation: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 registration_visualisation
+.PHONY : registration_visualisation
+
+# fast build rule for target.
+registration_visualisation/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/registration_visualisation.dir/build.make map-merge/map_merge_3d/CMakeFiles/registration_visualisation.dir/build
+.PHONY : registration_visualisation/fast
+
+#=============================================================================
+# Target rules for targets named map_merge_tool
+
+# Build rule for target.
+map_merge_tool: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 map_merge_tool
+.PHONY : map_merge_tool
+
+# fast build rule for target.
+map_merge_tool/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/map_merge_tool.dir/build.make map-merge/map_merge_3d/CMakeFiles/map_merge_tool.dir/build
+.PHONY : map_merge_tool/fast
+
+#=============================================================================
+# Target rules for targets named run_tests_map_merge_3d_gtest_test_map_merging
+
+# Build rule for target.
+run_tests_map_merge_3d_gtest_test_map_merging: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 run_tests_map_merge_3d_gtest_test_map_merging
+.PHONY : run_tests_map_merge_3d_gtest_test_map_merging
+
+# fast build rule for target.
+run_tests_map_merge_3d_gtest_test_map_merging/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_gtest_test_map_merging.dir/build.make map-merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_gtest_test_map_merging.dir/build
+.PHONY : run_tests_map_merge_3d_gtest_test_map_merging/fast
+
+#=============================================================================
+# Target rules for targets named run_tests_map_merge_3d_gtest
+
+# Build rule for target.
+run_tests_map_merge_3d_gtest: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 run_tests_map_merge_3d_gtest
+.PHONY : run_tests_map_merge_3d_gtest
+
+# fast build rule for target.
+run_tests_map_merge_3d_gtest/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_gtest.dir/build.make map-merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_gtest.dir/build
+.PHONY : run_tests_map_merge_3d_gtest/fast
+
+#=============================================================================
+# Target rules for targets named std_srvs_generate_messages_eus
+
+# Build rule for target.
+std_srvs_generate_messages_eus: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 std_srvs_generate_messages_eus
+.PHONY : std_srvs_generate_messages_eus
+
+# fast build rule for target.
+std_srvs_generate_messages_eus/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_eus.dir/build.make map-merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_eus.dir/build
+.PHONY : std_srvs_generate_messages_eus/fast
+
+#=============================================================================
+# Target rules for targets named topic_tools_generate_messages_nodejs
+
+# Build rule for target.
+topic_tools_generate_messages_nodejs: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 topic_tools_generate_messages_nodejs
+.PHONY : topic_tools_generate_messages_nodejs
+
+# fast build rule for target.
+topic_tools_generate_messages_nodejs/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_nodejs.dir/build.make map-merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_nodejs.dir/build
+.PHONY : topic_tools_generate_messages_nodejs/fast
+
+#=============================================================================
+# Target rules for targets named topic_tools_generate_messages_lisp
+
+# Build rule for target.
+topic_tools_generate_messages_lisp: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 topic_tools_generate_messages_lisp
+.PHONY : topic_tools_generate_messages_lisp
+
+# fast build rule for target.
+topic_tools_generate_messages_lisp/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_lisp.dir/build.make map-merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_lisp.dir/build
+.PHONY : topic_tools_generate_messages_lisp/fast
+
+#=============================================================================
+# Target rules for targets named topic_tools_generate_messages_py
+
+# Build rule for target.
+topic_tools_generate_messages_py: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 topic_tools_generate_messages_py
+.PHONY : topic_tools_generate_messages_py
+
+# fast build rule for target.
+topic_tools_generate_messages_py/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_py.dir/build.make map-merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_py.dir/build
+.PHONY : topic_tools_generate_messages_py/fast
+
+#=============================================================================
+# Target rules for targets named map_merging
+
+# Build rule for target.
+map_merging: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 map_merging
+.PHONY : map_merging
+
+# fast build rule for target.
+map_merging/fast:
+	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/map_merging.dir/build.make map-merge/map_merge_3d/CMakeFiles/map_merging.dir/build
+.PHONY : map_merging/fast
+
+#=============================================================================
+# Target rules for targets named realsense2_camera
+
+# Build rule for target.
+realsense2_camera: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 realsense2_camera
+.PHONY : realsense2_camera
+
+# fast build rule for target.
+realsense2_camera/fast:
+	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera.dir/build
+.PHONY : realsense2_camera/fast
 
 #=============================================================================
 # Target rules for targets named realsense2_camera_genpy
@@ -3370,17 +3591,160 @@ realsense2_camera_genpy/fast:
 .PHONY : realsense2_camera_genpy/fast
 
 #=============================================================================
-# Target rules for targets named realsense2_camera
+# Target rules for targets named realsense2_camera_gennodejs
 
 # Build rule for target.
-realsense2_camera: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 realsense2_camera
-.PHONY : realsense2_camera
+realsense2_camera_gennodejs: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 realsense2_camera_gennodejs
+.PHONY : realsense2_camera_gennodejs
 
 # fast build rule for target.
-realsense2_camera/fast:
-	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera.dir/build
-.PHONY : realsense2_camera/fast
+realsense2_camera_gennodejs/fast:
+	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_gennodejs.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_gennodejs.dir/build
+.PHONY : realsense2_camera_gennodejs/fast
+
+#=============================================================================
+# Target rules for targets named realsense2_camera_generate_messages_cpp
+
+# Build rule for target.
+realsense2_camera_generate_messages_cpp: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 realsense2_camera_generate_messages_cpp
+.PHONY : realsense2_camera_generate_messages_cpp
+
+# fast build rule for target.
+realsense2_camera_generate_messages_cpp/fast:
+	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages_cpp.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages_cpp.dir/build
+.PHONY : realsense2_camera_generate_messages_cpp/fast
+
+#=============================================================================
+# Target rules for targets named _realsense2_camera_generate_messages_check_deps_Extrinsics
+
+# Build rule for target.
+_realsense2_camera_generate_messages_check_deps_Extrinsics: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _realsense2_camera_generate_messages_check_deps_Extrinsics
+.PHONY : _realsense2_camera_generate_messages_check_deps_Extrinsics
+
+# fast build rule for target.
+_realsense2_camera_generate_messages_check_deps_Extrinsics/fast:
+	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/_realsense2_camera_generate_messages_check_deps_Extrinsics.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/_realsense2_camera_generate_messages_check_deps_Extrinsics.dir/build
+.PHONY : _realsense2_camera_generate_messages_check_deps_Extrinsics/fast
+
+#=============================================================================
+# Target rules for targets named realsense2_camera_geneus
+
+# Build rule for target.
+realsense2_camera_geneus: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 realsense2_camera_geneus
+.PHONY : realsense2_camera_geneus
+
+# fast build rule for target.
+realsense2_camera_geneus/fast:
+	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_geneus.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_geneus.dir/build
+.PHONY : realsense2_camera_geneus/fast
+
+#=============================================================================
+# Target rules for targets named realsense2_camera_generate_messages
+
+# Build rule for target.
+realsense2_camera_generate_messages: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 realsense2_camera_generate_messages
+.PHONY : realsense2_camera_generate_messages
+
+# fast build rule for target.
+realsense2_camera_generate_messages/fast:
+	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages.dir/build
+.PHONY : realsense2_camera_generate_messages/fast
+
+#=============================================================================
+# Target rules for targets named realsense2_camera_generate_messages_py
+
+# Build rule for target.
+realsense2_camera_generate_messages_py: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 realsense2_camera_generate_messages_py
+.PHONY : realsense2_camera_generate_messages_py
+
+# fast build rule for target.
+realsense2_camera_generate_messages_py/fast:
+	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages_py.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages_py.dir/build
+.PHONY : realsense2_camera_generate_messages_py/fast
+
+#=============================================================================
+# Target rules for targets named realsense2_camera_gencpp
+
+# Build rule for target.
+realsense2_camera_gencpp: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 realsense2_camera_gencpp
+.PHONY : realsense2_camera_gencpp
+
+# fast build rule for target.
+realsense2_camera_gencpp/fast:
+	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_gencpp.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_gencpp.dir/build
+.PHONY : realsense2_camera_gencpp/fast
+
+#=============================================================================
+# Target rules for targets named realsense2_camera_generate_messages_eus
+
+# Build rule for target.
+realsense2_camera_generate_messages_eus: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 realsense2_camera_generate_messages_eus
+.PHONY : realsense2_camera_generate_messages_eus
+
+# fast build rule for target.
+realsense2_camera_generate_messages_eus/fast:
+	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages_eus.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages_eus.dir/build
+.PHONY : realsense2_camera_generate_messages_eus/fast
+
+#=============================================================================
+# Target rules for targets named _realsense2_camera_generate_messages_check_deps_IMUInfo
+
+# Build rule for target.
+_realsense2_camera_generate_messages_check_deps_IMUInfo: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _realsense2_camera_generate_messages_check_deps_IMUInfo
+.PHONY : _realsense2_camera_generate_messages_check_deps_IMUInfo
+
+# fast build rule for target.
+_realsense2_camera_generate_messages_check_deps_IMUInfo/fast:
+	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/_realsense2_camera_generate_messages_check_deps_IMUInfo.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/_realsense2_camera_generate_messages_check_deps_IMUInfo.dir/build
+.PHONY : _realsense2_camera_generate_messages_check_deps_IMUInfo/fast
+
+#=============================================================================
+# Target rules for targets named realsense2_camera_generate_messages_nodejs
+
+# Build rule for target.
+realsense2_camera_generate_messages_nodejs: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 realsense2_camera_generate_messages_nodejs
+.PHONY : realsense2_camera_generate_messages_nodejs
+
+# fast build rule for target.
+realsense2_camera_generate_messages_nodejs/fast:
+	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages_nodejs.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages_nodejs.dir/build
+.PHONY : realsense2_camera_generate_messages_nodejs/fast
+
+#=============================================================================
+# Target rules for targets named realsense2_camera_generate_messages_lisp
+
+# Build rule for target.
+realsense2_camera_generate_messages_lisp: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 realsense2_camera_generate_messages_lisp
+.PHONY : realsense2_camera_generate_messages_lisp
+
+# fast build rule for target.
+realsense2_camera_generate_messages_lisp/fast:
+	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages_lisp.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_generate_messages_lisp.dir/build
+.PHONY : realsense2_camera_generate_messages_lisp/fast
+
+#=============================================================================
+# Target rules for targets named realsense2_camera_genlisp
+
+# Build rule for target.
+realsense2_camera_genlisp: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 realsense2_camera_genlisp
+.PHONY : realsense2_camera_genlisp
+
+# fast build rule for target.
+realsense2_camera_genlisp/fast:
+	$(MAKE) $(MAKESILENT) -f realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_genlisp.dir/build.make realsense-ros/realsense2_camera/CMakeFiles/realsense2_camera_genlisp.dir/build
+.PHONY : realsense2_camera_genlisp/fast
 
 #=============================================================================
 # Target rules for targets named clean_test_results_pointcloud_to_laserscan
@@ -4410,6 +4774,11 @@ help:
 	@echo "... _run_tests_joy"
 	@echo "... _run_tests_joy_roslint"
 	@echo "... _run_tests_joy_roslint_package"
+	@echo "... _run_tests_map_merge_3d"
+	@echo "... _run_tests_map_merge_3d_gtest"
+	@echo "... _run_tests_map_merge_3d_gtest_test_map_merging"
+	@echo "... _run_tests_map_merge_3d_roslaunch-check"
+	@echo "... _run_tests_map_merge_3d_roslaunch-check_launch"
 	@echo "... _run_tests_pointcloud_to_laserscan"
 	@echo "... _run_tests_pointcloud_to_laserscan_roslint"
 	@echo "... _run_tests_pointcloud_to_laserscan_roslint_package"
@@ -4473,6 +4842,7 @@ help:
 	@echo "... clean_test_results_depthimage_to_laserscan"
 	@echo "... clean_test_results_gmapping"
 	@echo "... clean_test_results_joy"
+	@echo "... clean_test_results_map_merge_3d"
 	@echo "... clean_test_results_pointcloud_to_laserscan"
 	@echo "... clean_test_results_realsense2_description"
 	@echo "... clean_test_results_teleop_twist_joy"
@@ -4551,6 +4921,13 @@ help:
 	@echo "... nodelet_generate_messages_lisp"
 	@echo "... nodelet_generate_messages_nodejs"
 	@echo "... nodelet_generate_messages_py"
+	@echo "... nodelet_topic_tools_gencfg"
+	@echo "... pcl_msgs_generate_messages_cpp"
+	@echo "... pcl_msgs_generate_messages_eus"
+	@echo "... pcl_msgs_generate_messages_lisp"
+	@echo "... pcl_msgs_generate_messages_nodejs"
+	@echo "... pcl_msgs_generate_messages_py"
+	@echo "... pcl_ros_gencfg"
 	@echo "... realsense2_camera_gencpp"
 	@echo "... realsense2_camera_generate_messages"
 	@echo "... realsense2_camera_generate_messages_cpp"
@@ -4591,6 +4968,11 @@ help:
 	@echo "... run_tests_joy"
 	@echo "... run_tests_joy_roslint"
 	@echo "... run_tests_joy_roslint_package"
+	@echo "... run_tests_map_merge_3d"
+	@echo "... run_tests_map_merge_3d_gtest"
+	@echo "... run_tests_map_merge_3d_gtest_test_map_merging"
+	@echo "... run_tests_map_merge_3d_roslaunch-check"
+	@echo "... run_tests_map_merge_3d_roslaunch-check_launch"
 	@echo "... run_tests_pointcloud_to_laserscan"
 	@echo "... run_tests_pointcloud_to_laserscan_roslint"
 	@echo "... run_tests_pointcloud_to_laserscan_roslint_package"
@@ -4645,6 +5027,11 @@ help:
 	@echo "... tf_generate_messages_lisp"
 	@echo "... tf_generate_messages_nodejs"
 	@echo "... tf_generate_messages_py"
+	@echo "... topic_tools_generate_messages_cpp"
+	@echo "... topic_tools_generate_messages_eus"
+	@echo "... topic_tools_generate_messages_lisp"
+	@echo "... topic_tools_generate_messages_nodejs"
+	@echo "... topic_tools_generate_messages_py"
 	@echo "... trajectory_msgs_generate_messages_cpp"
 	@echo "... trajectory_msgs_generate_messages_eus"
 	@echo "... trajectory_msgs_generate_messages_lisp"
@@ -4693,15 +5080,20 @@ help:
 	@echo "... laserscan_to_pointcloud"
 	@echo "... laserscan_to_pointcloud_node"
 	@echo "... libtest"
+	@echo "... map_merge_node"
+	@echo "... map_merge_tool"
+	@echo "... map_merging"
 	@echo "... pointcloud_to_laserscan"
 	@echo "... pointcloud_to_laserscan_node"
 	@echo "... realsense2_camera"
+	@echo "... registration_visualisation"
 	@echo "... slam_gmapping"
 	@echo "... slam_gmapping_nodelet"
 	@echo "... slam_gmapping_replay"
 	@echo "... teleop_twist_joy"
 	@echo "... teleop_twist_joy_node"
 	@echo "... test_dtl"
+	@echo "... test_map_merging"
 	@echo "... turtlebot3_diagnostics"
 	@echo "... turtlebot3_drive"
 	@echo "... turtlebot3_fake_node"

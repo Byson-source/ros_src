@@ -5,6 +5,7 @@
 # This file includes the relevant testing commands required for 
 # testing this directory and lists subdirectories to be tested as well.
 subdirs("gtest")
+subdirs("custom_rviz_config")
 subdirs("teleop_twist_joy/joystick_drivers")
 subdirs("realsense-ros/realsense2_description")
 subdirs("slam_gmapping/slam_gmapping")
@@ -26,6 +27,7 @@ subdirs("depthimage_to_laserscan")
 subdirs("teleop_twist_joy/joy")
 subdirs("teleop_twist_joy/teleop_twist_joy")
 subdirs("slam_gmapping/gmapping")
+subdirs("map-merge/map_merge_3d")
 subdirs("realsense-ros/realsense2_camera")
 subdirs("ros_course_part2")
 subdirs("pointcloud_to_laserscan-1.4.1")

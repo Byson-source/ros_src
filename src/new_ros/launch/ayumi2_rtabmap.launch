@@ -210,8 +210,7 @@
 
 
     <!-- Visualisation Rviz -->
-    <node unless="$(arg db_recording)"
-          name="rviz" pkg="rviz" type="rviz" args="-d $(arg rviz_cfg)"/>
+    <!--<node required="$(arg db_recording)" name="rviz" pkg="rviz" type="rviz" args="-d $(arg rviz_cfg)"/>-->
 
 
     <!-- 3D Pointcloud Publishing -->
@@ -226,5 +225,6 @@
         <param name="voxel_size"            type="double"   value="0.0"/>
         <param name="approx_sync"           type="bool"     value="false"/>
     </node>
+
 
 </launch>
