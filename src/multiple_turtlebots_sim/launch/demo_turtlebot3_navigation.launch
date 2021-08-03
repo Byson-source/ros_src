@@ -1,12 +1,10 @@
-<!--for_frame="robot1/"
-for_topic="/robot1"-->
+<!--for_frame="robot1/"-->
 
 
 <launch>
   <!-- Arguments -->
   <arg name="for_frame"               default=""/>
-  <arg name="for_topic"               default=""/>
-  <arg name="robot"                   default=""/>
+  <arg name="topic_name"               default=""/>
   <arg name="odom_frame"              default="$(arg for_frame)odom"/>
 
   <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
@@ -15,10 +13,10 @@ for_topic="/robot1"-->
   <arg name="move_forward_only" default="false"/>
 
   <!-- topic names -->
-  <arg name="color_topic"             default="$(arg for_topic)/camera/rgb/image_raw"/>
-  <arg name="depth_topic"             default="$(arg for_topic)/camera/depth/image_raw"/>
-  <arg name="camera_info_topic"       default="$(arg for_topic)/camera/rgb/camera_info"/>
-  <arg name="odom_topic"              default="$(arg for_topic)/odom"/> <!-- when using only VO -->
+  <arg name="color_topic"             default="$(arg topic_name)/camera/rgb/image_raw"/>
+  <arg name="depth_topic"             default="$(arg topic_name)/camera/depth/image_raw"/>
+  <arg name="camera_info_topic"       default="$(arg topic_name)/camera/rgb/camera_info"/>
+  <arg name="odom_topic"              default="$(arg topic_name)/odom"/> <!-- when using only VO -->
 
   <arg name="map_frame"               default="$(arg for_frame)map"/>
   <arg name="frame_id"                default="$(arg for_frame)base_footprint"/> <!-- base/rover's frame -->
@@ -30,16 +28,16 @@ for_topic="/robot1"-->
   <arg unless="$(arg localization)" name="rtabmap_args" default="--delete_db_on_start"/>
 
   <!-- Turtlebot3 -->
-  <include file="$(find turtlebot3_bringup)/launch/turtlebot3_remote.launch">
+  <include file="$(find multiple_turtlebots_sim)/launch/ayumi_remote.launch">
     <arg name="model" value="$(arg model)" />
-    <arg name="multi_robot_name" default="$(arg robot)"/>
+    <arg name="robot" default="$(arg for_frame)"/>
   </include>
 
   <group ns="rtabmap">
       <node if="$(eval model=='waffle')" pkg="rtabmap_ros" type="rgbd_sync" name="rgbd_sync" output="screen">
-          <remap from="rgb/image"         to="/camera/rgb/image_raw"/>
-          <remap from="depth/image"       to="/camera/depth/image_raw"/>
-          <remap from="rgb/camera_info"   to="/camera/rgb/camera_info"/>
+          <remap from="rgb/image"         to="$(arg topic_name)/camera/rgb/image_raw"/>
+          <remap from="depth/image"       to="$(arg topic_name)/camera/depth/image_raw"/>
+          <remap from="rgb/camera_info"   to="$(arg topic_name)/camera/rgb/camera_info"/>
       </node>
 
     <node name="rtabmap" pkg="rtabmap_ros" type="rtabmap" output="screen" args="$(arg rtabmap_args)">
@@ -62,10 +60,10 @@ for_topic="/robot1"-->
       <remap from="move_base"            to="/move_base"/>-->
 
       <!-- inputs -->
-      <remap from="scan"            to="$(arg for_topic)/scan"/>
+      <remap from="scan"            to="$(arg topic_name)/scan"/>
 
       <!-- output -->
-      <remap from="grid_map" to="$(arg for_topic)/map"/>
+      <remap from="grid_map" to="$(arg topic_name)/map"/>
 
       <!-- RTAB-Map's parameters -->
       <param name="Reg/Strategy"                 type="string" value="1"/>
@@ -78,19 +76,19 @@ for_topic="/robot1"-->
     </node>
 
     <!-- visualization with rtabmapviz -->
-    <node if="$(arg rtabmapviz)" pkg="rtabmap_ros" type="rtabmapviz" name="rtabmapviz" args="-d $(find rtabmap_ros)/launch/config/rgbd_gui.ini" output="screen">
+    <!--<node if="$(arg rtabmapviz)" pkg="rtabmap_ros" type="rtabmapviz" name="rtabmapviz" args="-d $(find rtabmap_ros)/launch/config/rgbd_gui.ini" output="screen">
       <param name="subscribe_scan"   type="bool"   value="true"/>
       <param name="subscribe_odom"   type="bool"   value="true"/>
       <param name="frame_id"         type="string" value="$(arg frame_id)"/>
       <param name="approx_sync"      type="bool"   value="true"/>
 
-      <remap from="odom"            to="$(arg for_topic)/odom"/>
-      <remap from="scan"            to="$(arg for_topic)/scan"/>
-    </node>
+      <remap from="odom"            to="/odom"/>
+      <remap from="scan"            to="/scan"/>
+    </node>-->
   </group>
 
   <!-- rviz -->
-  <group if="$(arg open_rviz)">
+  <!--<group if="$(arg open_rviz)">
     <node pkg="rviz" type="rviz" name="rviz" required="true"/>
-  </group>
+  </group>-->
 </launch>

@@ -3145,7 +3145,7 @@ _run_tests_map_merge_3d_roslaunch-check_launch: cmake_check_build_system
 
 # fast build rule for target.
 _run_tests_map_merge_3d_roslaunch-check_launch/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_roslaunch-check_launch.dir/build.make map-merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_roslaunch-check_launch.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_roslaunch-check_launch.dir/build.make map_merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_roslaunch-check_launch.dir/build
 .PHONY : _run_tests_map_merge_3d_roslaunch-check_launch/fast
 
 #=============================================================================
@@ -3158,7 +3158,7 @@ run_tests_map_merge_3d_roslaunch-check_launch: cmake_check_build_system
 
 # fast build rule for target.
 run_tests_map_merge_3d_roslaunch-check_launch/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_roslaunch-check_launch.dir/build.make map-merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_roslaunch-check_launch.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_roslaunch-check_launch.dir/build.make map_merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_roslaunch-check_launch.dir/build
 .PHONY : run_tests_map_merge_3d_roslaunch-check_launch/fast
 
 #=============================================================================
@@ -3171,7 +3171,7 @@ _run_tests_map_merge_3d_roslaunch-check: cmake_check_build_system
 
 # fast build rule for target.
 _run_tests_map_merge_3d_roslaunch-check/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_roslaunch-check.dir/build.make map-merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_roslaunch-check.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_roslaunch-check.dir/build.make map_merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_roslaunch-check.dir/build
 .PHONY : _run_tests_map_merge_3d_roslaunch-check/fast
 
 #=============================================================================
@@ -3184,7 +3184,7 @@ run_tests_map_merge_3d_roslaunch-check: cmake_check_build_system
 
 # fast build rule for target.
 run_tests_map_merge_3d_roslaunch-check/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_roslaunch-check.dir/build.make map-merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_roslaunch-check.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_roslaunch-check.dir/build.make map_merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_roslaunch-check.dir/build
 .PHONY : run_tests_map_merge_3d_roslaunch-check/fast
 
 #=============================================================================
@@ -3197,7 +3197,7 @@ clean_test_results_map_merge_3d: cmake_check_build_system
 
 # fast build rule for target.
 clean_test_results_map_merge_3d/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/clean_test_results_map_merge_3d.dir/build.make map-merge/map_merge_3d/CMakeFiles/clean_test_results_map_merge_3d.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/clean_test_results_map_merge_3d.dir/build.make map_merge/map_merge_3d/CMakeFiles/clean_test_results_map_merge_3d.dir/build
 .PHONY : clean_test_results_map_merge_3d/fast
 
 #=============================================================================
@@ -3210,7 +3210,7 @@ _run_tests_map_merge_3d_gtest_test_map_merging: cmake_check_build_system
 
 # fast build rule for target.
 _run_tests_map_merge_3d_gtest_test_map_merging/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_gtest_test_map_merging.dir/build.make map-merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_gtest_test_map_merging.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_gtest_test_map_merging.dir/build.make map_merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_gtest_test_map_merging.dir/build
 .PHONY : _run_tests_map_merge_3d_gtest_test_map_merging/fast
 
 #=============================================================================
@@ -3223,7 +3223,7 @@ _run_tests_map_merge_3d_gtest: cmake_check_build_system
 
 # fast build rule for target.
 _run_tests_map_merge_3d_gtest/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_gtest.dir/build.make map-merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_gtest.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_gtest.dir/build.make map_merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d_gtest.dir/build
 .PHONY : _run_tests_map_merge_3d_gtest/fast
 
 #=============================================================================
@@ -3236,7 +3236,7 @@ pcl_msgs_generate_messages_lisp: cmake_check_build_system
 
 # fast build rule for target.
 pcl_msgs_generate_messages_lisp/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_lisp.dir/build.make map-merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_lisp.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_lisp.dir/build.make map_merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_lisp.dir/build
 .PHONY : pcl_msgs_generate_messages_lisp/fast
 
 #=============================================================================
@@ -3249,7 +3249,7 @@ map_merge_node: cmake_check_build_system
 
 # fast build rule for target.
 map_merge_node/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/map_merge_node.dir/build.make map-merge/map_merge_3d/CMakeFiles/map_merge_node.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/map_merge_node.dir/build.make map_merge/map_merge_3d/CMakeFiles/map_merge_node.dir/build
 .PHONY : map_merge_node/fast
 
 #=============================================================================
@@ -3262,7 +3262,7 @@ std_srvs_generate_messages_cpp: cmake_check_build_system
 
 # fast build rule for target.
 std_srvs_generate_messages_cpp/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_cpp.dir/build.make map-merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_cpp.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_cpp.dir/build.make map_merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_cpp.dir/build
 .PHONY : std_srvs_generate_messages_cpp/fast
 
 #=============================================================================
@@ -3275,7 +3275,7 @@ pcl_msgs_generate_messages_py: cmake_check_build_system
 
 # fast build rule for target.
 pcl_msgs_generate_messages_py/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_py.dir/build.make map-merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_py.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_py.dir/build.make map_merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_py.dir/build
 .PHONY : pcl_msgs_generate_messages_py/fast
 
 #=============================================================================
@@ -3288,7 +3288,7 @@ nodelet_topic_tools_gencfg: cmake_check_build_system
 
 # fast build rule for target.
 nodelet_topic_tools_gencfg/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/nodelet_topic_tools_gencfg.dir/build.make map-merge/map_merge_3d/CMakeFiles/nodelet_topic_tools_gencfg.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/nodelet_topic_tools_gencfg.dir/build.make map_merge/map_merge_3d/CMakeFiles/nodelet_topic_tools_gencfg.dir/build
 .PHONY : nodelet_topic_tools_gencfg/fast
 
 #=============================================================================
@@ -3301,7 +3301,7 @@ run_tests_map_merge_3d: cmake_check_build_system
 
 # fast build rule for target.
 run_tests_map_merge_3d/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d.dir/build.make map-merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d.dir/build.make map_merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d.dir/build
 .PHONY : run_tests_map_merge_3d/fast
 
 #=============================================================================
@@ -3314,7 +3314,7 @@ pcl_msgs_generate_messages_cpp: cmake_check_build_system
 
 # fast build rule for target.
 pcl_msgs_generate_messages_cpp/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_cpp.dir/build.make map-merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_cpp.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_cpp.dir/build.make map_merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_cpp.dir/build
 .PHONY : pcl_msgs_generate_messages_cpp/fast
 
 #=============================================================================
@@ -3327,7 +3327,7 @@ test_map_merging: cmake_check_build_system
 
 # fast build rule for target.
 test_map_merging/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/test_map_merging.dir/build.make map-merge/map_merge_3d/CMakeFiles/test_map_merging.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/test_map_merging.dir/build.make map_merge/map_merge_3d/CMakeFiles/test_map_merging.dir/build
 .PHONY : test_map_merging/fast
 
 #=============================================================================
@@ -3340,7 +3340,7 @@ std_srvs_generate_messages_lisp: cmake_check_build_system
 
 # fast build rule for target.
 std_srvs_generate_messages_lisp/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_lisp.dir/build.make map-merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_lisp.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_lisp.dir/build.make map_merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_lisp.dir/build
 .PHONY : std_srvs_generate_messages_lisp/fast
 
 #=============================================================================
@@ -3353,7 +3353,7 @@ pcl_ros_gencfg: cmake_check_build_system
 
 # fast build rule for target.
 pcl_ros_gencfg/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/pcl_ros_gencfg.dir/build.make map-merge/map_merge_3d/CMakeFiles/pcl_ros_gencfg.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/pcl_ros_gencfg.dir/build.make map_merge/map_merge_3d/CMakeFiles/pcl_ros_gencfg.dir/build
 .PHONY : pcl_ros_gencfg/fast
 
 #=============================================================================
@@ -3366,7 +3366,7 @@ pcl_msgs_generate_messages_eus: cmake_check_build_system
 
 # fast build rule for target.
 pcl_msgs_generate_messages_eus/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_eus.dir/build.make map-merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_eus.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_eus.dir/build.make map_merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_eus.dir/build
 .PHONY : pcl_msgs_generate_messages_eus/fast
 
 #=============================================================================
@@ -3379,7 +3379,7 @@ pcl_msgs_generate_messages_nodejs: cmake_check_build_system
 
 # fast build rule for target.
 pcl_msgs_generate_messages_nodejs/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_nodejs.dir/build.make map-merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_nodejs.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_nodejs.dir/build.make map_merge/map_merge_3d/CMakeFiles/pcl_msgs_generate_messages_nodejs.dir/build
 .PHONY : pcl_msgs_generate_messages_nodejs/fast
 
 #=============================================================================
@@ -3392,7 +3392,7 @@ std_srvs_generate_messages_nodejs: cmake_check_build_system
 
 # fast build rule for target.
 std_srvs_generate_messages_nodejs/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_nodejs.dir/build.make map-merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_nodejs.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_nodejs.dir/build.make map_merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_nodejs.dir/build
 .PHONY : std_srvs_generate_messages_nodejs/fast
 
 #=============================================================================
@@ -3405,7 +3405,7 @@ std_srvs_generate_messages_py: cmake_check_build_system
 
 # fast build rule for target.
 std_srvs_generate_messages_py/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_py.dir/build.make map-merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_py.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_py.dir/build.make map_merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_py.dir/build
 .PHONY : std_srvs_generate_messages_py/fast
 
 #=============================================================================
@@ -3418,7 +3418,7 @@ topic_tools_generate_messages_cpp: cmake_check_build_system
 
 # fast build rule for target.
 topic_tools_generate_messages_cpp/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_cpp.dir/build.make map-merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_cpp.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_cpp.dir/build.make map_merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_cpp.dir/build
 .PHONY : topic_tools_generate_messages_cpp/fast
 
 #=============================================================================
@@ -3431,7 +3431,7 @@ _run_tests_map_merge_3d: cmake_check_build_system
 
 # fast build rule for target.
 _run_tests_map_merge_3d/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d.dir/build.make map-merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d.dir/build.make map_merge/map_merge_3d/CMakeFiles/_run_tests_map_merge_3d.dir/build
 .PHONY : _run_tests_map_merge_3d/fast
 
 #=============================================================================
@@ -3444,7 +3444,7 @@ topic_tools_generate_messages_eus: cmake_check_build_system
 
 # fast build rule for target.
 topic_tools_generate_messages_eus/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_eus.dir/build.make map-merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_eus.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_eus.dir/build.make map_merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_eus.dir/build
 .PHONY : topic_tools_generate_messages_eus/fast
 
 #=============================================================================
@@ -3457,7 +3457,7 @@ registration_visualisation: cmake_check_build_system
 
 # fast build rule for target.
 registration_visualisation/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/registration_visualisation.dir/build.make map-merge/map_merge_3d/CMakeFiles/registration_visualisation.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/registration_visualisation.dir/build.make map_merge/map_merge_3d/CMakeFiles/registration_visualisation.dir/build
 .PHONY : registration_visualisation/fast
 
 #=============================================================================
@@ -3470,7 +3470,7 @@ map_merge_tool: cmake_check_build_system
 
 # fast build rule for target.
 map_merge_tool/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/map_merge_tool.dir/build.make map-merge/map_merge_3d/CMakeFiles/map_merge_tool.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/map_merge_tool.dir/build.make map_merge/map_merge_3d/CMakeFiles/map_merge_tool.dir/build
 .PHONY : map_merge_tool/fast
 
 #=============================================================================
@@ -3483,7 +3483,7 @@ run_tests_map_merge_3d_gtest_test_map_merging: cmake_check_build_system
 
 # fast build rule for target.
 run_tests_map_merge_3d_gtest_test_map_merging/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_gtest_test_map_merging.dir/build.make map-merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_gtest_test_map_merging.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_gtest_test_map_merging.dir/build.make map_merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_gtest_test_map_merging.dir/build
 .PHONY : run_tests_map_merge_3d_gtest_test_map_merging/fast
 
 #=============================================================================
@@ -3496,7 +3496,7 @@ run_tests_map_merge_3d_gtest: cmake_check_build_system
 
 # fast build rule for target.
 run_tests_map_merge_3d_gtest/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_gtest.dir/build.make map-merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_gtest.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_gtest.dir/build.make map_merge/map_merge_3d/CMakeFiles/run_tests_map_merge_3d_gtest.dir/build
 .PHONY : run_tests_map_merge_3d_gtest/fast
 
 #=============================================================================
@@ -3509,7 +3509,7 @@ std_srvs_generate_messages_eus: cmake_check_build_system
 
 # fast build rule for target.
 std_srvs_generate_messages_eus/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_eus.dir/build.make map-merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_eus.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_eus.dir/build.make map_merge/map_merge_3d/CMakeFiles/std_srvs_generate_messages_eus.dir/build
 .PHONY : std_srvs_generate_messages_eus/fast
 
 #=============================================================================
@@ -3522,7 +3522,7 @@ topic_tools_generate_messages_nodejs: cmake_check_build_system
 
 # fast build rule for target.
 topic_tools_generate_messages_nodejs/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_nodejs.dir/build.make map-merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_nodejs.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_nodejs.dir/build.make map_merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_nodejs.dir/build
 .PHONY : topic_tools_generate_messages_nodejs/fast
 
 #=============================================================================
@@ -3535,7 +3535,7 @@ topic_tools_generate_messages_lisp: cmake_check_build_system
 
 # fast build rule for target.
 topic_tools_generate_messages_lisp/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_lisp.dir/build.make map-merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_lisp.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_lisp.dir/build.make map_merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_lisp.dir/build
 .PHONY : topic_tools_generate_messages_lisp/fast
 
 #=============================================================================
@@ -3548,7 +3548,7 @@ topic_tools_generate_messages_py: cmake_check_build_system
 
 # fast build rule for target.
 topic_tools_generate_messages_py/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_py.dir/build.make map-merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_py.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_py.dir/build.make map_merge/map_merge_3d/CMakeFiles/topic_tools_generate_messages_py.dir/build
 .PHONY : topic_tools_generate_messages_py/fast
 
 #=============================================================================
@@ -3561,7 +3561,7 @@ map_merging: cmake_check_build_system
 
 # fast build rule for target.
 map_merging/fast:
-	$(MAKE) $(MAKESILENT) -f map-merge/map_merge_3d/CMakeFiles/map_merging.dir/build.make map-merge/map_merge_3d/CMakeFiles/map_merging.dir/build
+	$(MAKE) $(MAKESILENT) -f map_merge/map_merge_3d/CMakeFiles/map_merging.dir/build.make map_merge/map_merge_3d/CMakeFiles/map_merging.dir/build
 .PHONY : map_merging/fast
 
 #=============================================================================

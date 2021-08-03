@@ -1,0 +1,14 @@
+<launch>
+  <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
+  <arg name="multi_robot_name" default=""/>
+  <arg name="robot" default=""/>
+
+  <include file="$(find multiple_turtlebots_sim)/xml/custom.launch.xml">
+      <arg name="model" value="$(arg model)" />
+      <arg name="robot" value="$(arg robot)"/>
+  </include>
+
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+    <param name="publish_frequency" type="double" value="50.0" />
+  </node>
+</launch>
