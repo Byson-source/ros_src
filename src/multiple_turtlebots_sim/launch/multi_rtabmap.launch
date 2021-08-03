@@ -6,18 +6,14 @@
             <arg name="for_frame" value="robot1/"/>
             <arg name="topic_name" value="/robot1"/>
         </include>
-
-
-
-
     </group>
 
-    <!--<group ns="robot2">
+    <group ns="robot2">
         <include file="$(find multiple_turtlebots_sim)/launch/demo_turtlebot3_navigation.launch">
             <arg name="for_frame" value="robot2/"/>
-            <arg name="robot" value="robot2"/>
+            <arg name="topic_name" value="/robot2"/>
         </include>
-    </group>-->
+    </group>
 
-    <!--<node pkg="rviz" name="rviz" type="rviz"/>-->
+    <node pkg="rviz" name="rviz" type="rviz"/>
 </launch>

@@ -23,7 +23,7 @@
 
   <arg name="with_camera" default="true"/>
   <arg name="localization" default="false"/>
-  <arg name="database_path" default="~/.ros/rtabmap.db"/>
+  <arg name="database_path" default="~/.ros/$(arg for_frame)rtabmap.db"/>
   <arg     if="$(arg localization)" name="rtabmap_args" default=""/>
   <arg unless="$(arg localization)" name="rtabmap_args" default="--delete_db_on_start"/>
 
