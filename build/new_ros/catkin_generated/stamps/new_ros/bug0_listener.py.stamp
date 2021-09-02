@@ -10,6 +10,7 @@ if __name__ == '__main__':
     rate=rospy.Rate(10)
     command=Odometry()
     transform_listener = tf.TransformListener()
+    transform_listener.waitForTransform('/frame_a','/frame_b',rospy.Time(),rospy.Duration())
 
     cmd=rospy.Publisher('odom',Odometry,queue_size=1)
 
@@ -20,18 +21,18 @@ if __name__ == '__main__':
             continue
 
 
-        print(command.pose.pose)
-        # cmd_x=translation[0]
-        # cmd_y=translation[1]
-        #
-        # angular=4*math.atan2(cmd_y,cmd_x)
-        # linear = 0.5 * math.sqrt(cmd_x ** 2 + cmd_y ** 2)
-        #
-        # command.twist[4].linear.x=linear
-        # command.twist[4].angular.z=angular
-        #
-        # cmd.publish(command)
-        #
-        # rate.sleep()
+        # print(command.pose.pose)
+        cmd_x=translation[0]
+        cmd_y=translation[1]
+
+        angular=4*math.atan2(cmd_y,cmd_x)
+        linear = 0.5 * math.sqrt(cmd_x ** 2 + cmd_y ** 2)
+
+        command.twist[4].linear.x=linear
+        command.twist[4].angular.z=angular
+
+        cmd.publish(command)
+
+        rate.sleep()
 
 

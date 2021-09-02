@@ -15,5 +15,9 @@
         </include>
     </group>
 
+<!--    <node pkg="map_merge_3d" name="merger" type="map_merge_node" output="screen" respawn="false">-->
+<!--        <param name="robot_map_topic" type="string" value="cloud_map"/>-->
+<!--        <param name="robot_namespace" type="string" value="robot"/>-->
+<!--    </node>-->
     <node pkg="rviz" name="rviz" type="rviz"/>
 </launch>

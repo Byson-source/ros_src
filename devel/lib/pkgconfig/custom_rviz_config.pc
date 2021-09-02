@@ -1,0 +1,8 @@
+prefix=/home/ayumi/catkin_ws/devel
+
+Name: custom_rviz_config
+Description: Description of custom_rviz_config
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

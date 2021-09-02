@@ -1,0 +1,8 @@
+prefix=/home/ayumi/catkin_ws/devel
+
+Name: cpp_tutorial
+Description: Description of cpp_tutorial
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

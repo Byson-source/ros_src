@@ -64,7 +64,7 @@
 
   <group ns="rtabmap">
 
-    <!-- RGB-D Synchronisation -->
+    <!http://wiki.ros.org/-- RGB-D Synchronisation -->
     <node name="rgbd_sync" pkg="nodelet" type="nodelet" args="standalone rtabmap_ros/rgbd_sync" output="screen">
 
         <remap from="rgb/image"         to="$(arg color_topic)"/>
