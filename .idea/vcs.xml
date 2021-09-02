@@ -16,6 +16,16 @@
     <mapping directory="$PROJECT_DIR$/src/ros_course_part2" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/rtabmap_ros" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/slam_gmapping" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/src/ddynamic_reconfigure" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/src/depthimage_to_laserscan" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/src/image_transport_plugins" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/src/realsense-ros" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/src/rtabmap_ros" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/src/teleop_twist_joy" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/src_Pierre/src/ddynamic_reconfigure" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/src_Pierre/src/image_transport_plugins" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/src_Pierre/src/realsense-ros" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/src_Pierre/src/rtabmap_ros" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/teleop_twist_joy" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/turtlebot3" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/turtlebot3_msgs" vcs="Git" />
