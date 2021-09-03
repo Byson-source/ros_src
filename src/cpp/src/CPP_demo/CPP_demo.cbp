@@ -32,9 +32,16 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="LaserScanner.cpp" />
+		<Unit filename="client.cpp" />
+		<Unit filename="go-to-goal.cpp" />
 		<Unit filename="listener.cpp" />
 		<Unit filename="main.cpp" />
+		<Unit filename="move_straight.cpp" />
+		<Unit filename="server.cpp" />
 		<Unit filename="talker.cpp" />
+		<Unit filename="tf_broadcaster.cpp" />
+		<Unit filename="turn.cpp" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
