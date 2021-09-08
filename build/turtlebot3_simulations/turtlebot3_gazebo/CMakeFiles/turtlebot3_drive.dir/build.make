@@ -148,6 +148,7 @@ turtlebot3_drive_EXTERNAL_OBJECTS =
 /home/ayumi/catkin_ws/devel/lib/turtlebot3_gazebo/turtlebot3_drive: /usr/lib/x86_64-linux-gnu/libboost_date_time.so.1.71.0
 /home/ayumi/catkin_ws/devel/lib/turtlebot3_gazebo/turtlebot3_drive: /usr/lib/x86_64-linux-gnu/libprotobuf.so
 /home/ayumi/catkin_ws/devel/lib/turtlebot3_gazebo/turtlebot3_drive: /usr/lib/x86_64-linux-gnu/libsdformat9.so.9.5.0
+/home/ayumi/catkin_ws/devel/lib/turtlebot3_gazebo/turtlebot3_drive: /usr/lib/x86_64-linux-gnu/libOgreMain.so
 /home/ayumi/catkin_ws/devel/lib/turtlebot3_gazebo/turtlebot3_drive: /usr/lib/x86_64-linux-gnu/libboost_thread.so.1.71.0
 /home/ayumi/catkin_ws/devel/lib/turtlebot3_gazebo/turtlebot3_drive: /usr/lib/x86_64-linux-gnu/libboost_date_time.so.1.71.0
 /home/ayumi/catkin_ws/devel/lib/turtlebot3_gazebo/turtlebot3_drive: /usr/lib/x86_64-linux-gnu/libOgreTerrain.so

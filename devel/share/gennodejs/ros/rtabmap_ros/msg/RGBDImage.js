@@ -14,8 +14,8 @@ const _getByteLength = _ros_msg_utils.getByteLength;
 let KeyPoint = require('./KeyPoint.js');
 let Point3f = require('./Point3f.js');
 let GlobalDescriptor = require('./GlobalDescriptor.js');
-let sensor_msgs = _finder('sensor_msgs');
 let std_msgs = _finder('std_msgs');
+let sensor_msgs = _finder('sensor_msgs');
 
 //-----------------------------------------------------------
 

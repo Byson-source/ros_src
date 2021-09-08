@@ -1,0 +1,4 @@
+# depslib dependency file v1.0
+1630911752 source:/home/ayumi/catkin_ws/src/cpp/src/test/test1.cpp
+	<iostream>
+
