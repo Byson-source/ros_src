@@ -61,3 +61,7 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/multiple_turtlebots_sim" TYPE PROGRAM FILES "/home/ayumi/catkin_ws/build/multiple_turtlebots_sim/catkin_generated/installspace/tf_prefix.py")
 endif()
 
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/multiple_turtlebots_sim" TYPE PROGRAM FILES "/home/ayumi/catkin_ws/build/multiple_turtlebots_sim/catkin_generated/installspace/image_extractor.py")
+endif()
+

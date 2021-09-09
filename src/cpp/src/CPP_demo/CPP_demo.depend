@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1631186354 source:/home/ayumi/catkin_ws/src/cpp/src/CPP_demo/tets.cpp
+	<iostream>
+	<string>
+

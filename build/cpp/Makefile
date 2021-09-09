@@ -536,6 +536,20 @@ sensor_msgs_generate_messages_nodejs/fast:
 .PHONY : sensor_msgs_generate_messages_nodejs/fast
 
 # Convenience name for target.
+cpp/CMakeFiles/detection_checker.dir/rule:
+	cd /home/ayumi/catkin_ws/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 cpp/CMakeFiles/detection_checker.dir/rule
+.PHONY : cpp/CMakeFiles/detection_checker.dir/rule
+
+# Convenience name for target.
+detection_checker: cpp/CMakeFiles/detection_checker.dir/rule
+.PHONY : detection_checker
+
+# fast build rule for target.
+detection_checker/fast:
+	cd /home/ayumi/catkin_ws/build && $(MAKE) $(MAKESILENT) -f cpp/CMakeFiles/detection_checker.dir/build.make cpp/CMakeFiles/detection_checker.dir/build
+.PHONY : detection_checker/fast
+
+# Convenience name for target.
 cpp/CMakeFiles/roscpp_generate_messages_py.dir/rule:
 	cd /home/ayumi/catkin_ws/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 cpp/CMakeFiles/roscpp_generate_messages_py.dir/rule
 .PHONY : cpp/CMakeFiles/roscpp_generate_messages_py.dir/rule
@@ -1011,6 +1025,30 @@ cpp_gencpp/fast:
 	cd /home/ayumi/catkin_ws/build && $(MAKE) $(MAKESILENT) -f cpp/CMakeFiles/cpp_gencpp.dir/build.make cpp/CMakeFiles/cpp_gencpp.dir/build
 .PHONY : cpp_gencpp/fast
 
+src/CPP_demo/LoopClosureDetection.o: src/CPP_demo/LoopClosureDetection.cpp.o
+.PHONY : src/CPP_demo/LoopClosureDetection.o
+
+# target to build an object file
+src/CPP_demo/LoopClosureDetection.cpp.o:
+	cd /home/ayumi/catkin_ws/build && $(MAKE) $(MAKESILENT) -f cpp/CMakeFiles/detection_checker.dir/build.make cpp/CMakeFiles/detection_checker.dir/src/CPP_demo/LoopClosureDetection.cpp.o
+.PHONY : src/CPP_demo/LoopClosureDetection.cpp.o
+
+src/CPP_demo/LoopClosureDetection.i: src/CPP_demo/LoopClosureDetection.cpp.i
+.PHONY : src/CPP_demo/LoopClosureDetection.i
+
+# target to preprocess a source file
+src/CPP_demo/LoopClosureDetection.cpp.i:
+	cd /home/ayumi/catkin_ws/build && $(MAKE) $(MAKESILENT) -f cpp/CMakeFiles/detection_checker.dir/build.make cpp/CMakeFiles/detection_checker.dir/src/CPP_demo/LoopClosureDetection.cpp.i
+.PHONY : src/CPP_demo/LoopClosureDetection.cpp.i
+
+src/CPP_demo/LoopClosureDetection.s: src/CPP_demo/LoopClosureDetection.cpp.s
+.PHONY : src/CPP_demo/LoopClosureDetection.s
+
+# target to generate assembly for a file
+src/CPP_demo/LoopClosureDetection.cpp.s:
+	cd /home/ayumi/catkin_ws/build && $(MAKE) $(MAKESILENT) -f cpp/CMakeFiles/detection_checker.dir/build.make cpp/CMakeFiles/detection_checker.dir/src/CPP_demo/LoopClosureDetection.cpp.s
+.PHONY : src/CPP_demo/LoopClosureDetection.cpp.s
+
 src/CPP_demo/client.o: src/CPP_demo/client.cpp.o
 .PHONY : src/CPP_demo/client.o
 
@@ -1247,11 +1285,15 @@ help:
 	@echo "... tf_generate_messages_py"
 	@echo "... add_two_ints_client"
 	@echo "... add_two_ints_server_node"
+	@echo "... detection_checker"
 	@echo "... frame_a_to_frame_b_broadcaster"
 	@echo "... listener_node"
 	@echo "... talker_node"
 	@echo "... turnTurtle"
 	@echo "... turtlesimNode"
+	@echo "... src/CPP_demo/LoopClosureDetection.o"
+	@echo "... src/CPP_demo/LoopClosureDetection.i"
+	@echo "... src/CPP_demo/LoopClosureDetection.s"
 	@echo "... src/CPP_demo/client.o"
 	@echo "... src/CPP_demo/client.i"
 	@echo "... src/CPP_demo/client.s"

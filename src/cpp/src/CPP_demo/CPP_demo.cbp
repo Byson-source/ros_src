@@ -32,16 +32,52 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="LaserScanner.cpp" />
-		<Unit filename="client.cpp" />
-		<Unit filename="go-to-goal.cpp" />
-		<Unit filename="listener.cpp" />
-		<Unit filename="main.cpp" />
-		<Unit filename="move_straight.cpp" />
-		<Unit filename="server.cpp" />
-		<Unit filename="talker.cpp" />
-		<Unit filename="tf_broadcaster.cpp" />
-		<Unit filename="turn.cpp" />
+		<Unit filename="../../CMakeLists.txt" />
+		<Unit filename="LaserScanner.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="LoopClosureDetection.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="client.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="go-to-goal.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="listener.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="main.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="move_straight.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="server.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="talker.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="tets.cpp" />
+		<Unit filename="tf_broadcaster.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="turn.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

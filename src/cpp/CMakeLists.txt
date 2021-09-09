@@ -32,6 +32,7 @@ if(POLICY CMP0020)
   cmake_policy(SET CMP0020 OLD)
 endif()
 
+SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}")
 # include directories
 SET(INCLUDE_DIRS
    ${RTABMap_INCLUDE_DIRS}
@@ -49,7 +50,7 @@ INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
 SET(LIBRARIES
    ${RTABMap_LIBRARIES}
    ${OpenCV_LIBRARIES}
-   ${QT_LIBRARIES} 
+   ${QT_LIBRARIES}
    ${PCL_LIBRARIES}
 )
 
@@ -272,3 +273,7 @@ target_link_libraries(turnTurtle ${catkin_LIBRARIES})
 
 add_executable(frame_a_to_frame_b_broadcaster src/CPP_demo/tf_broadcaster.cpp)
 target_link_libraries(frame_a_to_frame_b_broadcaster ${catkin_LIBRARIES})
+
+add_executable(detection_checker src/CPP_demo/LoopClosureDetection.cpp)
+target_link_libraries(detection_checker ${catkin_LIBRARIES})
+target_link_libraries(detection_checker ${LIBRARIES})

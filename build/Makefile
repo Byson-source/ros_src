@@ -978,6 +978,19 @@ sensor_msgs_generate_messages_nodejs/fast:
 .PHONY : sensor_msgs_generate_messages_nodejs/fast
 
 #=============================================================================
+# Target rules for targets named detection_checker
+
+# Build rule for target.
+detection_checker: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 detection_checker
+.PHONY : detection_checker
+
+# fast build rule for target.
+detection_checker/fast:
+	$(MAKE) $(MAKESILENT) -f cpp/CMakeFiles/detection_checker.dir/build.make cpp/CMakeFiles/detection_checker.dir/build
+.PHONY : detection_checker/fast
+
+#=============================================================================
 # Target rules for targets named roscpp_generate_messages_py
 
 # Build rule for target.
@@ -6881,6 +6894,7 @@ help:
 	@echo "... add_two_ints_client"
 	@echo "... add_two_ints_server_node"
 	@echo "... depthimage_to_laserscan"
+	@echo "... detection_checker"
 	@echo "... flat_world_imu_node"
 	@echo "... frame_a_to_frame_b_broadcaster"
 	@echo "... gmapping-rtest"
