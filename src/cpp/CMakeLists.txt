@@ -162,7 +162,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+include
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -274,6 +274,6 @@ target_link_libraries(turnTurtle ${catkin_LIBRARIES})
 add_executable(frame_a_to_frame_b_broadcaster src/CPP_demo/tf_broadcaster.cpp)
 target_link_libraries(frame_a_to_frame_b_broadcaster ${catkin_LIBRARIES})
 
-add_executable(detection_checker src/CPP_demo/LoopClosureDetection.cpp)
-target_link_libraries(detection_checker ${catkin_LIBRARIES})
-target_link_libraries(detection_checker ${LIBRARIES})
+# add_executable(detection_checker src/CPP_demo/LoopClosureDetection.cpp)
+# target_link_libraries(detection_checker ${catkin_LIBRARIES})
+# target_link_libraries(detection_checker ${LIBRARIES})

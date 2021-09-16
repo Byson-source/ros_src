@@ -1,20 +1,21 @@
 #include <iostream>
 #include <string>
+#include <vector>
 
 using namespace std;
+void test(int a){
+    a+=2;
+    cout<<a<<endl;
+}
 
-int main(){
-    int a{0};
-    int *a_ptr{new int()};
-    a_ptr=&a;
-//    cout<<*a_ptr<<endl;
+int main(int argc, char *argv[]){
+    int a{3};
+    int *a_ptr{&a};
 
-    delete a_ptr;
-
-//    int b{0};
-//    int *a_ptr{new int()};
-//
-//    cout<<a<<endl;
+    test(a);
+    cout<<a<<endl;
+    cout<<"argc is "<<argc<<endl;
+    cout<<"argv is "<<argv<<endl;
     return 0;
 
 }

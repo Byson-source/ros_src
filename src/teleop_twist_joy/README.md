@@ -1,5 +1,4 @@
-# ROS Joystick Drivers Stack #
+teleop_twist_joy [![Build Status](https://travis-ci.org/ros-teleop/teleop_twist_joy.svg?branch=indigo-devel)](https://travis-ci.org/ros-teleop/teleop_twist_joy)
+================
 
-[![](https://github.com/ros-drivers/joystick_drivers/workflows/Basic%20Build%20Workflow/badge.svg?branch=master)](https://github.com/ros-drivers/joystick_drivers/actions)
-
-A simple set of nodes for supporting various types of joystick inputs and producing ROS messages from the underlying OS messages.
+Simple joystick teleop for twist robots. See [ROS Wiki](http://wiki.ros.org/teleop_twist_joy)

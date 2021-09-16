@@ -22,40 +22,51 @@ import os
 
 # Instantiate CvBridge
 bridge = CvBridge()
-mypath="/home/ayumi/test"
-file_number=0
+mypath="/home/ayumi/Documents/tohoku_uni/CLOVERs/1database/"
+dir_number=0
 img_number=0
+switch=1
 
-def make_dir(data):
-    global file_number
-    global img_number
-    while True:
-        file_number+=1
-        if os.path.exists(mypath+str(file_number)):
-            continue
-        else:
-            os.mkdir(mypath+str(file_number))
-            img_number=0
+def dir_callback(data):
+    global mypath,img_number
+    mypath=data.data
+    img_number=0
 
 def image_callback(msg):
-    global file_number
-    global img_number
-    cv2_img = bridge.imgmsg_to_cv2(msg, "bgr8")
-    # cv2.imwrite('/home/ayumi/test'+str(file_number)+"/"+str(img_number)+"camera_image.jpeg", cv2_img)
-    cv2.imwrite('/home/ayumi/test/' + str(img_number) + "camera_image.jpeg", cv2_img)
-    img_number+=1
+    global file_number,img_number,mypath,switch
+
+    if switch==1:
+        cv2_img = bridge.imgmsg_to_cv2(msg, "bgr8")
+        cv2_img=cv2.resize(cv2_img,dsize=(512,384))
+        # cv2.imwrite('/home/ayumi/test'+str(file_number)+"/"+str(img_number)+"camera_image.jpeg", cv2_img)
+        cv2.imwrite(mypath+ str(img_number) + ".jpg", cv2_img)
+        #Depth image はpng!
+        img_number+=1
+    else:
+        print("Image extractor is waiting for rtabmap-reprocess...")
+
+def rest_callback(data):
+    global switch
+    if data.data=="Still rtabmap-reprocess running":
+        switch=0
+    else:
+        switch=1
 
 
-def main():
-    rospy.init_node('image_listener')
-    # Define your image topic
-    image_topic = "/camera/rgb/image_raw"
-    # Set up your subscriber and define its callback
-    rospy.Subscriber(image_topic, Image, image_callback)
-    # Spin until ctrl + c
-    rospy.Subscriber("LoopClosureDetection",String,make_dir)
-
-    rospy.spin()
 
 if __name__ == '__main__':
-    main()
+    # rate=rospy.Rate(10)
+
+    rospy.init_node('image_listener', anonymous=True)
+    # Define your image topic
+    image_topic = "/camera/rgb/image_raw"
+    #To store the images from camera
+    rospy.Subscriber(image_topic, Image, image_callback)
+    #In order to know that the location is changed as soon as loop-closure detection occurs
+    rospy.Subscriber("dir_info",String,dir_callback);
+    #In order to stop storing images during rtabmap-reprocess
+    rospy.Subscriber("take_rest",String,rest_callback)
+
+
+
+    rospy.spin()

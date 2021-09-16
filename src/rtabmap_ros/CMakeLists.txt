@@ -17,7 +17,7 @@ endif (POLICY CMP0042)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
              cv_bridge roscpp rospy sensor_msgs std_msgs std_srvs nav_msgs geometry_msgs visualization_msgs
-             image_transport tf tf_conversions tf2_ros eigen_conversions laser_geometry pcl_conversions 
+             image_transport tf tf_conversions tf2_ros eigen_conversions laser_geometry pcl_conversions
              pcl_ros nodelet dynamic_reconfigure message_filters class_loader rosgraph_msgs
              genmsg stereo_msgs move_base_msgs image_geometry pluginlib
 )
@@ -88,7 +88,7 @@ IF(RTABMAP_GUI OR rviz_FOUND)
             INCLUDE(${QT_USE_FILE})
          ENDIF(NOT Qt5_FOUND)
       ENDIF()
-   ENDIF()   
+   ENDIF()
 ENDIF(RTABMAP_GUI OR rviz_FOUND)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -179,7 +179,7 @@ catkin_package(
   INCLUDE_DIRS include
   LIBRARIES rtabmap_ros
   CATKIN_DEPENDS cv_bridge roscpp rospy sensor_msgs std_msgs std_srvs nav_msgs geometry_msgs visualization_msgs
-                 image_transport tf tf_conversions tf2_ros eigen_conversions laser_geometry pcl_conversions 
+                 image_transport tf tf_conversions tf2_ros eigen_conversions laser_geometry pcl_conversions
                  pcl_ros nodelet dynamic_reconfigure message_filters class_loader rosgraph_msgs
                  stereo_msgs move_base_msgs image_geometry ${optional_dependencies}
   DEPENDS RTABMap OpenCV
@@ -207,7 +207,7 @@ SET(Libraries
    ${catkin_LIBRARIES}
    ${RTABMap_LIBRARIES}
 )
- 
+
 SET(rtabmap_sync_lib_src
    src/CommonDataSubscriber.cpp
    src/impl/CommonDataSubscriberDepth.cpp
@@ -229,14 +229,14 @@ IF(RTABMAP_SYNC_MULTI_RGBD)
     src/impl/CommonDataSubscriberRGBD6.cpp
   )
 ENDIF(RTABMAP_SYNC_MULTI_RGBD)
-  
+
 SET(rtabmap_ros_lib_src
    src/MsgConversion.cpp
    src/MapsManager.cpp
    src/OdometryROS.cpp
    src/PluginInterface.cpp
 )
-  
+
 SET(rtabmap_plugins_lib_src
    src/nodelets/rgbd_odometry.cpp
    src/nodelets/stereo_odometry.cpp
@@ -245,10 +245,10 @@ SET(rtabmap_plugins_lib_src
    src/nodelets/data_throttle.cpp
    src/nodelets/stereo_throttle.cpp
    src/nodelets/data_odom_sync.cpp
-   src/nodelets/point_cloud_xyzrgb.cpp 
+   src/nodelets/point_cloud_xyzrgb.cpp
    src/nodelets/point_cloud_xyz.cpp
-   src/nodelets/disparity_to_depth.cpp 
-   src/nodelets/pointcloud_to_depthimage.cpp 
+   src/nodelets/disparity_to_depth.cpp
+   src/nodelets/pointcloud_to_depthimage.cpp
    src/nodelets/obstacles_detection.cpp
    src/nodelets/obstacles_detection_old.cpp
    src/nodelets/point_cloud_aggregator.cpp
@@ -262,7 +262,7 @@ IF(${cv_bridge_VERSION_MAJOR} GREATER 1 OR ${cv_bridge_VERSION_MINOR} GREATER 10
    SET(rtabmap_plugins_lib_src ${rtabmap_plugins_lib_src} src/nodelets/rgbd_sync.cpp src/nodelets/stereo_sync.cpp src/nodelets/rgb_sync.cpp src/nodelets/rgbd_relay.cpp)
 ELSE()
    ADD_DEFINITIONS("-DCV_BRIDGE_HYDRO")
-ENDIF()   
+ENDIF()
 
 # If octomap is found, add definition
 IF(octomap_msgs_FOUND)
@@ -445,7 +445,7 @@ IF(rviz_FOUND)
       ${rviz_LIBRARIES}
       ${rviz_DEFAULT_PLUGIN_LIBRARIES}
     )
-    
+
     ## RVIZ plugin
     IF(QT4_FOUND)
 	  IF(WIN32)
@@ -478,7 +478,7 @@ IF(rviz_FOUND)
         )
 	  ENDIF()
     ENDIF()
-    
+
     # tf:message_filters, mixing boost and Qt signals
 	IF(WIN32)
       set_property(
@@ -491,15 +491,15 @@ IF(rviz_FOUND)
         PROPERTY COMPILE_DEFINITIONS QT_NO_KEYWORDS
       )
 	ENDIF()
-	SET(SRC_FILES 
+	SET(SRC_FILES
 	   src/rviz/MapCloudDisplay.cpp
        src/rviz/MapGraphDisplay.cpp
        src/rviz/InfoDisplay.cpp
        ${MOC_FILES}
 	)
 	IF(NOT WIN32)
-	  SET(SRC_FILES 
-	    ${SRC_FILES} 
+	  SET(SRC_FILES
+	    ${SRC_FILES}
 	    src/rviz/OrbitOrientedViewController.cpp
 	  )
 	ENDIF(NOT WIN32)
@@ -562,14 +562,14 @@ catkin_install_python(PROGRAMS
 )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS 
+install(TARGETS
    rtabmap_sync
    rtabmap_ros
-   rtabmap_plugins 
-   rtabmap 
-   rtabmap_rgbd_odometry 
+   rtabmap_plugins
+   rtabmap
+   rtabmap_rgbd_odometry
    rtabmap_icp_odometry
-   rtabmap_rgbdicp_odometry 
+   rtabmap_rgbdicp_odometry
    rtabmap_stereo_odometry
    rtabmap_map_assembler
    rtabmap_map_optimizer
@@ -587,7 +587,7 @@ install(TARGETS
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 IF(RTABMAP_GUI)
-    install(TARGETS 
+    install(TARGETS
        rtabmapviz
        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
@@ -611,7 +611,7 @@ install(FILES
    launch/rgbd_mapping_kinect2.launch
    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
 )
-install(DIRECTORY 
+install(DIRECTORY
    launch/config
    launch/data
    launch/demo
@@ -624,7 +624,7 @@ install(FILES
    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 IF(rviz_FOUND)
-    install(TARGETS 
+    install(TARGETS
        rtabmap_rviz_plugins
        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
@@ -637,7 +637,7 @@ IF(rviz_FOUND)
 ENDIF(rviz_FOUND)
 
 IF(costmap_2d_FOUND)
-    install(TARGETS 
+    install(TARGETS
        rtabmap_costmap_plugins
        rtabmap_costmap_plugins2
        rtabmap_costmap_voxel_markers
