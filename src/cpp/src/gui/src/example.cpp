@@ -39,7 +39,6 @@ overloaded_window::status_checker()
     }
     else
         return;
-
 }
 
 overloaded_window::close_database(){

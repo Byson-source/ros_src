@@ -3,7 +3,7 @@
 #include "rtabmap/utilite/UEventsManager.h"
 #include "rtabmap/core/RtabmapThread.h"
 #include "rtabmap/core/Rtabmap.h"
-#include "src/my_mainwindow.h"
+#include "example.h"
 #include <QMessageBox>
 #include "rtabmap/utilite/UObjDeletionThread.h"
 #include "rtabmap/utilite/UFile.h"
@@ -19,8 +19,9 @@
 
 using namespace rtabmap;
 
-int main(int argc, char* argv[])
+int main(int argc, char** argv)
 {
+    ros::init(argc, argv, "GUI_node");
     /* Set logger type */
     ULogger::setType(ULogger::kTypeConsole);
     ULogger::setLevel(ULogger::kWarning);
@@ -43,7 +44,7 @@ int main(int argc, char* argv[])
     app->setStyleSheet("QMessageBox { messagebox-text-interaction-flags: 5; }"); // selectable message box
 
     ParametersMap parameters = Parameters::parseArguments(argc, argv, false);
-    my_mainwindow * mainWindow = new my_mainwindow();
+    overloaded_window * mainWindow = new overloaded_window();
     app->installEventFilter(mainWindow); // to catch FileOpen events.
 
     std::string database;
