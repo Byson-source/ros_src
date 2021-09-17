@@ -6,7 +6,6 @@
 #include "rtabmap/utilite/UEventsManager.h"
 #include "rtabmap/core/RtabmapThread.h"
 #include "rtabmap/core/Rtabmap.h"
-#include "src/my_mainwindow.h"
 #include <QMessageBox>
 #include "rtabmap/utilite/UObjDeletionThread.h"
 #include "rtabmap/utilite/UFile.h"
@@ -20,20 +19,25 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 
-class overloaded_window : public rtabmap::MainWindow,listener_node
+class overloaded_window : public rtabmap::MainWindow, public listener_node
 {
     Q_OBJECT
-    Q_DISABLE_COPY
-
 public:
-    explicit overloaded_window(QObject *parent = nullptr);
+    overloaded_window();
 
 public slots:
     void open_database();
     void close_database();
+    void status_checker();
 
 signals:
+    void valueChanged(int);
+    void signal0();
     
-}
+
+private:
+    QTimer *mytimer;
+    QTimer *sub_timer;
+};
 
 #endif

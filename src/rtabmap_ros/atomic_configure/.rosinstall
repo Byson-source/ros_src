@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/ayumi/catkin_ws/src/rtabmap_ros/devel/setup.sh

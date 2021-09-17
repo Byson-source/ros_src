@@ -1,0 +1,11 @@
+# generated from genmsg/cmake/pkg-genmsg.context.in
+
+messages_str = "/home/ayumi/catkin_ws/src/rtabmap_ros/msg/Info.msg;/home/ayumi/catkin_ws/src/rtabmap_ros/msg/KeyPoint.msg;/home/ayumi/catkin_ws/src/rtabmap_ros/msg/GlobalDescriptor.msg;/home/ayumi/catkin_ws/src/rtabmap_ros/msg/ScanDescriptor.msg;/home/ayumi/catkin_ws/src/rtabmap_ros/msg/MapData.msg;/home/ayumi/catkin_ws/src/rtabmap_ros/msg/MapGraph.msg;/home/ayumi/catkin_ws/src/rtabmap_ros/msg/NodeData.msg;/home/ayumi/catkin_ws/src/rtabmap_ros/msg/Link.msg;/home/ayumi/catkin_ws/src/rtabmap_ros/msg/OdomInfo.msg;/home/ayumi/catkin_ws/src/rtabmap_ros/msg/Point2f.msg;/home/ayumi/catkin_ws/src/rtabmap_ros/msg/Point3f.msg;/home/ayumi/catkin_ws/src/rtabmap_ros/msg/Goal.msg;/home/ayumi/catkin_ws/src/rtabmap_ros/msg/RGBDImage.msg;/home/ayumi/catkin_ws/src/rtabmap_ros/msg/RGBDImages.msg;/home/ayumi/catkin_ws/src/rtabmap_ros/msg/UserData.msg;/home/ayumi/catkin_ws/src/rtabmap_ros/msg/GPS.msg;/home/ayumi/catkin_ws/src/rtabmap_ros/msg/Path.msg;/home/ayumi/catkin_ws/src/rtabmap_ros/msg/EnvSensor.msg"
+services_str = "/home/ayumi/catkin_ws/src/rtabmap_ros/srv/GetMap.srv;/home/ayumi/catkin_ws/src/rtabmap_ros/srv/GetMap2.srv;/home/ayumi/catkin_ws/src/rtabmap_ros/srv/ListLabels.srv;/home/ayumi/catkin_ws/src/rtabmap_ros/srv/PublishMap.srv;/home/ayumi/catkin_ws/src/rtabmap_ros/srv/ResetPose.srv;/home/ayumi/catkin_ws/src/rtabmap_ros/srv/SetGoal.srv;/home/ayumi/catkin_ws/src/rtabmap_ros/srv/SetLabel.srv;/home/ayumi/catkin_ws/src/rtabmap_ros/srv/GetPlan.srv;/home/ayumi/catkin_ws/src/rtabmap_ros/srv/AddLink.srv;/home/ayumi/catkin_ws/src/rtabmap_ros/srv/GetNodeData.srv;/home/ayumi/catkin_ws/src/rtabmap_ros/srv/GetNodesInRadius.srv;/home/ayumi/catkin_ws/src/rtabmap_ros/srv/LoadDatabase.srv"
+pkg_name = "rtabmap_ros"
+dependencies_str = "std_msgs;geometry_msgs;sensor_msgs"
+langs = "gencpp;geneus;genlisp;gennodejs;genpy"
+dep_include_paths_str = "rtabmap_ros;/home/ayumi/catkin_ws/src/rtabmap_ros/msg;std_msgs;/opt/ros/noetic/share/std_msgs/cmake/../msg;geometry_msgs;/opt/ros/noetic/share/geometry_msgs/cmake/../msg;sensor_msgs;/opt/ros/noetic/share/sensor_msgs/cmake/../msg"
+PYTHON_EXECUTABLE = "/usr/local/bin/python3"
+package_has_static_sources = 'TRUE' == 'TRUE'
+genmsg_check_deps_script = "/opt/ros/noetic/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py"
