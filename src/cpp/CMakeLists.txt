@@ -274,16 +274,16 @@ target_link_libraries(turnTurtle ${catkin_LIBRARIES})
 add_executable(frame_a_to_frame_b_broadcaster src/CPP_demo/tf_broadcaster.cpp)
 target_link_libraries(frame_a_to_frame_b_broadcaster ${catkin_LIBRARIES})
 
-add_executable(detection_checker loop_closure/detection_checker/LoopClosureDetection.cpp)
-target_link_libraries(detection_checker ${catkin_LIBRARIES})
-target_link_libraries(detection_checker ${LIBRARIES})
+# add_executable(detection_checker loop_closure/detection_checker/LoopClosureDetection.cpp)
+# target_link_libraries(detection_checker ${catkin_LIBRARIES})
+# target_link_libraries(detection_checker ${LIBRARIES})
 
 add_executable(GUI_node
-gui/src/example.cpp
-gui/src/listener.cpp
-gui/src/main.cpp
-gui/include/example.h
-gui/include/listener.h
+src/gui/src/example.cpp
+src/gui/src/listener.cpp
+src/gui/src/main.cpp
+src/gui/include/example.h
+src/gui/include/listener.h
 )
 
 target_link_libraries(GUI_node ${catkin_LIBRARIES})
