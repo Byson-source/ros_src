@@ -69,28 +69,28 @@ include cpp/CMakeFiles/test_averaging.dir/progress.make
 # Include the compile flags for this target's objects.
 include cpp/CMakeFiles/test_averaging.dir/flags.make
 
-cpp/CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_server.cpp.o: cpp/CMakeFiles/test_averaging.dir/flags.make
-cpp/CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_server.cpp.o: /home/ayumi/catkin_ws/src/cpp/src/CPP_demo/averaging_server.cpp
-cpp/CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_server.cpp.o: cpp/CMakeFiles/test_averaging.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object cpp/CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_server.cpp.o"
-	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT cpp/CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_server.cpp.o -MF CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_server.cpp.o.d -o CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_server.cpp.o -c /home/ayumi/catkin_ws/src/cpp/src/CPP_demo/averaging_server.cpp
+cpp/CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_client.cpp.o: cpp/CMakeFiles/test_averaging.dir/flags.make
+cpp/CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_client.cpp.o: /home/ayumi/catkin_ws/src/cpp/src/CPP_demo/averaging_client.cpp
+cpp/CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_client.cpp.o: cpp/CMakeFiles/test_averaging.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object cpp/CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_client.cpp.o"
+	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT cpp/CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_client.cpp.o -MF CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_client.cpp.o.d -o CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_client.cpp.o -c /home/ayumi/catkin_ws/src/cpp/src/CPP_demo/averaging_client.cpp
 
-cpp/CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_server.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_server.cpp.i"
-	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ayumi/catkin_ws/src/cpp/src/CPP_demo/averaging_server.cpp > CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_server.cpp.i
+cpp/CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_client.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_client.cpp.i"
+	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ayumi/catkin_ws/src/cpp/src/CPP_demo/averaging_client.cpp > CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_client.cpp.i
 
-cpp/CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_server.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_server.cpp.s"
-	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ayumi/catkin_ws/src/cpp/src/CPP_demo/averaging_server.cpp -o CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_server.cpp.s
+cpp/CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_client.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_client.cpp.s"
+	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ayumi/catkin_ws/src/cpp/src/CPP_demo/averaging_client.cpp -o CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_client.cpp.s
 
 # Object files for target test_averaging
 test_averaging_OBJECTS = \
-"CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_server.cpp.o"
+"CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_client.cpp.o"
 
 # External object files for target test_averaging
 test_averaging_EXTERNAL_OBJECTS =
 
-/home/ayumi/catkin_ws/devel/lib/cpp/test_averaging: cpp/CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_server.cpp.o
+/home/ayumi/catkin_ws/devel/lib/cpp/test_averaging: cpp/CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_client.cpp.o
 /home/ayumi/catkin_ws/devel/lib/cpp/test_averaging: cpp/CMakeFiles/test_averaging.dir/build.make
 /home/ayumi/catkin_ws/devel/lib/cpp/test_averaging: /opt/ros/noetic/lib/libtf.so
 /home/ayumi/catkin_ws/devel/lib/cpp/test_averaging: /opt/ros/noetic/lib/libtf2_ros.so

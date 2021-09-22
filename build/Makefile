@@ -1472,6 +1472,19 @@ actionlib_generate_messages_lisp/fast:
 .PHONY : actionlib_generate_messages_lisp/fast
 
 #=============================================================================
+# Target rules for targets named test_fibonacci_callback
+
+# Build rule for target.
+test_fibonacci_callback: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_fibonacci_callback
+.PHONY : test_fibonacci_callback
+
+# fast build rule for target.
+test_fibonacci_callback/fast:
+	$(MAKE) $(MAKESILENT) -f cpp/CMakeFiles/test_fibonacci_callback.dir/build.make cpp/CMakeFiles/test_fibonacci_callback.dir/build
+.PHONY : test_fibonacci_callback/fast
+
+#=============================================================================
 # Target rules for targets named actionlib_generate_messages_py
 
 # Build rule for target.
@@ -7037,6 +7050,7 @@ help:
 	@echo "... test_averaging"
 	@echo "... test_dtl"
 	@echo "... test_fibonacci"
+	@echo "... test_fibonacci_callback"
 	@echo "... test_map_merging"
 	@echo "... turnTurtle"
 	@echo "... turtlebot3_diagnostics"

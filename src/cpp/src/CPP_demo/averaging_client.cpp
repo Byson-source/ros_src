@@ -14,7 +14,7 @@ int main (int argc, char **argv)
   ros::init(argc, argv, "test_averaging");
 
   // create the action client
-  actionlib::SimpleActionClient<cpp::AveragingAction> ac("averaging_server");
+  actionlib::SimpleActionClient<cpp::AveragingAction> ac("averaging");
   boost::thread spin_thread(&spinThread);
 
   ROS_INFO("Waiting for action server to start.");

@@ -329,7 +329,7 @@ add_dependencies(
   ${cpp_EXPORTED_TARGETS}
 )
 
-add_executable(test_averaging src/CPP_demo/averaging_server.cpp)
+add_executable(test_averaging src/CPP_demo/averaging_client.cpp)
 
 target_link_libraries(
   test_averaging
@@ -341,5 +341,16 @@ add_dependencies(
   ${cpp_EXPORTED_TARGETS}
 )
 
+add_executable(test_fibonacci_callback src/CPP_demo/fibonacci_callback_client.cpp)
+
+target_link_libraries(
+  test_fibonacci_callback
+  ${catkin_LIBRARIES}
+)
+
+add_dependencies(
+  test_fibonacci_callback
+  ${cpp_EXPORTED_TARGETS}
+)
 
 
