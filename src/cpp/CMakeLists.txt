@@ -8,7 +8,9 @@ project(cpp)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  actionlib_msgs
   message_generation
+  rospy
   roscpp
   std_msgs
   tf
@@ -97,26 +99,28 @@ ENDIF()
 ## Generate messages in the 'msg' folder
 add_message_files(
   FILES
-  IoTSensor.msg
+  # IoTSensor.msg
 )
 
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES
-  AddTwoInts.srv
+  # AddTwoInts.srv
 )
 
 ## Generate actions in the 'action' folder
-# add_action_files(
-#   FILES
-#   Action1.action
-#   Action2.action
-# )
+add_action_files(
+  DIRECTORY action
+  FILES
+  Fibonacci.action
+  Averaging.action
+)
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
   DEPENDENCIES
   std_msgs
+  actionlib_msgs
 )
 
 ################################################
@@ -205,10 +209,10 @@ gui/include
 
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
-# catkin_install_python(PROGRAMS
-#   scripts/my_python_script
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+catkin_install_python(PROGRAMS
+  scripts/gen_numbers.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
@@ -278,14 +282,64 @@ target_link_libraries(frame_a_to_frame_b_broadcaster ${catkin_LIBRARIES})
 # target_link_libraries(detection_checker ${catkin_LIBRARIES})
 # target_link_libraries(detection_checker ${LIBRARIES})
 
-add_executable(GUI_node
-src/gui/src/example.cpp
-src/gui/src/listener.cpp
-src/gui/src/main.cpp
-src/gui/include/example.h
-src/gui/include/listener.h
+# add_executable(GUI_node
+# src/gui/src/example.cpp
+# src/gui/src/listener.cpp
+# src/gui/src/main.cpp
+# src/gui/include/example.h
+# src/gui/include/listener.h
+# )
+
+# target_link_libraries(GUI_node ${catkin_LIBRARIES})
+# target_link_libraries(GUI_node ${LIBRARIES})
+
+add_executable(fibonacci_server src/CPP_demo/action_server.cpp)
+
+target_link_libraries(
+  fibonacci_server
+  ${catkin_LIBRARIES}
 )
 
-target_link_libraries(GUI_node ${catkin_LIBRARIES})
-target_link_libraries(GUI_node ${LIBRARIES})
+add_dependencies(
+  fibonacci_server
+  ${cpp_EXPORTED_TARGETS}
+)
+
+add_executable(test_fibonacci src/CPP_demo/actionlib_client.cpp)
+
+target_link_libraries(
+  test_fibonacci
+  ${catkin_LIBRARIES}
+)
+
+add_dependencies(
+  test_fibonacci
+  ${cpp_EXPORTED_TARGETS}
+)
+
+add_executable(averaging src/CPP_demo/averaging_server.cpp)
+
+target_link_libraries(
+  averaging
+  ${catkin_LIBRARIES}
+)
+
+add_dependencies(
+  averaging
+  ${cpp_EXPORTED_TARGETS}
+)
+
+add_executable(test_averaging src/CPP_demo/averaging_server.cpp)
+
+target_link_libraries(
+  test_averaging
+  ${catkin_LIBRARIES}
+)
+
+add_dependencies(
+  test_averaging
+  ${cpp_EXPORTED_TARGETS}
+)
+
+
 

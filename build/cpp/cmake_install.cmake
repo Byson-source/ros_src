@@ -43,11 +43,34 @@ if(NOT DEFINED CMAKE_OBJDUMP)
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/cpp/msg" TYPE FILE FILES "/home/ayumi/catkin_ws/src/cpp/msg/IoTSensor.msg")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/cpp/action" TYPE FILE FILES
+    "/home/ayumi/catkin_ws/src/cpp/action/Fibonacci.action"
+    "/home/ayumi/catkin_ws/src/cpp/action/Averaging.action"
+    )
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/cpp/srv" TYPE FILE FILES "/home/ayumi/catkin_ws/src/cpp/srv/AddTwoInts.srv")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/cpp/msg" TYPE FILE FILES
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciAction.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionGoal.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionResult.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionFeedback.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciGoal.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciResult.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciFeedback.msg"
+    )
+endif()
+
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/cpp/msg" TYPE FILE FILES
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingAction.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionGoal.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionResult.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionFeedback.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingGoal.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingResult.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg"
+    )
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
@@ -95,5 +118,9 @@ endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/cpp" TYPE FILE FILES "/home/ayumi/catkin_ws/src/cpp/package.xml")
+endif()
+
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cpp" TYPE PROGRAM FILES "/home/ayumi/catkin_ws/build/cpp/catkin_generated/installspace/gen_numbers.py")
 endif()
 

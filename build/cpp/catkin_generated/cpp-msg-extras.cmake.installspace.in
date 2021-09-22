@@ -1,2 +1,2 @@
-set(cpp_MESSAGE_FILES "msg/IoTSensor.msg")
-set(cpp_SERVICE_FILES "srv/AddTwoInts.srv")
+set(cpp_MESSAGE_FILES "msg/FibonacciAction.msg;msg/FibonacciActionGoal.msg;msg/FibonacciActionResult.msg;msg/FibonacciActionFeedback.msg;msg/FibonacciGoal.msg;msg/FibonacciResult.msg;msg/FibonacciFeedback.msg;msg/AveragingAction.msg;msg/AveragingActionGoal.msg;msg/AveragingActionResult.msg;msg/AveragingActionFeedback.msg;msg/AveragingGoal.msg;msg/AveragingResult.msg;msg/AveragingFeedback.msg")
+set(cpp_SERVICE_FILES "")

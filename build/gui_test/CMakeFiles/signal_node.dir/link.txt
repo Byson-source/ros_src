@@ -1,1 +1,0 @@
-/usr/bin/c++ -rdynamic CMakeFiles/signal_node.dir/signal_node_autogen/mocs_compilation.cpp.o CMakeFiles/signal_node.dir/src/talker.cpp.o -o /home/ayumi/catkin_ws/devel/lib/gui_test/signal_node 
