@@ -1,4 +1,5 @@
 #include <ros/ros.h>
+#include <std_msgs/String.h>
 #include <std_msgs/Float32.h>
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/terminal_state.h>
@@ -15,9 +16,11 @@ private:
 
   ros::Subscriber switch_sub;
 
-  ros::Subscriber random_sub;
+  ros::Publisher pub;
 
   // boost::thread spin_thread(&Average_Client::spinThread());
+
+  actionlib::SimpleActionClient<cpp::AveragingAction> ac;
 
   float status{0.0};
 
@@ -28,26 +31,25 @@ private:
   ros::Time t_start{ros::Time::now()};
 
 public:
-  Average_Client(std::string name) : action_name(name)
+  Average_Client(std::string name) : action_name(name),ac(name, true)
   {
     ROS_INFO("Now launching...");
 
-    random_sub = n.subscribe("/random_number", 1, &Average_Client::randomCB, this);
-
-    switch_sub = n.subscribe("/switch_number", 1, &Average_Client::switchCB, this);
+    pub = n.advertise<std_msgs::String>("test", 10);
+    switch_sub = n.subscribe("/switch_number", 100, &Average_Client::switchCB, this);
   }
 
-  void switchCB(const::std_msgs::Float32::ConstPtr &msg){
-    status=msg->data;
-  }
-
-  void randomCB(const std_msgs::Float32::ConstPtr &msg)
+  void switchCB(const std_msgs::Float32::ConstPtr &msg)
   {
+    std_msgs::String datada;
+    datada.data = "Yes";
+    status = msg->data;
+    pub.publish(datada);
+    // std::cout<<"status: "<<status<<"previous_status: "<<status<<std::endl;
     if (status == 1.0 && !previous_status == status)
+    // if (status == 1.0)
     {
-      previous_status=1;
-
-      actionlib::SimpleActionClient<cpp::AveragingAction> ac(action_name,true);
+      previous_status = 1;
 
       bool finished_before_timeout = ac.waitForResult(ros::Duration(30.0));
 
@@ -59,7 +61,6 @@ public:
       cpp::AveragingGoal goal;
       goal.samples = 100;
       ac.sendGoal(goal);
-
       if (finished_before_timeout)
       {
         actionlib::SimpleClientGoalState state = ac.getState();
@@ -67,17 +68,12 @@ public:
       }
       else
         ROS_INFO("Action did not finish before the time out.");
-    }else{
-      previous_status = status;
-
     }
-    
+    else
+    {
+      previous_status = status;
+    }
   }
-
-  // void spinThread()
-  // {
-  //   ros::spin();
-  // }
 };
 int main(int argc, char **argv)
 {

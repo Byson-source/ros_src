@@ -1225,6 +1225,7 @@ cpp/CMakeFiles/averaging.dir/src/CPP_demo/averaging_server.cpp.o: /home/ayumi/ca
   /opt/ros/noetic/include/ros/node_handle.h \
   /opt/ros/noetic/include/std_msgs/Float32.h \
   /opt/ros/noetic/include/ros/message_operations.h \
+  /opt/ros/noetic/include/std_msgs/String.h \
   /opt/ros/noetic/include/actionlib/server/simple_action_server.h \
   /usr/include/boost/thread/condition.hpp \
   /usr/include/boost/thread/condition_variable.hpp \
@@ -1646,6 +1647,8 @@ cpp/CMakeFiles/averaging.dir/src/CPP_demo/averaging_server.cpp.o: /home/ayumi/ca
 /usr/include/boost/thread/lock_guard.hpp:
 
 /usr/include/boost/thread/condition_variable.hpp:
+
+/opt/ros/noetic/include/std_msgs/String.h:
 
 /opt/ros/noetic/include/actionlib/server/simple_action_server_imp.h:
 

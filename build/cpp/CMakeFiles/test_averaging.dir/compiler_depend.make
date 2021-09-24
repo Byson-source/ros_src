@@ -1223,8 +1223,9 @@ cpp/CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_client.cpp.o: /home/ayu
   /opt/ros/noetic/include/ros/param.h \
   /opt/ros/noetic/include/ros/topic.h \
   /opt/ros/noetic/include/ros/node_handle.h \
-  /opt/ros/noetic/include/std_msgs/Float32.h \
+  /opt/ros/noetic/include/std_msgs/String.h \
   /opt/ros/noetic/include/ros/message_operations.h \
+  /opt/ros/noetic/include/std_msgs/Float32.h \
   /opt/ros/noetic/include/actionlib/client/simple_action_client.h \
   /usr/include/boost/thread/condition.hpp \
   /usr/include/boost/thread/condition_variable.hpp \
@@ -1685,6 +1686,8 @@ cpp/CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_client.cpp.o: /home/ayu
 /usr/include/boost/thread/condition_variable.hpp:
 
 /opt/ros/noetic/include/actionlib/client/simple_action_client.h:
+
+/opt/ros/noetic/include/std_msgs/String.h:
 
 /opt/ros/noetic/include/ros/master.h:
 

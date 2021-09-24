@@ -1,14 +1,4 @@
 #! /usr/bin/python
-# Copyright (c) 2015, Rethink Robotics, Inc.
-
-# Using this CvBridge Tutorial for converting
-# ROS images to OpenCV2 images
-# http://wiki.ros.org/cv_bridge/Tutorials/ConvertingBetweenROSImagesAndOpenCVImagesPython
-
-# Using this OpenCV2 tutorial for saving Images:
-# http://opencv-python-tutroals.readthedocs.org/en/latest/py_tutorials/py_gui/py_image_display/py_image_display.html
-
-# rospy for the subscriber
 import rospy
 # ROS Image message
 from sensor_msgs.msg import Image
@@ -43,7 +33,7 @@ def image_callback(msg):
         #Depth image はpng!
         img_number+=1
     else:
-        print("Image extractor is waiting for rtabmap-reprocess...")
+        rospy.loginfo("Image extractor is waiting for rtabmap-reprocess...")
 
 def rest_callback(data):
     global switch
