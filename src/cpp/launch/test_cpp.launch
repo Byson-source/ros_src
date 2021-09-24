@@ -1,0 +1,9 @@
+<launch>
+    <node pkg="cpp" type="gen_numbers.py" name="switch" respawn="false" output="screen"/>
+
+    <node pkg="cpp" type="test_averaging" name="client" respawn="false" output="screen"/>
+
+    <node pkg="cpp" type="averaging_server" name="averaging" respawn="false" output="screen"/>
+
+</launch>
+

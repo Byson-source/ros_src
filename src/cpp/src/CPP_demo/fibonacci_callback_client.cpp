@@ -1,8 +1,8 @@
 #include <ros/ros.h>
 #include <actionlib/client/simple_action_client.h>
-#include <actionlib_tutorials/FibonacciAction.h>
+#include <cpp/FibonacciAction.h>
 
-using namespace actionlib_tutorials;
+using namespace cpp;
 typedef actionlib::SimpleActionClient<FibonacciAction> Client;
 
 // Called once when the goal completes
