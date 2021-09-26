@@ -1,5 +1,6 @@
 #goal definition
 int32 samples
+# string[] sample2
 ---
 #result definition
 float32 mean

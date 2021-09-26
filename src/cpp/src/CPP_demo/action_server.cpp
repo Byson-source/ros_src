@@ -1,10 +1,12 @@
 #include <ros/ros.h>
 #include <actionlib/server/simple_action_server.h>
 #include <cpp/FibonacciAction.h>
+#include <string>
 
 class FibonacciAction
 {
 protected:
+  std::vector<std::string> test;
   ros::NodeHandle nh_;
   actionlib::SimpleActionServer<cpp::FibonacciAction> as_; // NodeHandle instance must be created before this line. Otherwise strange error occurs.
   std::string action_name_;
@@ -23,7 +25,7 @@ public:
   {
   }
 
-  void executeCB(const cpp::FibonacciGoalConstPtr &goal)
+  void executeCB(const cpp::FibonacciGoal::ConstPtr &goal)
   {
     // helper variables
     ros::Rate r(1);
@@ -37,6 +39,10 @@ public:
     // publish info to the console for the user
     ROS_INFO("%s: Executing, creating fibonacci sequence of order %i with seeds %i, %i",
              action_name_.c_str(), goal->order, feedback_.sequence[0], feedback_.sequence[1]);
+
+    test.push_back(goal->strings[0]);
+    for (auto val : goal->strings)
+      std::cout << val << std::endl;
 
     // start executing the action
     for (int i = 1; i <= goal->order; i++)

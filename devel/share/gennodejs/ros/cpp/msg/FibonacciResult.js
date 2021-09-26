@@ -69,6 +69,7 @@ class FibonacciResult {
     #result definition
     int32[] sequence
     
+    
     `;
   }
 

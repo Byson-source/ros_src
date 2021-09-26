@@ -19,6 +19,11 @@ int main (int argc, char **argv)
   // send a goal to the action
   cpp::FibonacciGoal goal;
   goal.order = 20;
+
+  goal.strings.clear();
+  goal.strings.push_back("Hello");
+  goal.strings.push_back("Good night");
+
   ac.sendGoal(goal);
 
   //wait for the action to return

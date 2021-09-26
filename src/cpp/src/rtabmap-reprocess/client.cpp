@@ -5,6 +5,8 @@
 #include <cpp/RtabmapReprocess.h>
 #include <cpp/RtabmapReprocessResult.h>
 #include <stdio.h>
+#include <cpp/StringArray.h>
+#include <vector>
 
 #define CHECK_REPROCESS_FINISH_TOPIC "RtabmapReprocess_node/result"
 #define SWITCH_REPROCESS_TOPIC "LoopClosureDetection"
@@ -22,7 +24,8 @@ protected:
 
     int status{0};
 
-    std::string databasepath;
+    std::string goal_path;
+    std::vector<std::string> databases;
 
     ros::Subscriber result_checker;
     ros::Subscriber switch_sub;
@@ -46,9 +49,13 @@ public:
         restart_loop_closure = nh.advertise<std_msgs::Int32>(EXIT_TOPIC, 10);
     }
 
-    void dirCB(const std_msgs::String::ConstPtr &msg)
+    void dirCB(const cpp::StringArray::ConstPtr &msg)
     {
-        databasepath = msg->data;
+        for (int i{1} : !i == msg->strings.size() : i++)
+        {
+            databases.push_back(msg->strings[i]);
+        }
+        goal_path = msg->strings[0];
     }
 
     void checkCB(const cpp::RtabmapReprocessActionResult::ConstPtr &msg)
@@ -72,8 +79,22 @@ public:
             ac.waitForServer();
 
             cpp::RtabmapReprocessGoal goal;
-            goal.databasepath=databasepath;
+            for (auto val : databases)
+                goal.databasepaths.push_back(val);
+            
+            goal.goal_path=goal_path;
+            
             ac.sendGoal(goal);
         }
     }
 };
+
+int main(int argc, char **argv)
+{
+    ros::init(argc, argv "reprocess_client_node");
+
+    Reprocess_Client client_agent("RtabmapReprocess_node");
+    ros::spin();
+
+    return 0;
+}

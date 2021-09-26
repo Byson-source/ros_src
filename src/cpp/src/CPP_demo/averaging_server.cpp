@@ -4,18 +4,25 @@
 #include <actionlib/server/simple_action_server.h>
 #include <cpp/AveragingAction.h>
 #include <stdio.h>
+#include <vector>
 
 class AveragingAction
 {
 
 protected:
   ros::NodeHandle nh_;
+
   int data_count_, goal_;
   float sum_, sum_sq_;
+
+  // std::vector<std::string> sample2;
+
   actionlib::SimpleActionServer<cpp::AveragingAction> as_;
   std::string action_name_;
+
   cpp::AveragingFeedback feedback_;
   cpp::AveragingResult result_;
+
   ros::Subscriber sub_;
   ros::Subscriber sub2;
 
@@ -29,7 +36,7 @@ public:
 
     //subscribe to the data topic of interest
     sub_ = nh_.subscribe("/random_number", 1, &AveragingAction::analysisCB, this);
-    sub2 = nh_.subscribe("/test", 1, &AveragingAction::testCB, this);
+    // sub2 = nh_.subscribe("/test", 1, &AveragingAction::testCB, this);
     as_.start();
   }
 
@@ -48,11 +55,18 @@ public:
     sum_sq_ = 0;
     // accept the new goal
     goal_ = as_.acceptNewGoal()->samples;
+    // sample2=as_.acceptNewGoal()->sample2;
+    // for(auto val:sample2){
+    //   std::cout<<val;
+    // }
+    // std::cout<<"\n";
+
   }
 
   void preemptCB()
   {
     ROS_INFO("%s: Preempted", action_name_.c_str());
+
     // set the action state to preempted
     as_.setPreempted();
   }

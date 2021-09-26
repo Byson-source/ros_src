@@ -64,6 +64,11 @@ public:
       // send a goal to the action
       cpp::AveragingGoal goal;
       goal.samples = 100;
+
+      // goal.sample2.clear();
+      // goal.sample2.push_back("a");
+      // goal.sample2.push_back("b");
+
       ac.sendGoal(goal);
       if (finished_before_timeout)
       {

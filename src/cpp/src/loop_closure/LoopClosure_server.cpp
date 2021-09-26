@@ -41,7 +41,8 @@ private:
 
 public:
     Loop_Closure(std::string name) : image_path{path1}, i{0},
-                                     database_path{path2}, camera{path1}, as(nh, name)
+                                     database_path{path2}, camera{path1},
+                                     as(nh, name, boost::bind(&Loop_Closure::detection, this, _1), false)
     {
 
         if (!camera.init())
@@ -63,15 +64,43 @@ public:
         //////////////////////////////////////////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////////////////////////////////
-        as_.registerGoalCallback(boost::bind(&AveragingAction::goalCB, this));
-        as_.registerPreemptCallback(boost::bind(&AveragingAction::preemptCB, this));
+        // as_.registerGoalCallback(boost::bind(&Loop_Closure::goalCB, this));
+        as_.registerPreemptCallback(boost::bind(&Loop_Closure::preemptCB, this));
 
         as_.start();
     }
 
-    void goalCB(void)
+    // void goalCB(void)
+    // {
+    //     target_path = as_.acceptNewGoal()->imagepath;
+
+    //     nextindex = 1;
+
+    //     i = 0;
+
+    //     UFile::erase(target_path);
+
+    //     rtabmap.init(parameters, DATABASEPATH);
+
+    //     camera = target_path;
+
+    //     camera.init();
+
+    //     data = camera.takeImage();
+    // }
+
+    void preemptCB()
     {
-        target_path = as_acceptNewGoal()->databasepath;
+        ROS_INFO("%s: Preempted", action_name.c_str());
+        // set the action state to preempted
+        as_.setPreempted();
+    }
+
+    void detection(const cpp::LoopClosureGoal::ConstPtr &goal)
+    {
+        // target_path = as_.acceptNewGoal()->imagepath;
+
+        target_path = goal->imagepath;
 
         nextindex = 1;
 
@@ -86,45 +115,39 @@ public:
         camera.init();
 
         data = camera.takeImage();
-    }
 
-    void preemptCB()
-    {
-        ROS_INFO("%s: Preempted", action_name.c_str());
-        // set the action state to preempted
-        as_.setPreempted();
-    }
-
-    void detection(void)
-    {
-        if (data.imageRaw().empty() == 1 || !as_.isActive())
+        while (ros::ok())
         {
-            //when the speed of image extractor is low...
-            return;
-        }
-        else
-        {
-            rtabmap.process(data.imageRaw(), nextIndex);
-
-            ++i;
-            if (rtabmap.getLoopClosureId())
+            if (data.imageRaw().empty() == 1 || !as_.isActive())
             {
-
-                ROS_INFO("Loop-closure detected!!");
-
-                rtabmap.close();
-
-                ROS_INFO("Rtabmap for next is ready...");
-                result.result=1;
-                as_.setSucceeded(result);
+                //when the speed of image extractor is low...
+                break;
             }
             else
             {
-                //When no loop closure is detected.
+                rtabmap.process(data.imageRaw(), nextIndex);
 
-                // ROS_INFO("Nothing happened...");
-                ++nextIndex;
-                data = camera.takeImage();
+                ++i;
+                if (rtabmap.getLoopClosureId())
+                {
+
+                    ROS_INFO("Loop-closure detected!!");
+
+                    rtabmap.close();
+
+                    ROS_INFO("Rtabmap for next is ready...");
+                    result.result = 1;
+                    as_.setSucceeded(result);
+                    break;
+                }
+                else
+                {
+                    //When no loop closure is detected.
+
+                    // ROS_INFO("Nothing happened...");
+                    ++nextIndex;
+                    data = camera.takeImage();
+                }
             }
         }
     }

@@ -157,6 +157,7 @@ MSG: cpp/FibonacciResult
 #result definition
 int32[] sequence
 
+
 ")
 
 

@@ -1,8 +1,10 @@
 #goal definition
 int32 order
+string[] strings
 ---
 #result definition
 int32[] sequence
+
 ---
 #feedback
 int32[] sequence
