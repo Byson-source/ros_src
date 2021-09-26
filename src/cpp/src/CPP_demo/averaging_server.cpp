@@ -10,10 +10,10 @@ class AveragingAction
 
 protected:
   ros::NodeHandle nh_;
-  actionlib::SimpleActionServer<cpp::AveragingAction> as_;
-  std::string action_name_;
   int data_count_, goal_;
   float sum_, sum_sq_;
+  actionlib::SimpleActionServer<cpp::AveragingAction> as_;
+  std::string action_name_;
   cpp::AveragingFeedback feedback_;
   cpp::AveragingResult result_;
   ros::Subscriber sub_;

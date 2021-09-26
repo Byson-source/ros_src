@@ -20,12 +20,12 @@
 
 using namespace rtabmap;
 
-void guicallback(const std_msgs::String::ConstPtr &msg){
-    if
-
+void guicallback(const std_msgs::String::ConstPtr &msg)
+{
+	if
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
 	/* Set logger type */
 	ULogger::setType(ULogger::kTypeConsole);
@@ -44,31 +44,31 @@ int main(int argc, char* argv[])
 #endif
 
 	/* Create tasks */
-	QApplication * app = new QApplication(argc, argv);
-    QTimer::singleShot(10000,app,SLOT(quit()));
+	QApplication *app = new QApplication(argc, argv);
+	QTimer::singleShot(10000, app, SLOT(quit()));
 	app->setStyleSheet("QMessageBox { messagebox-text-interaction-flags: 5; }"); // selectable message box
 
 	ParametersMap parameters = Parameters::parseArguments(argc, argv, false);
-	MainWindow * mainWindow = new MainWindow();
-    app->installEventFilter(mainWindow); // to catch FileOpen events.
+	MainWindow *mainWindow = new MainWindow();
+	app->installEventFilter(mainWindow); // to catch FileOpen events.
 
-    std::string database;
-    for(int i=1; i<argc; ++i)
-    {
-        std::string value = uReplaceChar(argv[i], '~', UDirectory::homeDir());
-        if(UFile::exists(value) &&
-           UFile::getExtension(value).compare("db") == 0)
-        {
-            database = value;
-        }
-    }
+	std::string database;
+	for (int i = 1; i < argc; ++i)
+	{
+		std::string value = uReplaceChar(argv[i], '~', UDirectory::homeDir());
+		if (UFile::exists(value) &&
+			UFile::getExtension(value).compare("db") == 0)
+		{
+			database = value;
+		}
+	}
 
 	printf("Program started...\n");
 
 	UEventsManager::addHandler(mainWindow);
 
 	/* Start thread's task */
-	if(mainWindow->isSavedMaximized())
+	if (mainWindow->isSavedMaximized())
 	{
 		mainWindow->showMaximized();
 	}
@@ -77,34 +77,33 @@ int main(int argc, char* argv[])
 		mainWindow->show();
 	}
 
-	RtabmapThread * rtabmap = new RtabmapThread(new Rtabmap());
+	RtabmapThread *rtabmap = new RtabmapThread(new Rtabmap());
 	rtabmap->start(); // start it not initialized... will be initialized by event from the gui
 	UEventsManager::addHandler(rtabmap);
 
-	    for(int i=1; i<argc; ++i)
-    {
-        std::string value = uReplaceChar(argv[i], '~', UDirectory::homeDir());
-        if(UFile::exists(value) &&
-           UFile::getExtension(value).compare("db") == 0)
-        {
-            database = value;
-        }
-    }
+	for (int i = 1; i < argc; ++i)
+	{
+		std::string value = uReplaceChar(argv[i], '~', UDirectory::homeDir());
+		if (UFile::exists(value) &&
+			UFile::getExtension(value).compare("db") == 0)
+		{
+			database = value;
+		}
+	}
 
-
-    if(!database.empty())
-    {
-    	mainWindow->openDatabase(database.c_str(), parameters);
-    }
-    else if(parameters.size())
-    {
-    	mainWindow->updateParameters(parameters);
-    }
+	if (!database.empty())
+	{
+		mainWindow->openDatabase(database.c_str(), parameters);
+	}
+	else if (parameters.size())
+	{
+		mainWindow->updateParameters(parameters);
+	}
 
 	// Now wait for application to finish
-	app->connect( app, SIGNAL( lastWindowClosed() ),
-				app, SLOT( quit() ) );
-	app->exec();// MUST be called by the Main Thread
+	app->connect(app, SIGNAL(lastWindowClosed()),
+				 app, SLOT(quit()));
+	app->exec(); // MUST be called by the Main Thread
 
 	/* Remove handlers */
 	UEventsManager::removeHandler(mainWindow);
@@ -118,6 +117,5 @@ int main(int argc, char* argv[])
 	delete app;
 	printf("All done!\n");
 
-    return 0;
+	return 0;
 }
-

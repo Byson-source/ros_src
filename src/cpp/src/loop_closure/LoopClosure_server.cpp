@@ -25,6 +25,7 @@ private:
 
     actionlib::SimpleActionServer<cpp::LoopClosureAction> as_;
     std::string action_name;
+
     cpp::LoopClosureFeedback feedback;
     cpp::LoopClosureResult result;
 
@@ -114,7 +115,7 @@ public:
                 rtabmap.close();
 
                 ROS_INFO("Rtabmap for next is ready...");
-                result.result="Terminated";
+                result.result=1;
                 as_.setSucceeded(result);
             }
             else

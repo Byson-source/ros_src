@@ -4,10 +4,12 @@
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/terminal_state.h>
 #include <cpp/AveragingAction.h>
+#include <cpp/AveragingActionResult.h>
 #include <boost/thread.hpp>
 #include <string>
 #include <iostream>
 #include <stdio.h>
+#include <vector>
 
 class Average_Client
 {
@@ -15,6 +17,7 @@ private:
   ros::NodeHandle n;
 
   ros::Subscriber switch_sub;
+  ros::Subscriber result_sub;
 
   ros::Publisher pub;
 
@@ -31,12 +34,13 @@ private:
   ros::Time t_start{ros::Time::now()};
 
 public:
-  Average_Client(std::string name) : action_name(name),ac(name, true)
+  Average_Client(std::string name) : action_name(name), ac(name, true)
   {
     ROS_INFO("Now launching...");
 
     pub = n.advertise<std_msgs::String>("test", 10);
     switch_sub = n.subscribe("/switch_number", 100, &Average_Client::switchCB, this);
+    result_sub=n.subscribe("averaging/result",10,&Average_Client::resultCB, this);
   }
 
   void switchCB(const std_msgs::Float32::ConstPtr &msg)
@@ -72,6 +76,13 @@ public:
     else
     {
       previous_status = status;
+    }
+  }
+
+  void resultCB(const cpp::AveragingActionResult::ConstPtr &msg){
+    std::cout<<std::to_string(msg->result.mean).size()<<std::endl;
+    if(std::to_string(msg->result.mean).size()>=0){
+      ROS_INFO("result was catched!");
     }
   }
 };

@@ -1,0 +1,8 @@
+#goal definition
+string databasepath
+---
+#result definition
+int result
+---
+#feedback
+int state

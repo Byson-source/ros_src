@@ -3,12 +3,18 @@
 #include <std_msgs/int32.h>
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/terminal_state.h>
-#include <cpp/AveragingAction.h>
+#include <cpp/LoopClosure.h>
+#include <cpp/LoopClosureResult.h>
 #include <boost/thread.hpp>
 #include <string>
 #include <stdio.h>
 
 #define TEMPLATE_IMAGE_PATH "/home/ayumi/Documents/CLOVERs/"
+#define ACTIVATE_REPROCESS_TOPIC "LoopClosureDetection"
+#define DIR_INFO_TOPIC "dir_info"
+#define REST_TOPIC "take_rest"
+#define RESTART_TOPIC "wait_for_rtabmap_reprocess"
+#define RESULT_INFO "Loop_closure/result"
 
 class Client
 {
@@ -16,6 +22,7 @@ private:
     ros::NodeHandle n;
 
     ros::Subscriber switch_sub;
+    ros::Subscriber result_catcher;
 
     //To turn on-off the node that conducts rtabmap-reprocess
     ros::Publisher rtabmap_reprocess_commander;
@@ -42,21 +49,19 @@ public:
     {
         ROS_INFO("Now launching...");
 
-        rtabmap_reprocess_commander = n.advertise<std_msgs::Int32>("LoopClosureDetection", 10);
-        dir_changer = n.advertise<std_msgs::String>("dir_info", 10);
-        rest_commander = n.advertise<std_msgs::Int32>("take_rest", 10);
+        rtabmap_reprocess_commander = n.advertise<std_msgs::Int32>(ACTIVATE_REPROCESS_TOPIC, 10);
+        dir_changer = n.advertise<std_msgs::String>(DIR_INFO_TOPIC, 10);
+        rest_commander = n.advertise<std_msgs::Int32>(REST_TOPIC, 10);
 
-        switch_sub = n.subscribe("waiting_for_reprocess", 10, Client::switchCB, this);
+        switch_sub = n.subscribe(RESTART_TOPIC, 10, Client::switchCB, this);
+        result_catcher = n.subscribe(RESULT_INFO, 10, Client::resultCB, this);
     }
 
     void send_command(void)
     {
-
-        dir_info.data = image_path;
-        dir_changer.publish(dir_info);
-
         if (status == 0)
         {
+            //Start rtabmap-reprocess
             for_rtabmap_reprocess.data = 1;
             rest_command.data = 1;
 
@@ -65,12 +70,13 @@ public:
         }
         else
         {
-            for_rtabmap_reprocess.data = 0;
+            //Start loop-closure detection
+            dir_info.data = image_path;
+            dir_changer.publish(dir_info);
+
             rest_command.data = 0;
 
-            rtabmap_reprocess_commander.publish(for_rtabmap_reprocess);
             rest_commander.publish(rest_commander);
-            
         }
     }
 
@@ -89,45 +95,59 @@ public:
         }
     }
 
+
+    //Wait for rtabmap-reprocess. Then restart the loop closure detection
     void switchCB(const std_msgs::int32::ConstPtr &msg)
     {
 
-        status = msg->data;
+        status = msg->data;//==1
         //Loop closure ON
-        if (status == 1 && !previous_status == status)
+        // if (status == 1 && !previous_status == status)
+        // if (status == 1)
+        // {
+        dir_number += 1;
+        change_dir();
+
+        send_command();
+
+        actionlib::SimpleActionClient<cpp::LoopClosureAction> ac(action_name, true);
+
+        ROS_INFO("Waiting for action server to start.");
+        ac.waitForServer();
+
+        ROS_INFO("Action server started, sending goal.");
+        // send a goal to the action
+        cpp::LoopClosureGoal goal;
+        goal.imagepath = image_path;
+        ac.sendGoal(goal);
+
+        bool finished_before_timeout = ac.waitForResult(ros::Duration(3000));
+        if (finished_before_timeout)
         {
-            dir_number += 1;
-            change_dir();
-
-            previous_status = 1;
-
-            actionlib::SimpleActionClient<cpp::LoopClosureAction> ac(action_name, true);
-
-            ROS_INFO("Waiting for action server to start.");
-            ac.waitForServer();
-
-            ROS_INFO("Action server started, sending goal.");
-            // send a goal to the action
-            cpp::LoopClosureGoal goal;
-            goal.databasepath = image_path;
-            ac.sendGoal(goal);
-
-            bool finished_before_timeout = ac.waitForResult(ros::Duration(3000));
-            if (finished_before_timeout)
-            {
-                actionlib::SimpleClientGoalState state = ac.getState();
-                ROS_INFO("Action finished: %s", state.toString().c_str());
-            }
-            else
-                ROS_INFO("Action did not finish before the time out.");
-            
+            actionlib::SimpleClientGoalState state = ac.getState();
+            ROS_INFO("Action finished: %s", state.toString().c_str());
         }
         else
-        {
-            previous_status = status;
-        }
+            ROS_INFO("Action did not finish before the time out.");
     }
-};
+    // else
+    // {
+    //     previous_status = status;
+    // }
+}
+
+void
+result_CB(const cpp::LoopClosureResult::ConstPtr &msg)
+{
+    if (msg->result.result == 1)
+    {
+        status = 0;
+        Client::send_command();
+        
+    }
+}
+}
+;
 
 int main(int argc, char **argv)
 {

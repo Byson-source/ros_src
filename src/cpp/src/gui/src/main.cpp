@@ -10,6 +10,7 @@
 #include "rtabmap/utilite/UConversion.h"
 #include <QTimer>
 #include<iostream>
+#include"example.h"
 
 #include <vtk-7.1/vtkObject.h>
 
@@ -26,21 +27,9 @@ int main(int argc, char** argv)
     ULogger::setType(ULogger::kTypeConsole);
     ULogger::setLevel(ULogger::kWarning);
 
-#ifdef WIN32
-    CoInitialize(nullptr);
-#endif
-
-#ifdef RTABMAP_PYTHON
-    PythonInterface python; // Make sure we initialize python in main thread
-#endif
-
-#if VTK_MAJOR_VERSION >= 8
-    vtkObject::GlobalWarningDisplayOff();
-#endif
 
     /* Create tasks */
     QApplication * app = new QApplication(argc, argv);
-    QTimer::singleShot(10000,app,SLOT(quit()));
     app->setStyleSheet("QMessageBox { messagebox-text-interaction-flags: 5; }"); // selectable message box
 
     ParametersMap parameters = Parameters::parseArguments(argc, argv, false);
@@ -84,20 +73,7 @@ int main(int argc, char** argv)
     {
         mainWindow->updateParameters(parameters);
     }
-    std::chrono::system_clock::time_point  start, end; // 型は auto で可
-    start = std::chrono::system_clock::now(); // 計測開始時間
-// 処理
-    end = std::chrono::system_clock::now();  // 計測終了時間
-    double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count(); //処理に要した時間をミリ秒に変換
 
-    while(elapsed<10000){
-
-        // end = std::chrono::system_clock::now();
-        elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
-        std::cout<<elapsed<<std::endl;
-
-    }
-    mainWindow->database_close();
     // Now wait for application to finish
     app->connect( app, SIGNAL( lastWindowClosed() ),
                 app, SLOT( quit() ) );

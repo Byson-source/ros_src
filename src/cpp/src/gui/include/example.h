@@ -3,13 +3,6 @@
 #include "object.h"
 #include <QApplication>
 #include <QtCore/QDir>
-#include "rtabmap/utilite/UEventsManager.h"
-#include "rtabmap/core/RtabmapThread.h"
-#include "rtabmap/core/Rtabmap.h"
-#include <QMessageBox>
-#include "rtabmap/utilite/UObjDeletionThread.h"
-#include "rtabmap/utilite/UFile.h"
-#include "rtabmap/utilite/UConversion.h"
 #include <QTimer>
 #include <QObject>
 #include <iostream>
@@ -19,11 +12,11 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 
-class overloaded_window : public rtabmap::MainWindow, public listener_node
+class overloaded_window : public rtabmap::MainWindow,public listener_node
 {
     Q_OBJECT
 public:
-    overloaded_window();
+    overloaded_window(int,char);
 
 public slots:
     void open_database();
@@ -38,6 +31,7 @@ signals:
 private:
     QTimer *mytimer;
     QTimer *sub_timer;
+
 };
 
 #endif

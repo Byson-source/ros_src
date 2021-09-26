@@ -5,7 +5,6 @@
 class FibonacciAction
 {
 protected:
-
   ros::NodeHandle nh_;
   actionlib::SimpleActionServer<cpp::FibonacciAction> as_; // NodeHandle instance must be created before this line. Otherwise strange error occurs.
   std::string action_name_;
@@ -14,10 +13,8 @@ protected:
   cpp::FibonacciResult result_;
 
 public:
-
-  FibonacciAction(std::string name) :
-    as_(nh_, name, boost::bind(&FibonacciAction::executeCB, this, _1), false),
-    action_name_(name)
+  FibonacciAction(std::string name) : as_(nh_, name, boost::bind(&FibonacciAction::executeCB, this, _1), false),
+                                      action_name_(name)
   {
     as_.start();
   }
@@ -38,11 +35,11 @@ public:
     feedback_.sequence.push_back(1);
 
     // publish info to the console for the user
-    ROS_INFO("%s: Executing, creating fibonacci sequence of order %i with seeds %i, %i", 
-    action_name_.c_str(), goal->order, feedback_.sequence[0], feedback_.sequence[1]);
+    ROS_INFO("%s: Executing, creating fibonacci sequence of order %i with seeds %i, %i",
+             action_name_.c_str(), goal->order, feedback_.sequence[0], feedback_.sequence[1]);
 
     // start executing the action
-    for(int i=1; i<=goal->order; i++)
+    for (int i = 1; i <= goal->order; i++)
     {
       // check that preempt has not been requested by the client
       if (as_.isPreemptRequested() || !ros::ok())
@@ -53,14 +50,14 @@ public:
         success = false;
         break;
       }
-      feedback_.sequence.push_back(feedback_.sequence[i] + feedback_.sequence[i-1]);
+      feedback_.sequence.push_back(feedback_.sequence[i] + feedback_.sequence[i - 1]);
       // publish the feedback
       as_.publishFeedback(feedback_);
       // this sleep is not necessary, the sequence is computed at 1 Hz for demonstration purposes
       r.sleep();
     }
 
-    if(success)
+    if (success)
     {
       result_.sequence = feedback_.sequence;
       ROS_INFO("%s: Succeeded", action_name_.c_str());
@@ -68,12 +65,9 @@ public:
       as_.setSucceeded(result_);
     }
   }
-
-
 };
 
-
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
   ros::init(argc, argv, "fibonacci");
 

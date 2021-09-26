@@ -1,8 +1,8 @@
 #goal definition
-string databasepath
+string imagepath
 ---
 #result definition
-string result
+int result
 ---
 #feedback
 int state
