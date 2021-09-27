@@ -1,4 +1,5 @@
 file(REMOVE_RECURSE
+  "/home/ayumi/catkin_ws/devel/include/cpp/AddThreeInts.h"
   "/home/ayumi/catkin_ws/devel/include/cpp/AveragingAction.h"
   "/home/ayumi/catkin_ws/devel/include/cpp/AveragingActionFeedback.h"
   "/home/ayumi/catkin_ws/devel/include/cpp/AveragingActionGoal.h"

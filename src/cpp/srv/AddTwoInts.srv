@@ -1,4 +1,4 @@
-int64 a
-int64 b
+Int64 a
+Int64 b
 ---
-int64 sum
+Int64 sum

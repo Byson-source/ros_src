@@ -14,6 +14,7 @@ file(REMOVE_RECURSE
   "/home/ayumi/catkin_ws/devel/share/gennodejs/ros/cpp/msg/FibonacciGoal.js"
   "/home/ayumi/catkin_ws/devel/share/gennodejs/ros/cpp/msg/FibonacciResult.js"
   "/home/ayumi/catkin_ws/devel/share/gennodejs/ros/cpp/msg/StringArray.js"
+  "/home/ayumi/catkin_ws/devel/share/gennodejs/ros/cpp/srv/AddThreeInts.js"
   "CMakeFiles/cpp_generate_messages_nodejs"
 )
 

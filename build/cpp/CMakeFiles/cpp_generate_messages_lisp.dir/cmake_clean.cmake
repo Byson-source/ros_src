@@ -14,6 +14,7 @@ file(REMOVE_RECURSE
   "/home/ayumi/catkin_ws/devel/share/common-lisp/ros/cpp/msg/FibonacciGoal.lisp"
   "/home/ayumi/catkin_ws/devel/share/common-lisp/ros/cpp/msg/FibonacciResult.lisp"
   "/home/ayumi/catkin_ws/devel/share/common-lisp/ros/cpp/msg/StringArray.lisp"
+  "/home/ayumi/catkin_ws/devel/share/common-lisp/ros/cpp/srv/AddThreeInts.lisp"
   "CMakeFiles/cpp_generate_messages_lisp"
 )
 

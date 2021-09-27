@@ -1,6 +1,6 @@
 # generated from genmsg/cmake/pkg-genmsg.cmake.em
 
-message(STATUS "cpp: 15 messages, 0 services")
+message(STATUS "cpp: 15 messages, 1 services")
 
 set(MSG_I_FLAGS "-Icpp:/home/ayumi/catkin_ws/src/cpp/msg;-Icpp:/home/ayumi/catkin_ws/devel/share/cpp/msg;-Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg;-Iactionlib_msgs:/opt/ros/noetic/share/actionlib_msgs/cmake/../msg")
 
@@ -24,22 +24,22 @@ add_custom_target(_cpp_generate_messages_check_deps_${_filename}
 
 get_filename_component(_filename "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciAction.msg" NAME_WE)
 add_custom_target(_cpp_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "cpp" "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciAction.msg" "cpp/FibonacciActionResult:actionlib_msgs/GoalID:actionlib_msgs/GoalStatus:cpp/FibonacciActionFeedback:cpp/FibonacciActionGoal:cpp/FibonacciFeedback:cpp/FibonacciResult:cpp/FibonacciGoal:std_msgs/Header"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "cpp" "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciAction.msg" "cpp/FibonacciActionFeedback:cpp/FibonacciActionGoal:cpp/FibonacciFeedback:actionlib_msgs/GoalStatus:cpp/FibonacciResult:actionlib_msgs/GoalID:cpp/FibonacciGoal:std_msgs/Header:cpp/FibonacciActionResult"
 )
 
 get_filename_component(_filename "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionGoal.msg" NAME_WE)
 add_custom_target(_cpp_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "cpp" "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionGoal.msg" "cpp/FibonacciGoal:actionlib_msgs/GoalID:std_msgs/Header"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "cpp" "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionGoal.msg" "std_msgs/Header:actionlib_msgs/GoalID:cpp/FibonacciGoal"
 )
 
 get_filename_component(_filename "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionResult.msg" NAME_WE)
 add_custom_target(_cpp_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "cpp" "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionResult.msg" "actionlib_msgs/GoalStatus:actionlib_msgs/GoalID:std_msgs/Header:cpp/FibonacciResult"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "cpp" "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionResult.msg" "std_msgs/Header:actionlib_msgs/GoalID:actionlib_msgs/GoalStatus:cpp/FibonacciResult"
 )
 
 get_filename_component(_filename "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionFeedback.msg" NAME_WE)
 add_custom_target(_cpp_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "cpp" "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionFeedback.msg" "cpp/FibonacciFeedback:actionlib_msgs/GoalStatus:actionlib_msgs/GoalID:std_msgs/Header"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "cpp" "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionFeedback.msg" "cpp/FibonacciFeedback:std_msgs/Header:actionlib_msgs/GoalID:actionlib_msgs/GoalStatus"
 )
 
 get_filename_component(_filename "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciGoal.msg" NAME_WE)
@@ -59,22 +59,22 @@ add_custom_target(_cpp_generate_messages_check_deps_${_filename}
 
 get_filename_component(_filename "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingAction.msg" NAME_WE)
 add_custom_target(_cpp_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "cpp" "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingAction.msg" "cpp/AveragingGoal:actionlib_msgs/GoalID:cpp/AveragingResult:cpp/AveragingFeedback:cpp/AveragingActionFeedback:cpp/AveragingActionGoal:actionlib_msgs/GoalStatus:std_msgs/Header:cpp/AveragingActionResult"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "cpp" "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingAction.msg" "cpp/AveragingGoal:cpp/AveragingResult:actionlib_msgs/GoalStatus:cpp/AveragingActionGoal:cpp/AveragingActionResult:actionlib_msgs/GoalID:cpp/AveragingFeedback:cpp/AveragingActionFeedback:std_msgs/Header"
 )
 
 get_filename_component(_filename "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionGoal.msg" NAME_WE)
 add_custom_target(_cpp_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "cpp" "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionGoal.msg" "cpp/AveragingGoal:actionlib_msgs/GoalID:std_msgs/Header"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "cpp" "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionGoal.msg" "std_msgs/Header:actionlib_msgs/GoalID:cpp/AveragingGoal"
 )
 
 get_filename_component(_filename "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionResult.msg" NAME_WE)
 add_custom_target(_cpp_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "cpp" "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionResult.msg" "cpp/AveragingResult:actionlib_msgs/GoalStatus:actionlib_msgs/GoalID:std_msgs/Header"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "cpp" "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionResult.msg" "cpp/AveragingResult:std_msgs/Header:actionlib_msgs/GoalID:actionlib_msgs/GoalStatus"
 )
 
 get_filename_component(_filename "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionFeedback.msg" NAME_WE)
 add_custom_target(_cpp_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "cpp" "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionFeedback.msg" "actionlib_msgs/GoalStatus:actionlib_msgs/GoalID:std_msgs/Header:cpp/AveragingFeedback"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "cpp" "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionFeedback.msg" "std_msgs/Header:actionlib_msgs/GoalID:cpp/AveragingFeedback:actionlib_msgs/GoalStatus"
 )
 
 get_filename_component(_filename "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingGoal.msg" NAME_WE)
@@ -92,6 +92,11 @@ add_custom_target(_cpp_generate_messages_check_deps_${_filename}
   COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "cpp" "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg" ""
 )
 
+get_filename_component(_filename "/home/ayumi/catkin_ws/src/cpp/srv/AddThreeInts.srv" NAME_WE)
+add_custom_target(_cpp_generate_messages_check_deps_${_filename}
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "cpp" "/home/ayumi/catkin_ws/src/cpp/srv/AddThreeInts.srv" ""
+)
+
 #
 #  langs = gencpp;geneus;genlisp;gennodejs;genpy
 #
@@ -107,25 +112,25 @@ _generate_msg_cpp(cpp
 _generate_msg_cpp(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionGoal.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciResult.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionGoal.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionResult.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/cpp
 )
 _generate_msg_cpp(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciGoal.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/cpp
 )
 _generate_msg_cpp(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciResult.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciResult.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/cpp
 )
 _generate_msg_cpp(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/cpp
 )
 _generate_msg_cpp(cpp
@@ -149,25 +154,25 @@ _generate_msg_cpp(cpp
 _generate_msg_cpp(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingResult.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionResult.msg"
+  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingGoal.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionGoal.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/cpp
 )
 _generate_msg_cpp(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingGoal.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/cpp
 )
 _generate_msg_cpp(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/cpp
 )
 _generate_msg_cpp(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/cpp
 )
 _generate_msg_cpp(cpp
@@ -190,6 +195,12 @@ _generate_msg_cpp(cpp
 )
 
 ### Generating Services
+_generate_srv_cpp(cpp
+  "/home/ayumi/catkin_ws/src/cpp/srv/AddThreeInts.srv"
+  "${MSG_I_FLAGS}"
+  ""
+  ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/cpp
+)
 
 ### Generating Module File
 _generate_module_cpp(cpp
@@ -233,6 +244,8 @@ get_filename_component(_filename "/home/ayumi/catkin_ws/devel/share/cpp/msg/Aver
 add_dependencies(cpp_generate_messages_cpp _cpp_generate_messages_check_deps_${_filename})
 get_filename_component(_filename "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg" NAME_WE)
 add_dependencies(cpp_generate_messages_cpp _cpp_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/ayumi/catkin_ws/src/cpp/srv/AddThreeInts.srv" NAME_WE)
+add_dependencies(cpp_generate_messages_cpp _cpp_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
 add_custom_target(cpp_gencpp)
@@ -252,25 +265,25 @@ _generate_msg_eus(cpp
 _generate_msg_eus(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionGoal.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciResult.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionGoal.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionResult.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/cpp
 )
 _generate_msg_eus(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciGoal.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/cpp
 )
 _generate_msg_eus(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciResult.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciResult.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/cpp
 )
 _generate_msg_eus(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/cpp
 )
 _generate_msg_eus(cpp
@@ -294,25 +307,25 @@ _generate_msg_eus(cpp
 _generate_msg_eus(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingResult.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionResult.msg"
+  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingGoal.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionGoal.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/cpp
 )
 _generate_msg_eus(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingGoal.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/cpp
 )
 _generate_msg_eus(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/cpp
 )
 _generate_msg_eus(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/cpp
 )
 _generate_msg_eus(cpp
@@ -335,6 +348,12 @@ _generate_msg_eus(cpp
 )
 
 ### Generating Services
+_generate_srv_eus(cpp
+  "/home/ayumi/catkin_ws/src/cpp/srv/AddThreeInts.srv"
+  "${MSG_I_FLAGS}"
+  ""
+  ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/cpp
+)
 
 ### Generating Module File
 _generate_module_eus(cpp
@@ -378,6 +397,8 @@ get_filename_component(_filename "/home/ayumi/catkin_ws/devel/share/cpp/msg/Aver
 add_dependencies(cpp_generate_messages_eus _cpp_generate_messages_check_deps_${_filename})
 get_filename_component(_filename "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg" NAME_WE)
 add_dependencies(cpp_generate_messages_eus _cpp_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/ayumi/catkin_ws/src/cpp/srv/AddThreeInts.srv" NAME_WE)
+add_dependencies(cpp_generate_messages_eus _cpp_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
 add_custom_target(cpp_geneus)
@@ -397,25 +418,25 @@ _generate_msg_lisp(cpp
 _generate_msg_lisp(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionGoal.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciResult.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionGoal.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionResult.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/cpp
 )
 _generate_msg_lisp(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciGoal.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/cpp
 )
 _generate_msg_lisp(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciResult.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciResult.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/cpp
 )
 _generate_msg_lisp(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/cpp
 )
 _generate_msg_lisp(cpp
@@ -439,25 +460,25 @@ _generate_msg_lisp(cpp
 _generate_msg_lisp(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingResult.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionResult.msg"
+  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingGoal.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionGoal.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/cpp
 )
 _generate_msg_lisp(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingGoal.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/cpp
 )
 _generate_msg_lisp(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/cpp
 )
 _generate_msg_lisp(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/cpp
 )
 _generate_msg_lisp(cpp
@@ -480,6 +501,12 @@ _generate_msg_lisp(cpp
 )
 
 ### Generating Services
+_generate_srv_lisp(cpp
+  "/home/ayumi/catkin_ws/src/cpp/srv/AddThreeInts.srv"
+  "${MSG_I_FLAGS}"
+  ""
+  ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/cpp
+)
 
 ### Generating Module File
 _generate_module_lisp(cpp
@@ -523,6 +550,8 @@ get_filename_component(_filename "/home/ayumi/catkin_ws/devel/share/cpp/msg/Aver
 add_dependencies(cpp_generate_messages_lisp _cpp_generate_messages_check_deps_${_filename})
 get_filename_component(_filename "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg" NAME_WE)
 add_dependencies(cpp_generate_messages_lisp _cpp_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/ayumi/catkin_ws/src/cpp/srv/AddThreeInts.srv" NAME_WE)
+add_dependencies(cpp_generate_messages_lisp _cpp_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
 add_custom_target(cpp_genlisp)
@@ -542,25 +571,25 @@ _generate_msg_nodejs(cpp
 _generate_msg_nodejs(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionGoal.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciResult.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionGoal.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionResult.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/cpp
 )
 _generate_msg_nodejs(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciGoal.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/cpp
 )
 _generate_msg_nodejs(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciResult.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciResult.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/cpp
 )
 _generate_msg_nodejs(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/cpp
 )
 _generate_msg_nodejs(cpp
@@ -584,25 +613,25 @@ _generate_msg_nodejs(cpp
 _generate_msg_nodejs(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingResult.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionResult.msg"
+  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingGoal.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionGoal.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/cpp
 )
 _generate_msg_nodejs(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingGoal.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/cpp
 )
 _generate_msg_nodejs(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/cpp
 )
 _generate_msg_nodejs(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/cpp
 )
 _generate_msg_nodejs(cpp
@@ -625,6 +654,12 @@ _generate_msg_nodejs(cpp
 )
 
 ### Generating Services
+_generate_srv_nodejs(cpp
+  "/home/ayumi/catkin_ws/src/cpp/srv/AddThreeInts.srv"
+  "${MSG_I_FLAGS}"
+  ""
+  ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/cpp
+)
 
 ### Generating Module File
 _generate_module_nodejs(cpp
@@ -668,6 +703,8 @@ get_filename_component(_filename "/home/ayumi/catkin_ws/devel/share/cpp/msg/Aver
 add_dependencies(cpp_generate_messages_nodejs _cpp_generate_messages_check_deps_${_filename})
 get_filename_component(_filename "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg" NAME_WE)
 add_dependencies(cpp_generate_messages_nodejs _cpp_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/ayumi/catkin_ws/src/cpp/srv/AddThreeInts.srv" NAME_WE)
+add_dependencies(cpp_generate_messages_nodejs _cpp_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
 add_custom_target(cpp_gennodejs)
@@ -687,25 +724,25 @@ _generate_msg_py(cpp
 _generate_msg_py(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionGoal.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciResult.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionGoal.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionResult.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/cpp
 )
 _generate_msg_py(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciGoal.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/cpp
 )
 _generate_msg_py(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciResult.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciResult.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/cpp
 )
 _generate_msg_py(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/home/ayumi/catkin_ws/devel/share/cpp/msg/FibonacciFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/cpp
 )
 _generate_msg_py(cpp
@@ -729,25 +766,25 @@ _generate_msg_py(cpp
 _generate_msg_py(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingResult.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionResult.msg"
+  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingGoal.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionGoal.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/cpp
 )
 _generate_msg_py(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingGoal.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/cpp
 )
 _generate_msg_py(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/cpp
 )
 _generate_msg_py(cpp
   "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/cpp
 )
 _generate_msg_py(cpp
@@ -770,6 +807,12 @@ _generate_msg_py(cpp
 )
 
 ### Generating Services
+_generate_srv_py(cpp
+  "/home/ayumi/catkin_ws/src/cpp/srv/AddThreeInts.srv"
+  "${MSG_I_FLAGS}"
+  ""
+  ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/cpp
+)
 
 ### Generating Module File
 _generate_module_py(cpp
@@ -812,6 +855,8 @@ add_dependencies(cpp_generate_messages_py _cpp_generate_messages_check_deps_${_f
 get_filename_component(_filename "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingResult.msg" NAME_WE)
 add_dependencies(cpp_generate_messages_py _cpp_generate_messages_check_deps_${_filename})
 get_filename_component(_filename "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg" NAME_WE)
+add_dependencies(cpp_generate_messages_py _cpp_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/ayumi/catkin_ws/src/cpp/srv/AddThreeInts.srv" NAME_WE)
 add_dependencies(cpp_generate_messages_py _cpp_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility

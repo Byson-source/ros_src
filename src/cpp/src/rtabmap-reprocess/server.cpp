@@ -63,6 +63,13 @@ public:
         as.start();
     }
 
+    void preemptCB()
+    {
+        ROS_INFO("%s: Preempted", action_name.c_str());
+        // set the action state to preempted
+        as.setPreempted();
+    }
+
     // void goalCB()
     // {
     //     1_target_databasepath = as.acceptNewGoal()->databasepath;
@@ -158,13 +165,8 @@ public:
         ++sessionCount;
     }
 
-    void preemptCB()
-    {
-        ROS_INFO("%s: Preempted", action_name.c_str());
-        // set the action state to preempted
-        as.setPreempted();
-    }
 
+    
     void reprocess(const cpp::RtabmapReprocessResult::ConstPtr &goal)
     {
         signal(SIGABRT, &sighandler);

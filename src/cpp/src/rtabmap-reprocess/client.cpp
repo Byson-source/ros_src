@@ -9,7 +9,7 @@
 #include <vector>
 
 #define CHECK_REPROCESS_FINISH_TOPIC "RtabmapReprocess_node/result"
-#define SWITCH_REPROCESS_TOPIC "LoopClosureDetection"
+#define SWITCH_REPROCESS_TOPIC "Reprocess_start"
 #define EXIT_TOPIC "wait_for_rtabmap_reprocess"
 #define DATABASE_DIR_TOPIC "path_info"
 
@@ -75,8 +75,8 @@ public:
         if (msg->data == 1)
         {
 
-            ROS_INFO("Rtabmap-reprocess server started, sending goal...");
             ac.waitForServer();
+            ROS_INFO("Rtabmap-reprocess server started, sending goal...");
 
             cpp::RtabmapReprocessGoal goal;
             for (auto val : databases)

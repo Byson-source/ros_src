@@ -10,7 +10,7 @@
 #include <stdio.h>
 
 #define TEMPLATE_IMAGE_PATH "/home/ayumi/Documents/CLOVERs/"
-#define ACTIVATE_REPROCESS_TOPIC "LoopClosureDetection"
+#define ACTIVATE_LOAD_TOPIC "LoopClosureDetection"
 #define DIR_INFO_TOPIC "dir_info"
 #define REST_TOPIC "take_rest"
 #define RESTART_TOPIC "wait_for_rtabmap_reprocess"
@@ -25,7 +25,7 @@ private:
     ros::Subscriber result_catcher;
 
     //To turn on-off the node that conducts rtabmap-reprocess
-    ros::Publisher rtabmap_reprocess_commander;
+    ros::Publisher load_database_commander;
     //To notify the change of location where the image is stored
     ros::Publisher dir_changer;
     //To turn on-off the image extractor node.
@@ -34,7 +34,7 @@ private:
     std::string image_path;
     std::string action_name;
 
-    std_msgs::Int32 for_rtabmap_reprocess;
+    std_msgs::Int32 for_load_database;
     std_msgs::String dir_info;
     std_msgs::Int32 rest_command;
 
@@ -49,7 +49,7 @@ public:
     {
         ROS_INFO("Now launching...");
 
-        rtabmap_reprocess_commander = n.advertise<std_msgs::Int32>(ACTIVATE_REPROCESS_TOPIC, 10);
+        load_database_commander = n.advertise<std_msgs::Int32>(ACTIVATE_LOAD_TOPIC, 10);
         dir_changer = n.advertise<std_msgs::String>(DIR_INFO_TOPIC, 10);
         rest_commander = n.advertise<std_msgs::Int32>(REST_TOPIC, 10);
 
@@ -62,10 +62,10 @@ public:
         if (status == 0)
         {
             //Start rtabmap-reprocess
-            for_rtabmap_reprocess.data = 1;
+            for_load_database.data = 1;
             rest_command.data = 1;
 
-            rtabmap_reprocess_commander.publish(for_rtabmap_reprocess);
+            load_database_commander.publish(for_rtabmap_reprocess);
             rest_commander.publish(rest_commander);
         }
         else
