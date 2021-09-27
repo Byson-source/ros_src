@@ -13,6 +13,7 @@ file(REMOVE_RECURSE
   "/home/ayumi/catkin_ws/devel/lib/python3/dist-packages/cpp/msg/_FibonacciFeedback.py"
   "/home/ayumi/catkin_ws/devel/lib/python3/dist-packages/cpp/msg/_FibonacciGoal.py"
   "/home/ayumi/catkin_ws/devel/lib/python3/dist-packages/cpp/msg/_FibonacciResult.py"
+  "/home/ayumi/catkin_ws/devel/lib/python3/dist-packages/cpp/msg/_StringArray.py"
   "/home/ayumi/catkin_ws/devel/lib/python3/dist-packages/cpp/msg/__init__.py"
   "/home/ayumi/catkin_ws/devel/lib/python3/dist-packages/cpp/srv/__init__.py"
   "CMakeFiles/cpp_generate_messages_py"

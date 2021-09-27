@@ -6,7 +6,7 @@
 class FibonacciAction
 {
 protected:
-  std::vector<std::string> test;
+  std::list<std::string> test;
   ros::NodeHandle nh_;
   actionlib::SimpleActionServer<cpp::FibonacciAction> as_; // NodeHandle instance must be created before this line. Otherwise strange error occurs.
   std::string action_name_;

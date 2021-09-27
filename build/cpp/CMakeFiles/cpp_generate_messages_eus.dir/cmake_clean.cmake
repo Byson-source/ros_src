@@ -14,6 +14,7 @@ file(REMOVE_RECURSE
   "/home/ayumi/catkin_ws/devel/share/roseus/ros/cpp/msg/FibonacciFeedback.l"
   "/home/ayumi/catkin_ws/devel/share/roseus/ros/cpp/msg/FibonacciGoal.l"
   "/home/ayumi/catkin_ws/devel/share/roseus/ros/cpp/msg/FibonacciResult.l"
+  "/home/ayumi/catkin_ws/devel/share/roseus/ros/cpp/msg/StringArray.l"
   "CMakeFiles/cpp_generate_messages_eus"
 )
 

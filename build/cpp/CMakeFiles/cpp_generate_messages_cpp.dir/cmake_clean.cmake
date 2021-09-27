@@ -13,6 +13,7 @@ file(REMOVE_RECURSE
   "/home/ayumi/catkin_ws/devel/include/cpp/FibonacciFeedback.h"
   "/home/ayumi/catkin_ws/devel/include/cpp/FibonacciGoal.h"
   "/home/ayumi/catkin_ws/devel/include/cpp/FibonacciResult.h"
+  "/home/ayumi/catkin_ws/devel/include/cpp/StringArray.h"
   "CMakeFiles/cpp_generate_messages_cpp"
 )
 

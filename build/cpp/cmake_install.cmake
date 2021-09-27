@@ -43,6 +43,10 @@ if(NOT DEFINED CMAKE_OBJDUMP)
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/cpp/msg" TYPE FILE FILES "/home/ayumi/catkin_ws/src/cpp/msg/StringArray.msg")
+endif()
+
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/cpp/action" TYPE FILE FILES
     "/home/ayumi/catkin_ws/src/cpp/action/Fibonacci.action"
     "/home/ayumi/catkin_ws/src/cpp/action/Averaging.action"

@@ -13,3 +13,4 @@ from ._FibonacciFeedback import *
 from ._FibonacciGoal import *
 from ._FibonacciResult import *
 from ._IoTSensor import *
+from ._StringArray import *

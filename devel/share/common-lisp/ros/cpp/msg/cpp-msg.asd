@@ -36,4 +36,6 @@
     (:file "_package_FibonacciResult" :depends-on ("_package"))
     (:file "IoTSensor" :depends-on ("_package_IoTSensor"))
     (:file "_package_IoTSensor" :depends-on ("_package"))
+    (:file "StringArray" :depends-on ("_package_StringArray"))
+    (:file "_package_StringArray" :depends-on ("_package"))
   ))

@@ -2,6 +2,7 @@
 "use strict";
 
 let IoTSensor = require('./IoTSensor.js');
+let StringArray = require('./StringArray.js');
 let FibonacciAction = require('./FibonacciAction.js');
 let AveragingActionGoal = require('./AveragingActionGoal.js');
 let AveragingActionResult = require('./AveragingActionResult.js');
@@ -19,6 +20,7 @@ let FibonacciActionFeedback = require('./FibonacciActionFeedback.js');
 
 module.exports = {
   IoTSensor: IoTSensor,
+  StringArray: StringArray,
   FibonacciAction: FibonacciAction,
   AveragingActionGoal: AveragingActionGoal,
   AveragingActionResult: AveragingActionResult,
