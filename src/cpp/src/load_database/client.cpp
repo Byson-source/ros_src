@@ -6,14 +6,10 @@
 #include "rtabmap_ros/LoadDatabase.h"
 #include <cpp/StringArray.h>
 #include <vector>
-#include <direct.h>
 
 #define SWITCH_LOAD_TOPIC "LoopClosureDetection"
 #define ACTIVATE_REPROCESS_TOPIC "Reprocess_start"
-#define CHECK_LOAD_FINISH_TOPIC "LoadFinished"
 #define PATH_TOPIC "path_info"
-#define TEMPLATE_DATABASE_PATH "/home/ayumi/Documents/RTAB-Map/Experiment/"
-#define TEMPLATE_LOADDATABASE_TOPIC "/rtabmap/load_database"
 
 class LoadDatabase_Client
 {
@@ -26,11 +22,15 @@ protected:
 
     std::string action_name;
 
-    int status{0};
+    std::string template_database_path{"/home/ayumi/Documents/RTAB-Map/Experiment/No"};
+    std::string template_loaddatabase_topic{"/rtabmap/load_database"};
+
+    int status{1};
     int database_num{1};
 
     std::vector<std::string> databases;
     std::vector<std::string> srv_topics;
+    std::vector<std::string> previous_pathinfo;
 
     ros::Subscriber result_checker;
     ros::Subscriber switch_sub;
@@ -39,14 +39,13 @@ protected:
     ros::Publisher reprocess_commander;
 
 public:
-    LoadDatabase_Client(int num):robots_num{num}
+    LoadDatabase_Client(int num) : robots_num{num}
     {
         ROS_INFO("launching Rtabmap-reprocess...");
 
-
-        for (int i{0} : !i == robots_num : i++)
+        for (int i = 0; !i == robots_num; i++)
         {
-            srv_topics.push_back("No." + std::to_string(i) + TEMPLATE_LOADDATABASE_TOPIC);
+            srv_topics.push_back("No." + std::to_string(i) + template_loaddatabase_topic);
             clients.push_back(nh.serviceClient<rtabmap_ros::LoadDatabase>(srv_topics[i]));
         }
 
@@ -68,14 +67,26 @@ public:
 
     void switchCB(const std_msgs::Int32::ConstPtr &msg)
     {
-        if (msg->data == 1)
+        if (msg->data == 1 || status == 1)
         {
-            for (int i{0} : !i == robots_num : i++)
+            status = 0;
+            if (!previous_pathinfo.size() == 0)
+            {
+                cpp::StringArray reading_path;
+
+                for (auto val : previous_pathinfo)
+                    reading_path.strings.push_back(val);
+
+                databasepath_transmitter.publish(reading_path);
+                previous_pathinfo.clear();
+            }
+
+            for (int i = 0; !i == robots_num; i++)
             {
                 rtabmap_ros::LoadDatabase srv;
 
-                srv.request.database_path = TEMPLATE_DATABASE_PATH + "No" + std::to_string(database_num) + ".db";
-                srv.request.clear = "true";
+                srv.request.database_path = template_database_path + std::to_string(database_num) + ".db";
+                srv.request.clear = true;
 
                 database_num += 1;
 
@@ -86,23 +97,26 @@ public:
                 else
                 {
                     ROS_ERROR("Failed to call LoadDatabase service");
-                    return 1;
+                    break;
                 }
 
-                LoadDatabase_Client::checkCB();
+                previous_pathinfo.push_back(srv.request.database_path);
             }
+
+            LoadDatabase_Client::checkCB();
         }
     }
 };
 
-int main(int argc,char **argv){
-    ros::init(argc,argv,"LoadDatabase_client");
+int main(int argc, char **argv)
+{
+    ros::init(argc, argv, "LoadDatabase_client");
 
-    ros::NodeHandle png("~");
+    ros::NodeHandle pnh("~");
     int number;
     pnh.getParam("num", number);
 
-    loadDatabase_client client_agent(number);
+    LoadDatabase_Client client_agent(number);
 
     ros::spin();
 

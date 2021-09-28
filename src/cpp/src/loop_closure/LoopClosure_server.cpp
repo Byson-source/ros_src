@@ -8,9 +8,8 @@
 #include "std_msgs/String.h"
 #include <ros/ros.h>
 #include <string>
-#include <direct.h>
 #include <actionlib/server/simple_action_server.h>
-#include <cpp/LoopClosure.h>
+#include <cpp/LoopClosureAction.h>
 
 #define DATABASEPATH "/home/ayumi/Documents/RTAB-MAP/rtabmap.db"
 
@@ -26,85 +25,38 @@ private:
     actionlib::SimpleActionServer<cpp::LoopClosureAction> as_;
     std::string action_name;
 
-    cpp::LoopClosureFeedback feedback;
     cpp::LoopClosureResult result;
 
-    int i;
-    int nextIndex;
-
-    std::string target_path;
+    std::string database_path{DATABASEPATH};
 
     rtabmap::Rtabmap rtabmap;
     rtabmap::ParametersMap parameters;
-    rtabmap::CameraImages camera;
-    rtabmap::SensorData data;
 
 public:
-    Loop_Closure(std::string name) : image_path{path1}, i{0},
-                                     database_path{path2}, camera{path1},
-                                     as(nh, name, boost::bind(&Loop_Closure::detection, this, _1), false)
+    Loop_Closure(std::string name) : as_(n, name, boost::bind(&Loop_Closure::detection, this, _1), false),
+    action_name{name}
     {
-
-        if (!camera.init())
-        {
-            ROS_INFO("Camera init failed, using path \"%s\"\n", image_path.c_str());
-            return 1;
-        }
         rtabmap.setTimeThreshold(700.0f); // Time threshold : 700 ms, 0 ms means no limit
 
-        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRtabmapLoopThr(), rtabmap::Parameters::defaultRtabmapLoopThr()));
+        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRtabmapLoopThr(),"0.11"));
         parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRGBDEnabled(), "false"));
 
         UFile::erase(database_path);
-
-        rtabmap.init(parameters, database_path);
-
-        data = camera.takeImage();
-        nextIndex = rtabmap.getLastLocationId() + 1;
-        //////////////////////////////////////////////////////////////////////////////////////////////
-        //////////////////////////////////////////////////////////////////////////////////////////////
-        //////////////////////////////////////////////////////////////////////////////////////////////
-        // as_.registerGoalCallback(boost::bind(&Loop_Closure::goalCB, this));
-        as_.registerPreemptCallback(boost::bind(&Loop_Closure::preemptCB, this));
+        
 
         as_.start();
-    }
-
-    // void goalCB(void)
-    // {
-    //     target_path = as_.acceptNewGoal()->imagepath;
-
-    //     nextindex = 1;
-
-    //     i = 0;
-
-    //     UFile::erase(target_path);
-
-    //     rtabmap.init(parameters, DATABASEPATH);
-
-    //     camera = target_path;
-
-    //     camera.init();
-
-    //     data = camera.takeImage();
-    // }
-
-    void preemptCB()
-    {
-        ROS_INFO("%s: Preempted", action_name.c_str());
-        // set the action state to preempted
-        as_.setPreempted();
     }
 
     void detection(const cpp::LoopClosureGoal::ConstPtr &goal)
     {
         // target_path = as_.acceptNewGoal()->imagepath;
+        std::string target_path{goal->imagepath};
 
-        target_path = goal->imagepath;
+        rtabmap::CameraImages camera(target_path);
+        rtabmap::SensorData data{camera.takeImage()};
 
-        nextindex = 1;
-
-        i = 0;
+        int i{0};
+        int nextIndex{1};
 
         UFile::erase(target_path);
 
@@ -153,7 +105,7 @@ public:
     }
 };
 
-int main()
+int main(int argc, char **argv)
 {
 
     ros::init(argc, argv, "detection_checker");

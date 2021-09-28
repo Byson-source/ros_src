@@ -7,6 +7,7 @@ project(cpp)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+
 find_package(catkin REQUIRED COMPONENTS
   actionlib_msgs
   message_generation
@@ -16,6 +17,8 @@ find_package(catkin REQUIRED COMPONENTS
   tf
 )
 ########################################################
+SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}")
+
 FIND_PACKAGE(RTABMap REQUIRED)
 FIND_PACKAGE(OpenCV REQUIRED)
 FIND_PACKAGE(PCL 1.7 REQUIRED)
@@ -34,7 +37,6 @@ if(POLICY CMP0020)
   cmake_policy(SET CMP0020 OLD)
 endif()
 
-SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}")
 # include directories
 SET(INCLUDE_DIRS
    ${RTABMap_INCLUDE_DIRS}
@@ -46,15 +48,16 @@ IF(QT4_FOUND)
    INCLUDE(${QT_USE_FILE})
 ENDIF(QT4_FOUND)
 
-INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
 
 # libraries
 SET(LIBRARIES
-   ${RTABMap_LIBRARIES}
-   ${OpenCV_LIBRARIES}
-   ${QT_LIBRARIES}
-   ${PCL_LIBRARIES}
+${RTABMap_LIBRARIES}
+${OpenCV_LIBRARIES}
+${QT_LIBRARIES}
+${PCL_LIBRARIES}
 )
+
+INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
 
 IF(QT4_FOUND)
    QT4_WRAP_CPP(moc_srcs MapBuilder.h)
@@ -115,6 +118,8 @@ add_action_files(
   FILES
   Fibonacci.action
   Averaging.action
+  LoopClosure.action
+  RtabmapReprocess.action
 )
 
 ## Generate added messages and services with any dependencies listed here
@@ -156,7 +161,7 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES cpp
-#  CATKIN_DEPENDS message_generation roscpp std_msgs message_runtime
+#  CATKIN_DEPENDS message_generation roscpp std_msgs message_runtime actionlib_msgs
 #  DEPENDS system_lib
 )
 
@@ -354,4 +359,68 @@ add_dependencies(
   ${cpp_EXPORTED_TARGETS}
 )
 
+
+add_executable(LoadDatabase_client src/load_database/client.cpp)
+
+target_link_libraries(
+  LoadDatabase_client 
+  ${catkin_LIBRARIES}
+)
+
+add_dependencies(
+  LoadDatabase_client
+  ${cpp_EXPORTED_TARGETS}
+)
+
+add_executable(loop_closure_client src/loop_closure/LoopClosure_client.cpp)
+
+target_link_libraries(
+  loop_closure_client
+  ${catkin_LIBRARIES}
+)
+
+add_dependencies(
+  loop_closure_client
+  ${cpp_EXPORTED_TARGETS}
+)
+
+add_executable(detection_checker src/loop_closure/LoopClosure_server.cpp)
+
+target_link_libraries(
+  detection_checker
+  ${catkin_LIBRARIES}
+  ${LIBRARIES}
+)
+
+add_dependencies(
+  detection_checker
+  ${cpp_EXPORTED_TARGETS}
+)
+
+add_executable(reprocess_client_node src/rtabmap-reprocess/client.cpp)
+
+target_link_libraries(
+  reprocess_client_node
+  ${catkin_LIBRARIES}
+  ${LIBRARIES}
+)
+
+add_dependencies(
+  reprocess_client_node
+  ${cpp_EXPORTED_TARGETS}
+)
+
+
+add_executable(reprocess_server_node src/rtabmap-reprocess/server.cpp)
+
+target_link_libraries(
+  reprocess_server_node
+  ${catkin_LIBRARIES}
+  ${LIBRARIES}
+)
+
+add_dependencies(
+  reprocess_server_node
+  ${cpp_EXPORTED_TARGETS}
+)
 

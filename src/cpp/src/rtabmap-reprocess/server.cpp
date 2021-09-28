@@ -1,8 +1,10 @@
 #include <ros/ros.h>
+
 #include <std_msgs/Int32.h>
 #include <std_msgs/String.h>
+
 #include <actionlib/server/simple_action_server.h>
-#include <cpp/RtabmapReprocess.h>
+#include <cpp/RtabmapReprocessAction.h>
 #include <stdio.h>
 #include <string>
 
@@ -21,6 +23,10 @@
 #include <stdlib.h>
 #include <pcl/io/pcd_io.h>
 #include <signal.h>
+
+bool g_loopForever = true;
+
+using namespace rtabmap;
 
 class Reprocess_Server
 {
@@ -52,34 +58,35 @@ protected:
     bool exportPoses = false;
     int sessionCount = 0;
 
+    int argc;
+    char **argv;
+
 public:
-    Reprocess_Server(std::string name) : as(n, name, boost::bind(&Reprocess_Server::reprocess, this), false),
-                                        action_name(name)
+    Reprocess_Server(std::string name, int argc, char **argv) : as(n, name, boost::bind(&Reprocess_Server::reprocess, this, _1), false),
+                                                                action_name(name), argc{argc}, argv{argv}
     {
         //register the goal and feeback callbacks
-        // as.registerGoalCallback(boost::bind(&Reprocess_Server::goalCB, this));
-        as.registerPreemptCallback(boost::bind(&Reprocess_Server::preemptCB, this));
 
         as.start();
     }
 
-    void preemptCB()
-    {
-        ROS_INFO("%s: Preempted", action_name.c_str());
-        // set the action state to preempted
-        as.setPreempted();
-    }
+    // void preemptCB()
+    // {
+    //     ROS_INFO("%s: Preempted", action_name.c_str());
+    //     // set the action state to preempted
+    //     as.setPreempted();
+    // }
 
     // void goalCB()
     // {
     //     1_target_databasepath = as.acceptNewGoal()->databasepath;
     // }
-
-    void sighandler(int sig)
+    static void sighandler(int sig)
     {
         printf("\nSignal %d caught...\n", sig);
         g_loopForever = false;
     }
+
     void showLocalizationStats(const std::string &outputDatabasePath)
     {
         printf("Total localizations on previous session = %d/%d (Loop=%d, Prox=%d, In Motion=%d/%d)\n", loopCount + proxCount, totalFrames, loopCount, proxCount, loopCountMotion, totalFramesMotion);
@@ -165,9 +172,7 @@ public:
         ++sessionCount;
     }
 
-
-    
-    void reprocess(const cpp::RtabmapReprocessResult::ConstPtr &goal)
+    int reprocess(const cpp::RtabmapReprocessGoal::ConstPtr &goal)
     {
         signal(SIGABRT, &sighandler);
         signal(SIGTERM, &sighandler);
@@ -198,7 +203,7 @@ public:
         for (auto val : goal->databasepaths)
             inputDatabasePath += val + ";";
 
-        inputDatabasePath -= ";";
+        inputDatabasePath.erase(inputDatabasePath.size() - 1);
 
         outputDatabasePath = goal->goal_path;
 
@@ -207,7 +212,7 @@ public:
         if (databases.empty())
         {
             printf("No input database \"%s\" detected!\n", inputDatabasePath.c_str());
-            return -1;
+            return 1;
         }
 
         for (std::list<std::string>::iterator iter = databases.begin(); iter != databases.end(); ++iter)
@@ -215,20 +220,20 @@ public:
             if (!UFile::exists(*iter))
             {
                 printf("Input database \"%s\" doesn't exist!\n", iter->c_str());
-                return -1;
+                return 1;
             }
 
             if (UFile::getExtension(*iter).compare("db") != 0)
             {
                 printf("File \"%s\" is not a database format (*.db)!\n", iter->c_str());
-                return -1;
+                return 1;
             }
         }
 
         if (UFile::getExtension(outputDatabasePath).compare("db") != 0)
         {
             printf("File \"%s\" is not a database format (*.db)!\n", outputDatabasePath.c_str());
-            return -1;
+            return 1;
         }
 
         if (UFile::exists(outputDatabasePath))
@@ -242,7 +247,7 @@ public:
         {
             printf("Failed opening input database!\n");
             delete dbDriver;
-            return -1;
+            return 1;
         }
 
         ParametersMap parameters = dbDriver->getLastParameters();
@@ -299,7 +304,7 @@ public:
             printf("Input database doesn't have any nodes saved in it.\n");
             dbDriver->closeConnection(false);
             delete dbDriver;
-            return -1;
+            return 1;
         }
         if (!(!incrementalMemory && databases.size() > 1))
         {
@@ -314,7 +319,7 @@ public:
             {
                 printf("Failed opening input database!\n");
                 delete dbDriver;
-                return -1;
+                return 1;
             }
             ids.clear();
             dbDriver->getAllNodeIds(ids, false, false, !intermediateNodes);
@@ -357,9 +362,6 @@ public:
 
         OccupancyGrid grid(parameters);
         grid.setCloudAssembling(assemble3dMap);
-#ifdef RTABMAP_OCTOMAP
-        OctoMap octomap(parameters);
-#endif
 
         float linearUpdate = Parameters::defaultRGBDLinearUpdate();
         float angularUpdate = Parameters::defaultRGBDAngularUpdate();
@@ -433,12 +435,7 @@ public:
                             {
                                 updateGridMap = true;
                             }
-#ifdef RTABMAP_OCTOMAP
-                            if ((assemble2dOctoMap || assemble3dOctoMap) && octomap.addedNodes().find(id) == octomap.addedNodes().end())
-                            {
-                                updateOctoMap = true;
-                            }
-#endif
+
                             if (updateGridMap || updateOctoMap)
                             {
                                 cv::Mat ground, obstacles, empty;
@@ -452,43 +449,13 @@ public:
                                     grid.update(stats.poses());
                                     timeUpdateGrid = t.ticks() + timeUpdateInit;
                                 }
-#ifdef RTABMAP_OCTOMAP
-                                if (updateOctoMap)
-                                {
-                                    const cv::Point3f &viewpoint = stats.getLastSignatureData().sensorData().gridViewPoint();
-                                    octomap.addToCache(id, ground, obstacles, empty, viewpoint);
-                                    octomap.update(stats.poses());
-                                    timeUpdateOctoMap = t.ticks() + timeUpdateInit;
-                                }
-#endif
                             }
                         }
                     }
 
                     globalMapStats.insert(std::make_pair(std::string("GlobalGrid/GridUpdate/ms"), timeUpdateGrid * 1000.0f));
-#ifdef RTABMAP_OCTOMAP
-                    //Simulate publishing
-                    double timePub2dOctoMap = 0.0;
-                    double timePub3dOctoMap = 0.0;
-                    if (assemble2dOctoMap)
-                    {
-                        float xMin, yMin, size;
-                        octomap.createProjectionMap(xMin, yMin, size);
-                        timePub2dOctoMap = t.ticks();
-                    }
-                    if (assemble3dOctoMap)
-                    {
-                        octomap.createCloud();
-                        timePub3dOctoMap = t.ticks();
-                    }
 
-                    globalMapStats.insert(std::make_pair(std::string("GlobalGrid/OctoMapUpdate/ms"), timeUpdateOctoMap * 1000.0f));
-                    globalMapStats.insert(std::make_pair(std::string("GlobalGrid/OctoMapProjection/ms"), timePub2dOctoMap * 1000.0f));
-                    globalMapStats.insert(std::make_pair(std::string("GlobalGrid/OctomapToCloud/ms"), timePub3dOctoMap * 1000.0f));
-                    globalMapStats.insert(std::make_pair(std::string("GlobalGrid/TotalWithRtabmap/ms"), (timeUpdateGrid + timeUpdateOctoMap + timePub2dOctoMap + timePub3dOctoMap + timeRtabmap) * 1000.0f));
-#else
                     globalMapStats.insert(std::make_pair(std::string("GlobalGrid/TotalWithRtabmap/ms"), (timeUpdateGrid + timeRtabmap) * 1000.0f));
-#endif
                 }
             }
 
@@ -638,16 +605,17 @@ public:
         printf("Closing database \"%s\"...\n", outputDatabasePath.c_str());
         rtabmap.close(true);
         printf("Closing database \"%s\"... done!\n", outputDatabasePath.c_str());
+        return 1;
     }
 };
 
-int main(int argc,char **argv){
-    ros::init(argc,argv,"reprocess_server_node");
+int main(int argc, char **argv)
+{
+    ros::init(argc, argv, "reprocess_server_node");
 
-    Reprocess_Server server_agent("RtabmapReprocess_node");
+    Reprocess_Server server_agent("RtabmapReprocess_node", argc, argv);
 
     ros::spin();
 
     return 0;
 }
-

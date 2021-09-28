@@ -54,6 +54,8 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/cpp/action" TYPE FILE FILES
     "/home/ayumi/catkin_ws/src/cpp/action/Fibonacci.action"
     "/home/ayumi/catkin_ws/src/cpp/action/Averaging.action"
+    "/home/ayumi/catkin_ws/src/cpp/action/LoopClosure.action"
+    "/home/ayumi/catkin_ws/src/cpp/action/RtabmapReprocess.action"
     )
 endif()
 
@@ -78,6 +80,30 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
     "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingGoal.msg"
     "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingResult.msg"
     "/home/ayumi/catkin_ws/devel/share/cpp/msg/AveragingFeedback.msg"
+    )
+endif()
+
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/cpp/msg" TYPE FILE FILES
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/LoopClosureAction.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/LoopClosureActionGoal.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/LoopClosureActionResult.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/LoopClosureActionFeedback.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/LoopClosureGoal.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/LoopClosureResult.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/LoopClosureFeedback.msg"
+    )
+endif()
+
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/cpp/msg" TYPE FILE FILES
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/RtabmapReprocessAction.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/RtabmapReprocessActionGoal.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/RtabmapReprocessActionResult.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/RtabmapReprocessActionFeedback.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/RtabmapReprocessGoal.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/RtabmapReprocessResult.msg"
+    "/home/ayumi/catkin_ws/devel/share/cpp/msg/RtabmapReprocessFeedback.msg"
     )
 endif()
 

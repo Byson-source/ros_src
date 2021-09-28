@@ -1,9 +1,10 @@
 #include <ros/ros.h>
 #include <std_msgs/Int32.h>
 #include <std_msgs/String.h>
-#include <actionlib/server/simple_action_server.h>
-#include <cpp/RtabmapReprocess.h>
-#include <cpp/RtabmapReprocessResult.h>
+#include <actionlib/client/simple_action_client.h>
+#include <actionlib/client/terminal_state.h>
+#include <cpp/RtabmapReprocessAction.h>
+#include <cpp/RtabmapReprocessActionResult.h>
 #include <stdio.h>
 #include <cpp/StringArray.h>
 #include <vector>
@@ -18,7 +19,7 @@ class Reprocess_Client
 protected:
     ros::NodeHandle nh;
 
-    actionlib::SimpleActionServer<cpp::RtabmapReprocessAction> ac;
+    actionlib::SimpleActionClient<cpp::RtabmapReprocessAction> ac;
 
     std::string action_name;
 
@@ -35,7 +36,7 @@ protected:
 
 public:
     Reprocess_Client(std::string name)
-        : action_name{name}, ac(nh, name, false)
+        : action_name{name}, ac(action_name, true)
     {
         ROS_INFO("launching Rtabmap-reprocess...");
 
@@ -51,7 +52,7 @@ public:
 
     void dirCB(const cpp::StringArray::ConstPtr &msg)
     {
-        for (int i{1} : !i == msg->strings.size() : i++)
+        for (int i = 1; !i == msg->strings.size(); i++)
         {
             databases.push_back(msg->strings[i]);
         }
@@ -81,9 +82,9 @@ public:
             cpp::RtabmapReprocessGoal goal;
             for (auto val : databases)
                 goal.databasepaths.push_back(val);
-            
-            goal.goal_path=goal_path;
-            
+
+            goal.goal_path = goal_path;
+
             ac.sendGoal(goal);
         }
     }
@@ -91,7 +92,7 @@ public:
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv "reprocess_client_node");
+    ros::init(argc, argv, "reprocess_client_node");
 
     Reprocess_Client client_agent("RtabmapReprocess_node");
     ros::spin();
