@@ -603,7 +603,9 @@ public:
         }
 
         printf("Closing database \"%s\"...\n", outputDatabasePath.c_str());
+
         rtabmap.close(true);
+        
         printf("Closing database \"%s\"... done!\n", outputDatabasePath.c_str());
         return 1;
     }

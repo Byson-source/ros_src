@@ -4,7 +4,7 @@
 #include "std_msgs/String.h"
 #include "std_msgs/Int32.h"
 #include <string>
-#define FIRST_DATABASE_PATH "/home/ayumi/.ros/"
+#include <QString>
 class listener_node
 {
 
@@ -20,7 +20,7 @@ protected:
     
     int status{0};
     int previous_status=0;
-    std::string database_path{FIRST_DATABASE_PATH};0
+    QString database_path{"/home/ayumi/.ros/"};
 
 };
 

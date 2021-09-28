@@ -122,6 +122,7 @@
 /home/ayumi/catkin_ws/build/cpp/CMakeFiles/install.dir
 /home/ayumi/catkin_ws/build/cpp/CMakeFiles/rebuild_cache.dir
 /home/ayumi/catkin_ws/build/cpp/CMakeFiles/edit_cache.dir
+/home/ayumi/catkin_ws/build/cpp/CMakeFiles/GUI_node.dir
 /home/ayumi/catkin_ws/build/cpp/CMakeFiles/reprocess_server_node.dir
 /home/ayumi/catkin_ws/build/cpp/CMakeFiles/_cpp_generate_messages_check_deps_FibonacciActionFeedback.dir
 /home/ayumi/catkin_ws/build/cpp/CMakeFiles/actionlib_msgs_generate_messages_py.dir

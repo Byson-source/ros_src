@@ -172,7 +172,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-gui/include
+src/gui/include
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -424,3 +424,21 @@ add_dependencies(
   ${cpp_EXPORTED_TARGETS}
 )
 
+add_executable(GUI_node 
+src/gui/src/main.cpp
+src/gui/src/listener.cpp
+src/gui/src/example.cpp
+src/gui/include/example.h
+src/gui/include/listener.h
+)
+
+target_link_libraries(
+  GUI_node
+  ${catkin_LIBRARIES}
+  ${LIBRARIES}
+)
+
+add_dependencies(
+  GUI_node
+  ${cpp_EXPORTED_TARGETS}
+)

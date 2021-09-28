@@ -640,6 +640,19 @@ turtlebot3_msgs_generate_messages_py/fast:
 .PHONY : turtlebot3_msgs_generate_messages_py/fast
 
 #=============================================================================
+# Target rules for targets named GUI_node
+
+# Build rule for target.
+GUI_node: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 GUI_node
+.PHONY : GUI_node
+
+# fast build rule for target.
+GUI_node/fast:
+	$(MAKE) $(MAKESILENT) -f cpp/CMakeFiles/GUI_node.dir/build.make cpp/CMakeFiles/GUI_node.dir/build
+.PHONY : GUI_node/fast
+
+#=============================================================================
 # Target rules for targets named reprocess_server_node
 
 # Build rule for target.
@@ -7275,6 +7288,7 @@ help:
 	@echo "... DepthImageToLaserScan"
 	@echo "... DepthImageToLaserScanNodelet"
 	@echo "... DepthImageToLaserScanROS"
+	@echo "... GUI_node"
 	@echo "... LoadDatabase_client"
 	@echo "... add_two_ints_client"
 	@echo "... add_two_ints_server_node"
