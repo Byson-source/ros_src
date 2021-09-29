@@ -1454,6 +1454,9 @@ cpp/CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_client.cpp.o: /home/ayu
   /home/ayumi/catkin_ws/devel/include/cpp/AveragingActionFeedback.h \
   /home/ayumi/catkin_ws/devel/include/cpp/AveragingFeedback.h
 
+cpp/CMakeFiles/test_averaging.dir/test_averaging_autogen/mocs_compilation.cpp.o: cpp/test_averaging_autogen/mocs_compilation.cpp \
+  /usr/include/stdc-predef.h
+
 
 /home/ayumi/catkin_ws/devel/include/cpp/AveragingActionFeedback.h:
 
@@ -2730,6 +2733,8 @@ cpp/CMakeFiles/test_averaging.dir/src/CPP_demo/averaging_client.cpp.o: /home/ayu
 /usr/include/boost/preprocessor/variadic/size.hpp:
 
 /usr/include/c++/9/math.h:
+
+cpp/test_averaging_autogen/mocs_compilation.cpp:
 
 /usr/include/boost/predef/os/windows.h:
 

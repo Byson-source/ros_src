@@ -69,10 +69,24 @@ include cpp/CMakeFiles/fibonacci_server.dir/progress.make
 # Include the compile flags for this target's objects.
 include cpp/CMakeFiles/fibonacci_server.dir/flags.make
 
+cpp/CMakeFiles/fibonacci_server.dir/fibonacci_server_autogen/mocs_compilation.cpp.o: cpp/CMakeFiles/fibonacci_server.dir/flags.make
+cpp/CMakeFiles/fibonacci_server.dir/fibonacci_server_autogen/mocs_compilation.cpp.o: cpp/fibonacci_server_autogen/mocs_compilation.cpp
+cpp/CMakeFiles/fibonacci_server.dir/fibonacci_server_autogen/mocs_compilation.cpp.o: cpp/CMakeFiles/fibonacci_server.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object cpp/CMakeFiles/fibonacci_server.dir/fibonacci_server_autogen/mocs_compilation.cpp.o"
+	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT cpp/CMakeFiles/fibonacci_server.dir/fibonacci_server_autogen/mocs_compilation.cpp.o -MF CMakeFiles/fibonacci_server.dir/fibonacci_server_autogen/mocs_compilation.cpp.o.d -o CMakeFiles/fibonacci_server.dir/fibonacci_server_autogen/mocs_compilation.cpp.o -c /home/ayumi/catkin_ws/build/cpp/fibonacci_server_autogen/mocs_compilation.cpp
+
+cpp/CMakeFiles/fibonacci_server.dir/fibonacci_server_autogen/mocs_compilation.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/fibonacci_server.dir/fibonacci_server_autogen/mocs_compilation.cpp.i"
+	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ayumi/catkin_ws/build/cpp/fibonacci_server_autogen/mocs_compilation.cpp > CMakeFiles/fibonacci_server.dir/fibonacci_server_autogen/mocs_compilation.cpp.i
+
+cpp/CMakeFiles/fibonacci_server.dir/fibonacci_server_autogen/mocs_compilation.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/fibonacci_server.dir/fibonacci_server_autogen/mocs_compilation.cpp.s"
+	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ayumi/catkin_ws/build/cpp/fibonacci_server_autogen/mocs_compilation.cpp -o CMakeFiles/fibonacci_server.dir/fibonacci_server_autogen/mocs_compilation.cpp.s
+
 cpp/CMakeFiles/fibonacci_server.dir/src/CPP_demo/action_server.cpp.o: cpp/CMakeFiles/fibonacci_server.dir/flags.make
 cpp/CMakeFiles/fibonacci_server.dir/src/CPP_demo/action_server.cpp.o: /home/ayumi/catkin_ws/src/cpp/src/CPP_demo/action_server.cpp
 cpp/CMakeFiles/fibonacci_server.dir/src/CPP_demo/action_server.cpp.o: cpp/CMakeFiles/fibonacci_server.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object cpp/CMakeFiles/fibonacci_server.dir/src/CPP_demo/action_server.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object cpp/CMakeFiles/fibonacci_server.dir/src/CPP_demo/action_server.cpp.o"
 	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT cpp/CMakeFiles/fibonacci_server.dir/src/CPP_demo/action_server.cpp.o -MF CMakeFiles/fibonacci_server.dir/src/CPP_demo/action_server.cpp.o.d -o CMakeFiles/fibonacci_server.dir/src/CPP_demo/action_server.cpp.o -c /home/ayumi/catkin_ws/src/cpp/src/CPP_demo/action_server.cpp
 
 cpp/CMakeFiles/fibonacci_server.dir/src/CPP_demo/action_server.cpp.i: cmake_force
@@ -85,11 +99,13 @@ cpp/CMakeFiles/fibonacci_server.dir/src/CPP_demo/action_server.cpp.s: cmake_forc
 
 # Object files for target fibonacci_server
 fibonacci_server_OBJECTS = \
+"CMakeFiles/fibonacci_server.dir/fibonacci_server_autogen/mocs_compilation.cpp.o" \
 "CMakeFiles/fibonacci_server.dir/src/CPP_demo/action_server.cpp.o"
 
 # External object files for target fibonacci_server
 fibonacci_server_EXTERNAL_OBJECTS =
 
+/home/ayumi/catkin_ws/devel/lib/cpp/fibonacci_server: cpp/CMakeFiles/fibonacci_server.dir/fibonacci_server_autogen/mocs_compilation.cpp.o
 /home/ayumi/catkin_ws/devel/lib/cpp/fibonacci_server: cpp/CMakeFiles/fibonacci_server.dir/src/CPP_demo/action_server.cpp.o
 /home/ayumi/catkin_ws/devel/lib/cpp/fibonacci_server: cpp/CMakeFiles/fibonacci_server.dir/build.make
 /home/ayumi/catkin_ws/devel/lib/cpp/fibonacci_server: /opt/ros/noetic/lib/libtf.so
@@ -115,7 +131,7 @@ fibonacci_server_EXTERNAL_OBJECTS =
 /home/ayumi/catkin_ws/devel/lib/cpp/fibonacci_server: /usr/lib/x86_64-linux-gnu/libboost_thread.so.1.71.0
 /home/ayumi/catkin_ws/devel/lib/cpp/fibonacci_server: /usr/lib/x86_64-linux-gnu/libconsole_bridge.so.0.4
 /home/ayumi/catkin_ws/devel/lib/cpp/fibonacci_server: cpp/CMakeFiles/fibonacci_server.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable /home/ayumi/catkin_ws/devel/lib/cpp/fibonacci_server"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable /home/ayumi/catkin_ws/devel/lib/cpp/fibonacci_server"
 	cd /home/ayumi/catkin_ws/build/cpp && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/fibonacci_server.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

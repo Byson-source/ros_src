@@ -69,10 +69,24 @@ include cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/progress.make
 # Include the compile flags for this target's objects.
 include cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/flags.make
 
+cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/frame_a_to_frame_b_broadcaster_autogen/mocs_compilation.cpp.o: cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/flags.make
+cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/frame_a_to_frame_b_broadcaster_autogen/mocs_compilation.cpp.o: cpp/frame_a_to_frame_b_broadcaster_autogen/mocs_compilation.cpp
+cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/frame_a_to_frame_b_broadcaster_autogen/mocs_compilation.cpp.o: cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/frame_a_to_frame_b_broadcaster_autogen/mocs_compilation.cpp.o"
+	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/frame_a_to_frame_b_broadcaster_autogen/mocs_compilation.cpp.o -MF CMakeFiles/frame_a_to_frame_b_broadcaster.dir/frame_a_to_frame_b_broadcaster_autogen/mocs_compilation.cpp.o.d -o CMakeFiles/frame_a_to_frame_b_broadcaster.dir/frame_a_to_frame_b_broadcaster_autogen/mocs_compilation.cpp.o -c /home/ayumi/catkin_ws/build/cpp/frame_a_to_frame_b_broadcaster_autogen/mocs_compilation.cpp
+
+cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/frame_a_to_frame_b_broadcaster_autogen/mocs_compilation.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/frame_a_to_frame_b_broadcaster.dir/frame_a_to_frame_b_broadcaster_autogen/mocs_compilation.cpp.i"
+	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ayumi/catkin_ws/build/cpp/frame_a_to_frame_b_broadcaster_autogen/mocs_compilation.cpp > CMakeFiles/frame_a_to_frame_b_broadcaster.dir/frame_a_to_frame_b_broadcaster_autogen/mocs_compilation.cpp.i
+
+cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/frame_a_to_frame_b_broadcaster_autogen/mocs_compilation.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/frame_a_to_frame_b_broadcaster.dir/frame_a_to_frame_b_broadcaster_autogen/mocs_compilation.cpp.s"
+	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ayumi/catkin_ws/build/cpp/frame_a_to_frame_b_broadcaster_autogen/mocs_compilation.cpp -o CMakeFiles/frame_a_to_frame_b_broadcaster.dir/frame_a_to_frame_b_broadcaster_autogen/mocs_compilation.cpp.s
+
 cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/src/CPP_demo/tf_broadcaster.cpp.o: cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/flags.make
 cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/src/CPP_demo/tf_broadcaster.cpp.o: /home/ayumi/catkin_ws/src/cpp/src/CPP_demo/tf_broadcaster.cpp
 cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/src/CPP_demo/tf_broadcaster.cpp.o: cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/src/CPP_demo/tf_broadcaster.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/src/CPP_demo/tf_broadcaster.cpp.o"
 	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/src/CPP_demo/tf_broadcaster.cpp.o -MF CMakeFiles/frame_a_to_frame_b_broadcaster.dir/src/CPP_demo/tf_broadcaster.cpp.o.d -o CMakeFiles/frame_a_to_frame_b_broadcaster.dir/src/CPP_demo/tf_broadcaster.cpp.o -c /home/ayumi/catkin_ws/src/cpp/src/CPP_demo/tf_broadcaster.cpp
 
 cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/src/CPP_demo/tf_broadcaster.cpp.i: cmake_force
@@ -85,11 +99,13 @@ cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/src/CPP_demo/tf_broadcaster.cp
 
 # Object files for target frame_a_to_frame_b_broadcaster
 frame_a_to_frame_b_broadcaster_OBJECTS = \
+"CMakeFiles/frame_a_to_frame_b_broadcaster.dir/frame_a_to_frame_b_broadcaster_autogen/mocs_compilation.cpp.o" \
 "CMakeFiles/frame_a_to_frame_b_broadcaster.dir/src/CPP_demo/tf_broadcaster.cpp.o"
 
 # External object files for target frame_a_to_frame_b_broadcaster
 frame_a_to_frame_b_broadcaster_EXTERNAL_OBJECTS =
 
+/home/ayumi/catkin_ws/devel/lib/cpp/frame_a_to_frame_b_broadcaster: cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/frame_a_to_frame_b_broadcaster_autogen/mocs_compilation.cpp.o
 /home/ayumi/catkin_ws/devel/lib/cpp/frame_a_to_frame_b_broadcaster: cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/src/CPP_demo/tf_broadcaster.cpp.o
 /home/ayumi/catkin_ws/devel/lib/cpp/frame_a_to_frame_b_broadcaster: cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/build.make
 /home/ayumi/catkin_ws/devel/lib/cpp/frame_a_to_frame_b_broadcaster: /opt/ros/noetic/lib/libtf.so
@@ -115,7 +131,7 @@ frame_a_to_frame_b_broadcaster_EXTERNAL_OBJECTS =
 /home/ayumi/catkin_ws/devel/lib/cpp/frame_a_to_frame_b_broadcaster: /usr/lib/x86_64-linux-gnu/libboost_thread.so.1.71.0
 /home/ayumi/catkin_ws/devel/lib/cpp/frame_a_to_frame_b_broadcaster: /usr/lib/x86_64-linux-gnu/libconsole_bridge.so.0.4
 /home/ayumi/catkin_ws/devel/lib/cpp/frame_a_to_frame_b_broadcaster: cpp/CMakeFiles/frame_a_to_frame_b_broadcaster.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable /home/ayumi/catkin_ws/devel/lib/cpp/frame_a_to_frame_b_broadcaster"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable /home/ayumi/catkin_ws/devel/lib/cpp/frame_a_to_frame_b_broadcaster"
 	cd /home/ayumi/catkin_ws/build/cpp && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/frame_a_to_frame_b_broadcaster.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

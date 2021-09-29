@@ -5,9 +5,13 @@
 #include "std_msgs/Int32.h"
 #include <string>
 #include <QString>
-class listener_node
+#include <QApplication>
+#include <QtCore/QDir>
+#include <QTimer>
+#include <QObject>
+class listener_node:public QObject
 {
-
+Q_OBJECT
 public:
     listener_node();
     void gui_Callback(const std_msgs::Int32::ConstPtr &msg);

@@ -69,10 +69,24 @@ include cpp/CMakeFiles/GUI_node.dir/progress.make
 # Include the compile flags for this target's objects.
 include cpp/CMakeFiles/GUI_node.dir/flags.make
 
+cpp/CMakeFiles/GUI_node.dir/GUI_node_autogen/mocs_compilation.cpp.o: cpp/CMakeFiles/GUI_node.dir/flags.make
+cpp/CMakeFiles/GUI_node.dir/GUI_node_autogen/mocs_compilation.cpp.o: cpp/GUI_node_autogen/mocs_compilation.cpp
+cpp/CMakeFiles/GUI_node.dir/GUI_node_autogen/mocs_compilation.cpp.o: cpp/CMakeFiles/GUI_node.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object cpp/CMakeFiles/GUI_node.dir/GUI_node_autogen/mocs_compilation.cpp.o"
+	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT cpp/CMakeFiles/GUI_node.dir/GUI_node_autogen/mocs_compilation.cpp.o -MF CMakeFiles/GUI_node.dir/GUI_node_autogen/mocs_compilation.cpp.o.d -o CMakeFiles/GUI_node.dir/GUI_node_autogen/mocs_compilation.cpp.o -c /home/ayumi/catkin_ws/build/cpp/GUI_node_autogen/mocs_compilation.cpp
+
+cpp/CMakeFiles/GUI_node.dir/GUI_node_autogen/mocs_compilation.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/GUI_node.dir/GUI_node_autogen/mocs_compilation.cpp.i"
+	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ayumi/catkin_ws/build/cpp/GUI_node_autogen/mocs_compilation.cpp > CMakeFiles/GUI_node.dir/GUI_node_autogen/mocs_compilation.cpp.i
+
+cpp/CMakeFiles/GUI_node.dir/GUI_node_autogen/mocs_compilation.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/GUI_node.dir/GUI_node_autogen/mocs_compilation.cpp.s"
+	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ayumi/catkin_ws/build/cpp/GUI_node_autogen/mocs_compilation.cpp -o CMakeFiles/GUI_node.dir/GUI_node_autogen/mocs_compilation.cpp.s
+
 cpp/CMakeFiles/GUI_node.dir/src/gui/src/main.cpp.o: cpp/CMakeFiles/GUI_node.dir/flags.make
 cpp/CMakeFiles/GUI_node.dir/src/gui/src/main.cpp.o: /home/ayumi/catkin_ws/src/cpp/src/gui/src/main.cpp
 cpp/CMakeFiles/GUI_node.dir/src/gui/src/main.cpp.o: cpp/CMakeFiles/GUI_node.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object cpp/CMakeFiles/GUI_node.dir/src/gui/src/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object cpp/CMakeFiles/GUI_node.dir/src/gui/src/main.cpp.o"
 	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT cpp/CMakeFiles/GUI_node.dir/src/gui/src/main.cpp.o -MF CMakeFiles/GUI_node.dir/src/gui/src/main.cpp.o.d -o CMakeFiles/GUI_node.dir/src/gui/src/main.cpp.o -c /home/ayumi/catkin_ws/src/cpp/src/gui/src/main.cpp
 
 cpp/CMakeFiles/GUI_node.dir/src/gui/src/main.cpp.i: cmake_force
@@ -82,20 +96,6 @@ cpp/CMakeFiles/GUI_node.dir/src/gui/src/main.cpp.i: cmake_force
 cpp/CMakeFiles/GUI_node.dir/src/gui/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/GUI_node.dir/src/gui/src/main.cpp.s"
 	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ayumi/catkin_ws/src/cpp/src/gui/src/main.cpp -o CMakeFiles/GUI_node.dir/src/gui/src/main.cpp.s
-
-cpp/CMakeFiles/GUI_node.dir/src/gui/src/listener.cpp.o: cpp/CMakeFiles/GUI_node.dir/flags.make
-cpp/CMakeFiles/GUI_node.dir/src/gui/src/listener.cpp.o: /home/ayumi/catkin_ws/src/cpp/src/gui/src/listener.cpp
-cpp/CMakeFiles/GUI_node.dir/src/gui/src/listener.cpp.o: cpp/CMakeFiles/GUI_node.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object cpp/CMakeFiles/GUI_node.dir/src/gui/src/listener.cpp.o"
-	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT cpp/CMakeFiles/GUI_node.dir/src/gui/src/listener.cpp.o -MF CMakeFiles/GUI_node.dir/src/gui/src/listener.cpp.o.d -o CMakeFiles/GUI_node.dir/src/gui/src/listener.cpp.o -c /home/ayumi/catkin_ws/src/cpp/src/gui/src/listener.cpp
-
-cpp/CMakeFiles/GUI_node.dir/src/gui/src/listener.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/GUI_node.dir/src/gui/src/listener.cpp.i"
-	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ayumi/catkin_ws/src/cpp/src/gui/src/listener.cpp > CMakeFiles/GUI_node.dir/src/gui/src/listener.cpp.i
-
-cpp/CMakeFiles/GUI_node.dir/src/gui/src/listener.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/GUI_node.dir/src/gui/src/listener.cpp.s"
-	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ayumi/catkin_ws/src/cpp/src/gui/src/listener.cpp -o CMakeFiles/GUI_node.dir/src/gui/src/listener.cpp.s
 
 cpp/CMakeFiles/GUI_node.dir/src/gui/src/example.cpp.o: cpp/CMakeFiles/GUI_node.dir/flags.make
 cpp/CMakeFiles/GUI_node.dir/src/gui/src/example.cpp.o: /home/ayumi/catkin_ws/src/cpp/src/gui/src/example.cpp
@@ -113,15 +113,15 @@ cpp/CMakeFiles/GUI_node.dir/src/gui/src/example.cpp.s: cmake_force
 
 # Object files for target GUI_node
 GUI_node_OBJECTS = \
+"CMakeFiles/GUI_node.dir/GUI_node_autogen/mocs_compilation.cpp.o" \
 "CMakeFiles/GUI_node.dir/src/gui/src/main.cpp.o" \
-"CMakeFiles/GUI_node.dir/src/gui/src/listener.cpp.o" \
 "CMakeFiles/GUI_node.dir/src/gui/src/example.cpp.o"
 
 # External object files for target GUI_node
 GUI_node_EXTERNAL_OBJECTS =
 
+/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: cpp/CMakeFiles/GUI_node.dir/GUI_node_autogen/mocs_compilation.cpp.o
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: cpp/CMakeFiles/GUI_node.dir/src/gui/src/main.cpp.o
-/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: cpp/CMakeFiles/GUI_node.dir/src/gui/src/listener.cpp.o
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: cpp/CMakeFiles/GUI_node.dir/src/gui/src/example.cpp.o
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: cpp/CMakeFiles/GUI_node.dir/build.make
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /opt/ros/noetic/lib/libtf.so
@@ -186,15 +186,12 @@ GUI_node_EXTERNAL_OBJECTS =
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libopencv_viz.so.4.2.0
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libopencv_xobjdetect.so.4.2.0
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libopencv_xphoto.so.4.2.0
-/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libpcl_apps.so
-/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libpcl_outofcore.so
-/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libpcl_people.so
+/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libpcl_io.so
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libboost_system.so
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libboost_filesystem.so
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libboost_date_time.so
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libboost_iostreams.so
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libboost_regex.so
-/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libqhull.so
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/libOpenNI.so
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/libOpenNI2.so
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libvtkChartsCore-7.1.so.7.1p.1
@@ -212,7 +209,7 @@ GUI_node_EXTERNAL_OBJECTS =
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libvtkViewsContext2D-7.1.so.7.1p.1
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libvtkViewsCore-7.1.so.7.1p.1
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libvtkRenderingContextOpenGL2-7.1.so.7.1p.1
-/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libflann_cpp.so
+/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libQt5Widgets.so.5.12.8
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libdc1394.so
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /opt/ros/noetic/lib/liboctomap.so
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /opt/ros/noetic/lib/liboctomath.so
@@ -221,13 +218,11 @@ GUI_node_EXTERNAL_OBJECTS =
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libboost_date_time.so
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libboost_iostreams.so
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libboost_regex.so
-/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libqhull.so
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/libOpenNI.so
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libjpeg.so
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libpng.so
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libtiff.so
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libexpat.so
-/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libQt5Widgets.so.5.12.8
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libQt5Gui.so.5.12.8
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libQt5Core.so.5.12.8
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libopencv_highgui.so.4.2.0
@@ -249,21 +244,6 @@ GUI_node_EXTERNAL_OBJECTS =
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libopencv_photo.so.4.2.0
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libopencv_imgproc.so.4.2.0
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libopencv_core.so.4.2.0
-/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libpcl_surface.so
-/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libpcl_keypoints.so
-/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libpcl_tracking.so
-/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libpcl_recognition.so
-/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libpcl_registration.so
-/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libpcl_stereo.so
-/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libpcl_segmentation.so
-/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libpcl_features.so
-/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libpcl_filters.so
-/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libpcl_sample_consensus.so
-/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libpcl_ml.so
-/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libpcl_visualization.so
-/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libpcl_search.so
-/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libpcl_kdtree.so
-/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libpcl_io.so
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libpcl_octree.so
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libpcl_common.so
 /home/ayumi/catkin_ws/devel/lib/cpp/GUI_node: /usr/lib/x86_64-linux-gnu/libvtkInteractionWidgets-7.1.so.7.1p.1

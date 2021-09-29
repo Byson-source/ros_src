@@ -69,10 +69,24 @@ include cpp/CMakeFiles/LoadDatabase_client.dir/progress.make
 # Include the compile flags for this target's objects.
 include cpp/CMakeFiles/LoadDatabase_client.dir/flags.make
 
+cpp/CMakeFiles/LoadDatabase_client.dir/LoadDatabase_client_autogen/mocs_compilation.cpp.o: cpp/CMakeFiles/LoadDatabase_client.dir/flags.make
+cpp/CMakeFiles/LoadDatabase_client.dir/LoadDatabase_client_autogen/mocs_compilation.cpp.o: cpp/LoadDatabase_client_autogen/mocs_compilation.cpp
+cpp/CMakeFiles/LoadDatabase_client.dir/LoadDatabase_client_autogen/mocs_compilation.cpp.o: cpp/CMakeFiles/LoadDatabase_client.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object cpp/CMakeFiles/LoadDatabase_client.dir/LoadDatabase_client_autogen/mocs_compilation.cpp.o"
+	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT cpp/CMakeFiles/LoadDatabase_client.dir/LoadDatabase_client_autogen/mocs_compilation.cpp.o -MF CMakeFiles/LoadDatabase_client.dir/LoadDatabase_client_autogen/mocs_compilation.cpp.o.d -o CMakeFiles/LoadDatabase_client.dir/LoadDatabase_client_autogen/mocs_compilation.cpp.o -c /home/ayumi/catkin_ws/build/cpp/LoadDatabase_client_autogen/mocs_compilation.cpp
+
+cpp/CMakeFiles/LoadDatabase_client.dir/LoadDatabase_client_autogen/mocs_compilation.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/LoadDatabase_client.dir/LoadDatabase_client_autogen/mocs_compilation.cpp.i"
+	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ayumi/catkin_ws/build/cpp/LoadDatabase_client_autogen/mocs_compilation.cpp > CMakeFiles/LoadDatabase_client.dir/LoadDatabase_client_autogen/mocs_compilation.cpp.i
+
+cpp/CMakeFiles/LoadDatabase_client.dir/LoadDatabase_client_autogen/mocs_compilation.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/LoadDatabase_client.dir/LoadDatabase_client_autogen/mocs_compilation.cpp.s"
+	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ayumi/catkin_ws/build/cpp/LoadDatabase_client_autogen/mocs_compilation.cpp -o CMakeFiles/LoadDatabase_client.dir/LoadDatabase_client_autogen/mocs_compilation.cpp.s
+
 cpp/CMakeFiles/LoadDatabase_client.dir/src/load_database/client.cpp.o: cpp/CMakeFiles/LoadDatabase_client.dir/flags.make
 cpp/CMakeFiles/LoadDatabase_client.dir/src/load_database/client.cpp.o: /home/ayumi/catkin_ws/src/cpp/src/load_database/client.cpp
 cpp/CMakeFiles/LoadDatabase_client.dir/src/load_database/client.cpp.o: cpp/CMakeFiles/LoadDatabase_client.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object cpp/CMakeFiles/LoadDatabase_client.dir/src/load_database/client.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object cpp/CMakeFiles/LoadDatabase_client.dir/src/load_database/client.cpp.o"
 	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT cpp/CMakeFiles/LoadDatabase_client.dir/src/load_database/client.cpp.o -MF CMakeFiles/LoadDatabase_client.dir/src/load_database/client.cpp.o.d -o CMakeFiles/LoadDatabase_client.dir/src/load_database/client.cpp.o -c /home/ayumi/catkin_ws/src/cpp/src/load_database/client.cpp
 
 cpp/CMakeFiles/LoadDatabase_client.dir/src/load_database/client.cpp.i: cmake_force
@@ -85,11 +99,13 @@ cpp/CMakeFiles/LoadDatabase_client.dir/src/load_database/client.cpp.s: cmake_for
 
 # Object files for target LoadDatabase_client
 LoadDatabase_client_OBJECTS = \
+"CMakeFiles/LoadDatabase_client.dir/LoadDatabase_client_autogen/mocs_compilation.cpp.o" \
 "CMakeFiles/LoadDatabase_client.dir/src/load_database/client.cpp.o"
 
 # External object files for target LoadDatabase_client
 LoadDatabase_client_EXTERNAL_OBJECTS =
 
+/home/ayumi/catkin_ws/devel/lib/cpp/LoadDatabase_client: cpp/CMakeFiles/LoadDatabase_client.dir/LoadDatabase_client_autogen/mocs_compilation.cpp.o
 /home/ayumi/catkin_ws/devel/lib/cpp/LoadDatabase_client: cpp/CMakeFiles/LoadDatabase_client.dir/src/load_database/client.cpp.o
 /home/ayumi/catkin_ws/devel/lib/cpp/LoadDatabase_client: cpp/CMakeFiles/LoadDatabase_client.dir/build.make
 /home/ayumi/catkin_ws/devel/lib/cpp/LoadDatabase_client: /opt/ros/noetic/lib/libtf.so
@@ -115,7 +131,7 @@ LoadDatabase_client_EXTERNAL_OBJECTS =
 /home/ayumi/catkin_ws/devel/lib/cpp/LoadDatabase_client: /usr/lib/x86_64-linux-gnu/libboost_thread.so.1.71.0
 /home/ayumi/catkin_ws/devel/lib/cpp/LoadDatabase_client: /usr/lib/x86_64-linux-gnu/libconsole_bridge.so.0.4
 /home/ayumi/catkin_ws/devel/lib/cpp/LoadDatabase_client: cpp/CMakeFiles/LoadDatabase_client.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable /home/ayumi/catkin_ws/devel/lib/cpp/LoadDatabase_client"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable /home/ayumi/catkin_ws/devel/lib/cpp/LoadDatabase_client"
 	cd /home/ayumi/catkin_ws/build/cpp && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/LoadDatabase_client.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

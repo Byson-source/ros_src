@@ -1,10 +1,13 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/GUI_node_autogen.dir/AutogenUsed.txt"
+  "CMakeFiles/GUI_node_autogen.dir/ParseCache.txt"
+  "GUI_node_autogen"
   "/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node"
   "/home/ayumi/catkin_ws/devel/lib/cpp/GUI_node.pdb"
+  "CMakeFiles/GUI_node.dir/GUI_node_autogen/mocs_compilation.cpp.o"
+  "CMakeFiles/GUI_node.dir/GUI_node_autogen/mocs_compilation.cpp.o.d"
   "CMakeFiles/GUI_node.dir/src/gui/src/example.cpp.o"
   "CMakeFiles/GUI_node.dir/src/gui/src/example.cpp.o.d"
-  "CMakeFiles/GUI_node.dir/src/gui/src/listener.cpp.o"
-  "CMakeFiles/GUI_node.dir/src/gui/src/listener.cpp.o.d"
   "CMakeFiles/GUI_node.dir/src/gui/src/main.cpp.o"
   "CMakeFiles/GUI_node.dir/src/gui/src/main.cpp.o.d"
 )

@@ -69,10 +69,24 @@ include cpp/CMakeFiles/turnTurtle.dir/progress.make
 # Include the compile flags for this target's objects.
 include cpp/CMakeFiles/turnTurtle.dir/flags.make
 
+cpp/CMakeFiles/turnTurtle.dir/turnTurtle_autogen/mocs_compilation.cpp.o: cpp/CMakeFiles/turnTurtle.dir/flags.make
+cpp/CMakeFiles/turnTurtle.dir/turnTurtle_autogen/mocs_compilation.cpp.o: cpp/turnTurtle_autogen/mocs_compilation.cpp
+cpp/CMakeFiles/turnTurtle.dir/turnTurtle_autogen/mocs_compilation.cpp.o: cpp/CMakeFiles/turnTurtle.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object cpp/CMakeFiles/turnTurtle.dir/turnTurtle_autogen/mocs_compilation.cpp.o"
+	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT cpp/CMakeFiles/turnTurtle.dir/turnTurtle_autogen/mocs_compilation.cpp.o -MF CMakeFiles/turnTurtle.dir/turnTurtle_autogen/mocs_compilation.cpp.o.d -o CMakeFiles/turnTurtle.dir/turnTurtle_autogen/mocs_compilation.cpp.o -c /home/ayumi/catkin_ws/build/cpp/turnTurtle_autogen/mocs_compilation.cpp
+
+cpp/CMakeFiles/turnTurtle.dir/turnTurtle_autogen/mocs_compilation.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/turnTurtle.dir/turnTurtle_autogen/mocs_compilation.cpp.i"
+	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ayumi/catkin_ws/build/cpp/turnTurtle_autogen/mocs_compilation.cpp > CMakeFiles/turnTurtle.dir/turnTurtle_autogen/mocs_compilation.cpp.i
+
+cpp/CMakeFiles/turnTurtle.dir/turnTurtle_autogen/mocs_compilation.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/turnTurtle.dir/turnTurtle_autogen/mocs_compilation.cpp.s"
+	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ayumi/catkin_ws/build/cpp/turnTurtle_autogen/mocs_compilation.cpp -o CMakeFiles/turnTurtle.dir/turnTurtle_autogen/mocs_compilation.cpp.s
+
 cpp/CMakeFiles/turnTurtle.dir/src/CPP_demo/turn.cpp.o: cpp/CMakeFiles/turnTurtle.dir/flags.make
 cpp/CMakeFiles/turnTurtle.dir/src/CPP_demo/turn.cpp.o: /home/ayumi/catkin_ws/src/cpp/src/CPP_demo/turn.cpp
 cpp/CMakeFiles/turnTurtle.dir/src/CPP_demo/turn.cpp.o: cpp/CMakeFiles/turnTurtle.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object cpp/CMakeFiles/turnTurtle.dir/src/CPP_demo/turn.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object cpp/CMakeFiles/turnTurtle.dir/src/CPP_demo/turn.cpp.o"
 	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT cpp/CMakeFiles/turnTurtle.dir/src/CPP_demo/turn.cpp.o -MF CMakeFiles/turnTurtle.dir/src/CPP_demo/turn.cpp.o.d -o CMakeFiles/turnTurtle.dir/src/CPP_demo/turn.cpp.o -c /home/ayumi/catkin_ws/src/cpp/src/CPP_demo/turn.cpp
 
 cpp/CMakeFiles/turnTurtle.dir/src/CPP_demo/turn.cpp.i: cmake_force
@@ -85,11 +99,13 @@ cpp/CMakeFiles/turnTurtle.dir/src/CPP_demo/turn.cpp.s: cmake_force
 
 # Object files for target turnTurtle
 turnTurtle_OBJECTS = \
+"CMakeFiles/turnTurtle.dir/turnTurtle_autogen/mocs_compilation.cpp.o" \
 "CMakeFiles/turnTurtle.dir/src/CPP_demo/turn.cpp.o"
 
 # External object files for target turnTurtle
 turnTurtle_EXTERNAL_OBJECTS =
 
+/home/ayumi/catkin_ws/devel/lib/cpp/turnTurtle: cpp/CMakeFiles/turnTurtle.dir/turnTurtle_autogen/mocs_compilation.cpp.o
 /home/ayumi/catkin_ws/devel/lib/cpp/turnTurtle: cpp/CMakeFiles/turnTurtle.dir/src/CPP_demo/turn.cpp.o
 /home/ayumi/catkin_ws/devel/lib/cpp/turnTurtle: cpp/CMakeFiles/turnTurtle.dir/build.make
 /home/ayumi/catkin_ws/devel/lib/cpp/turnTurtle: /opt/ros/noetic/lib/libtf.so
@@ -115,7 +131,7 @@ turnTurtle_EXTERNAL_OBJECTS =
 /home/ayumi/catkin_ws/devel/lib/cpp/turnTurtle: /usr/lib/x86_64-linux-gnu/libboost_thread.so.1.71.0
 /home/ayumi/catkin_ws/devel/lib/cpp/turnTurtle: /usr/lib/x86_64-linux-gnu/libconsole_bridge.so.0.4
 /home/ayumi/catkin_ws/devel/lib/cpp/turnTurtle: cpp/CMakeFiles/turnTurtle.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable /home/ayumi/catkin_ws/devel/lib/cpp/turnTurtle"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable /home/ayumi/catkin_ws/devel/lib/cpp/turnTurtle"
 	cd /home/ayumi/catkin_ws/build/cpp && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/turnTurtle.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

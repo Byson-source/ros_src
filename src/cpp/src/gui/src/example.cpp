@@ -11,13 +11,19 @@
 #include "rtabmap/utilite/UFile.h"
 #include "rtabmap/utilite/UConversion.h"
 #include "rtabmap/gui/MainWindow.h"
+#include "std_msgs/Int32.h"
+#include "std_msgs/String.h"
 #define TIME_TO_CONNECT_TO_DATABASE 1000
 #define TIME_TO_EMIT 1
+#define GUI_SWITCH_TOPIC "gui_info"
+#define STORED_DIR_TOPIC "stored_dir"
 
-overloaded_window::overloaded_window(int argc,char **argv)
+overloaded_window::overloaded_window(int argc, char **argv)
 {
+    sub1 = n.subscribe(GUI_SWITCH_TOPIC, 10, &overloaded_window::gui_Callback, this);
+    sub2 = n.subscribe(STORED_DIR_TOPIC, 10, &overloaded_window::dir_callback, this);
 
-parameters=rtabmap::Parameters::parseArguments(argc,argv,false);
+    parameters = rtabmap::Parameters::parseArguments(argc, argv, false);
 
     mytimer = new QTimer(this);
     mytimer->setSingleShot(true);
@@ -36,18 +42,36 @@ parameters=rtabmap::Parameters::parseArguments(argc,argv,false);
     QObject::connect(mytimer, SIGNAL(timeout()), SLOT(close_database()));
 }
 
+void overloaded_window::gui_Callback(const std_msgs::Int32::ConstPtr &msg)
+{
+    // previous_status=status;
+    if (msg->data == 1)
+        status = 1;
+    else
+        status = 0;
+}
+
+void overloaded_window::dir_callback(const std_msgs::String::ConstPtr &msg)
+{
+    database_path = QString::fromStdString(msg->data.c_str());
+}
+
 void overloaded_window::open_database(const rtabmap::ParametersMap &overridedParameters)
 {
-    openDatabase(database_path,overridedParameters);
+    openDatabase(database_path, overridedParameters);
     emit signal0();
 }
 
 void overloaded_window::close_database()
 {
     closeDatabase();
-    status=0;
-    previous_status=0;
+    status = 0;
+    previous_status = 0;
 }
+
+// void overloaded_window::valueChanged(int n) {}
+
+// void signal0(void) {}
 
 void overloaded_window::status_checker()
 {
@@ -57,7 +81,7 @@ void overloaded_window::status_checker()
         std::cout << "GUI is launching..." << std::endl;
         emit valueChanged(1);
 
-        previous_status=1;
+        previous_status = 1;
     }
     else
         return;

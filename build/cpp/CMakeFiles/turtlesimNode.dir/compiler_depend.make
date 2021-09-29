@@ -1228,6 +1228,9 @@ cpp/CMakeFiles/turtlesimNode.dir/src/CPP_demo/move_straight.cpp.o: /home/ayumi/c
   /opt/ros/noetic/include/geometry_msgs/Vector3.h \
   /opt/ros/noetic/include/turtlesim/Pose.h
 
+cpp/CMakeFiles/turtlesimNode.dir/turtlesimNode_autogen/mocs_compilation.cpp.o: cpp/turtlesimNode_autogen/mocs_compilation.cpp \
+  /usr/include/stdc-predef.h
+
 
 /opt/ros/noetic/include/turtlesim/Pose.h:
 
@@ -2326,6 +2329,8 @@ cpp/CMakeFiles/turtlesimNode.dir/src/CPP_demo/move_straight.cpp.o: /home/ayumi/c
 /usr/include/x86_64-linux-gnu/c++/9/bits/gthr-default.h:
 
 /usr/include/boost/mpl/vector/vector20.hpp:
+
+cpp/turtlesimNode_autogen/mocs_compilation.cpp:
 
 /usr/include/boost/type_traits/function_traits.hpp:
 

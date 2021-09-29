@@ -69,10 +69,24 @@ include cpp/CMakeFiles/averaging.dir/progress.make
 # Include the compile flags for this target's objects.
 include cpp/CMakeFiles/averaging.dir/flags.make
 
+cpp/CMakeFiles/averaging.dir/averaging_autogen/mocs_compilation.cpp.o: cpp/CMakeFiles/averaging.dir/flags.make
+cpp/CMakeFiles/averaging.dir/averaging_autogen/mocs_compilation.cpp.o: cpp/averaging_autogen/mocs_compilation.cpp
+cpp/CMakeFiles/averaging.dir/averaging_autogen/mocs_compilation.cpp.o: cpp/CMakeFiles/averaging.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object cpp/CMakeFiles/averaging.dir/averaging_autogen/mocs_compilation.cpp.o"
+	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT cpp/CMakeFiles/averaging.dir/averaging_autogen/mocs_compilation.cpp.o -MF CMakeFiles/averaging.dir/averaging_autogen/mocs_compilation.cpp.o.d -o CMakeFiles/averaging.dir/averaging_autogen/mocs_compilation.cpp.o -c /home/ayumi/catkin_ws/build/cpp/averaging_autogen/mocs_compilation.cpp
+
+cpp/CMakeFiles/averaging.dir/averaging_autogen/mocs_compilation.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/averaging.dir/averaging_autogen/mocs_compilation.cpp.i"
+	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ayumi/catkin_ws/build/cpp/averaging_autogen/mocs_compilation.cpp > CMakeFiles/averaging.dir/averaging_autogen/mocs_compilation.cpp.i
+
+cpp/CMakeFiles/averaging.dir/averaging_autogen/mocs_compilation.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/averaging.dir/averaging_autogen/mocs_compilation.cpp.s"
+	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ayumi/catkin_ws/build/cpp/averaging_autogen/mocs_compilation.cpp -o CMakeFiles/averaging.dir/averaging_autogen/mocs_compilation.cpp.s
+
 cpp/CMakeFiles/averaging.dir/src/CPP_demo/averaging_server.cpp.o: cpp/CMakeFiles/averaging.dir/flags.make
 cpp/CMakeFiles/averaging.dir/src/CPP_demo/averaging_server.cpp.o: /home/ayumi/catkin_ws/src/cpp/src/CPP_demo/averaging_server.cpp
 cpp/CMakeFiles/averaging.dir/src/CPP_demo/averaging_server.cpp.o: cpp/CMakeFiles/averaging.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object cpp/CMakeFiles/averaging.dir/src/CPP_demo/averaging_server.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object cpp/CMakeFiles/averaging.dir/src/CPP_demo/averaging_server.cpp.o"
 	cd /home/ayumi/catkin_ws/build/cpp && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT cpp/CMakeFiles/averaging.dir/src/CPP_demo/averaging_server.cpp.o -MF CMakeFiles/averaging.dir/src/CPP_demo/averaging_server.cpp.o.d -o CMakeFiles/averaging.dir/src/CPP_demo/averaging_server.cpp.o -c /home/ayumi/catkin_ws/src/cpp/src/CPP_demo/averaging_server.cpp
 
 cpp/CMakeFiles/averaging.dir/src/CPP_demo/averaging_server.cpp.i: cmake_force
@@ -85,11 +99,13 @@ cpp/CMakeFiles/averaging.dir/src/CPP_demo/averaging_server.cpp.s: cmake_force
 
 # Object files for target averaging
 averaging_OBJECTS = \
+"CMakeFiles/averaging.dir/averaging_autogen/mocs_compilation.cpp.o" \
 "CMakeFiles/averaging.dir/src/CPP_demo/averaging_server.cpp.o"
 
 # External object files for target averaging
 averaging_EXTERNAL_OBJECTS =
 
+/home/ayumi/catkin_ws/devel/lib/cpp/averaging: cpp/CMakeFiles/averaging.dir/averaging_autogen/mocs_compilation.cpp.o
 /home/ayumi/catkin_ws/devel/lib/cpp/averaging: cpp/CMakeFiles/averaging.dir/src/CPP_demo/averaging_server.cpp.o
 /home/ayumi/catkin_ws/devel/lib/cpp/averaging: cpp/CMakeFiles/averaging.dir/build.make
 /home/ayumi/catkin_ws/devel/lib/cpp/averaging: /opt/ros/noetic/lib/libtf.so
@@ -115,7 +131,7 @@ averaging_EXTERNAL_OBJECTS =
 /home/ayumi/catkin_ws/devel/lib/cpp/averaging: /usr/lib/x86_64-linux-gnu/libboost_thread.so.1.71.0
 /home/ayumi/catkin_ws/devel/lib/cpp/averaging: /usr/lib/x86_64-linux-gnu/libconsole_bridge.so.0.4
 /home/ayumi/catkin_ws/devel/lib/cpp/averaging: cpp/CMakeFiles/averaging.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable /home/ayumi/catkin_ws/devel/lib/cpp/averaging"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/ayumi/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable /home/ayumi/catkin_ws/devel/lib/cpp/averaging"
 	cd /home/ayumi/catkin_ws/build/cpp && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/averaging.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

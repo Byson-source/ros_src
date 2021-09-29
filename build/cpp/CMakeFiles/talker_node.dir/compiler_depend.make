@@ -1226,6 +1226,11 @@ cpp/CMakeFiles/talker_node.dir/src/CPP_demo/talker.cpp.o: /home/ayumi/catkin_ws/
   /opt/ros/noetic/include/std_msgs/String.h \
   /opt/ros/noetic/include/ros/message_operations.h
 
+cpp/CMakeFiles/talker_node.dir/talker_node_autogen/mocs_compilation.cpp.o: cpp/talker_node_autogen/mocs_compilation.cpp \
+  /usr/include/stdc-predef.h
+
+
+cpp/talker_node_autogen/mocs_compilation.cpp:
 
 /opt/ros/noetic/include/std_msgs/String.h:
 

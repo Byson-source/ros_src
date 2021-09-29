@@ -19,14 +19,27 @@ find_package(catkin REQUIRED COMPONENTS
 ########################################################
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}")
 
-FIND_PACKAGE(RTABMap REQUIRED)
-FIND_PACKAGE(OpenCV REQUIRED)
-FIND_PACKAGE(PCL 1.7 REQUIRED)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-FIND_PACKAGE(Qt5 COMPONENTS Widgets Core Gui Svg QUIET)
-IF(NOT Qt5_FOUND)
-  FIND_PACKAGE(Qt4 COMPONENTS QtCore QtGui QtSvg)
-ENDIF(NOT Qt5_FOUND)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+FIND_PACKAGE(RTABMap REQUIRED)
+find_package(Qt5 COMPONENTS Widgets REQUIRED)
+FIND_PACKAGE(OpenCV REQUIRED)
+find_package(PCL 1.3 REQUIRED COMPONENTS common io)
+
+link_directories(${PCL_LIBRARIES_DIRS})
+add_definitions(${PCL_DEFINITIONS})
+
+if(POLICY CMP0020)
+cmake_policy(SET CMP0020 NEW)
+endif()
+
 
 # fix libproj.so not found on Xenial
 if(NOT "${PCL_LIBRARIES}" STREQUAL "")
@@ -37,33 +50,35 @@ if(POLICY CMP0020)
   cmake_policy(SET CMP0020 OLD)
 endif()
 
+
 # include directories
 SET(INCLUDE_DIRS
-   ${RTABMap_INCLUDE_DIRS}
-   ${OpenCV_INCLUDE_DIRS}
-   ${PCL_INCLUDE_DIRS}
+${RTABMap_INCLUDE_DIRS}
+${OpenCV_INCLUDE_DIRS}
+${PCL_INCLUDE_DIRS}
 )
-
-IF(QT4_FOUND)
-   INCLUDE(${QT_USE_FILE})
-ENDIF(QT4_FOUND)
-
 
 # libraries
 SET(LIBRARIES
 ${RTABMap_LIBRARIES}
 ${OpenCV_LIBRARIES}
-${QT_LIBRARIES}
 ${PCL_LIBRARIES}
 )
 
-INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
 
-IF(QT4_FOUND)
-   QT4_WRAP_CPP(moc_srcs MapBuilder.h)
-ELSE()
-   QT5_WRAP_CPP(moc_srcs MapBuilder.h)
-ENDIF()
+IF(octomap_FOUND)
+
+SET(INCLUDE_DIRS
+${INCLUDE_DIRS}
+${OCTOMAP_INCLUDE_DIRS}
+)
+SET(LIBRARIES
+${LIBRARIES}
+${OCTOMAP_LIBRARIES}
+)
+ENDIF(octomap_FOUND)
+
+INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
 ##############################################################
 
 ## System dependencies are found with CMake's conventions
@@ -424,19 +439,24 @@ add_dependencies(
   ${cpp_EXPORTED_TARGETS}
 )
 
+INSTALL(TARGETS reprocess_server_node
+    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT runtime
+    BUNDLE DESTINATION "${CMAKE_BUNDLE_LOCATION}" COMPONENT runtime)
+
 add_executable(GUI_node 
 src/gui/src/main.cpp
-src/gui/src/listener.cpp
 src/gui/src/example.cpp
 src/gui/include/example.h
-src/gui/include/listener.h
 )
 
 target_link_libraries(
   GUI_node
   ${catkin_LIBRARIES}
   ${LIBRARIES}
+  Qt5::Widgets
 )
+
+# target_link_libraries(GUI_node PRIVATE Qt5::Widgets)
 
 add_dependencies(
   GUI_node
