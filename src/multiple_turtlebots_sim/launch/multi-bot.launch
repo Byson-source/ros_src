@@ -19,7 +19,7 @@
   </group>
 
   <group ns="robot2">
-    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro robot:=robot1/" />
+    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro robot:=robot2/" />
     <node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf"  args="-urdf -model $(arg robot2)turtlebot3_$(arg model) -x -0.5 -y 0 -z 0 -Y 1.047 -param robot_description" />
   </group>
 
