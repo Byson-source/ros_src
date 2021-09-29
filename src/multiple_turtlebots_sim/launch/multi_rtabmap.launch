@@ -15,9 +15,20 @@
         </include>
     </group>
 
-<!--    <node pkg="map_merge_3d" name="merger" type="map_merge_node" output="screen" respawn="false">-->
-<!--        <param name="robot_map_topic" type="string" value="cloud_map"/>-->
-<!--        <param name="robot_namespace" type="string" value="robot"/>-->
-<!--    </node>-->
+    <!-- <group ns="robot3">
+        <include file="$(find multiple_turtlebots_sim)/launch/for_multi_rtabmap.launch">
+            <arg name="for_frame" value="robot3/"/>
+            <arg name="topic_name" value="/robot3"/>
+        </include>
+    </group> -->
+
+    <!-- <node pkg="cpp" type="LoadDatabase_client" name="LoadDatabase_client" output="screen">
+        <param name="num" value="2"/>
+    </node> -->
+
+    <!--    <node pkg="map_merge_3d" name="merger" type="map_merge_node" output="screen" respawn="false">-->
+    <!--        <param name="robot_map_topic" type="string" value="cloud_map"/>-->
+    <!--        <param name="robot_namespace" type="string" value="robot"/>-->
+    <!--    </node>-->
     <!-- <node pkg="rviz" name="rviz" type="rviz"/> -->
 </launch>

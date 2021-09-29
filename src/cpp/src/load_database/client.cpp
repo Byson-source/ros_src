@@ -6,6 +6,7 @@
 #include "rtabmap_ros/LoadDatabase.h"
 #include <cpp/StringArray.h>
 #include <vector>
+#include <iostream>
 
 #define SWITCH_LOAD_TOPIC "LoopClosureDetection"
 #define ACTIVATE_REPROCESS_TOPIC "Reprocess_start"
@@ -16,21 +17,20 @@ class LoadDatabase_Client
 protected:
     ros::NodeHandle nh;
 
-    int robots_num;
+    // ros::NodeHandle pnh("~");
+    std::string robot_name;
 
-    std::vector<ros::ServiceClient> clients;
+    ros::ServiceClient client;
 
     std::string action_name;
 
-    std::string template_database_path{"/home/ayumi/Documents/RTAB-Map/Experiment/No"};
+    std::string template_database_path{"/home/ayumi/Documents/RTAB-Map/Experiment/"};
     std::string template_loaddatabase_topic{"/rtabmap/load_database"};
 
-    int status{1};
     int database_num{1};
 
-    std::vector<std::string> databases;
-    std::vector<std::string> srv_topics;
-    std::vector<std::string> previous_pathinfo;
+    std::string srv_topics;
+    std::string previous_path;
 
     ros::Subscriber result_checker;
     ros::Subscriber switch_sub;
@@ -39,21 +39,39 @@ protected:
     ros::Publisher reprocess_commander;
 
 public:
-    LoadDatabase_Client(int num) : robots_num{num}
+    // LoadDatabase_Client(std::string name) :robot_name{name}
+    LoadDatabase_Client(std::string name)
     {
-        ROS_INFO("launching Rtabmap-reprocess...");
+        ROS_INFO("launching Loaddatabase service...");
+        robot_name = name;
 
-        for (int i = 0; !i == robots_num; i++)
-        {
-            srv_topics.push_back("No." + std::to_string(i) + template_loaddatabase_topic);
-            clients.push_back(nh.serviceClient<rtabmap_ros::LoadDatabase>(srv_topics[i]));
-        }
+        // pnh.getParam("name", robot_name);
+        srv_topics = name + template_loaddatabase_topic;
+        client = nh.serviceClient<rtabmap_ros::LoadDatabase>(srv_topics);
 
         switch_sub = nh.subscribe(SWITCH_LOAD_TOPIC, 10,
                                   &LoadDatabase_Client::switchCB, this);
 
-        databasepath_transmitter = nh.advertise<cpp::StringArray>(PATH_TOPIC, 10);
+        databasepath_transmitter = nh.advertise<std_msgs::String>(PATH_TOPIC, 10);
         reprocess_commander = nh.advertise<std_msgs::Int32>(ACTIVATE_REPROCESS_TOPIC, 10);
+
+        rtabmap_ros::LoadDatabase srv;
+
+        ROS_INFO("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+        srv.request.database_path = template_database_path + robot_name + std::to_string(database_num) + ".db";
+        srv.request.clear = true;
+
+        database_num += 1;
+
+        if (client.call(srv))
+        {
+            ROS_INFO("Loading succeeded!");
+        }
+        else
+        {
+            ROS_ERROR("Failed to call LoadDatabase service");
+        }
     }
 
     void checkCB(void)
@@ -67,43 +85,43 @@ public:
 
     void switchCB(const std_msgs::Int32::ConstPtr &msg)
     {
-        if (msg->data == 1 || status == 1)
+        if (msg->data == 1)
         {
-            status = 0;
-            if (!previous_pathinfo.size() == 0)
+            if (!previous_path.size() == 0)
             {
-                cpp::StringArray reading_path;
+                std_msgs::String reading_path;
 
-                for (auto val : previous_pathinfo)
-                    reading_path.strings.push_back(val);
+                reading_path.data = previous_path;
 
                 databasepath_transmitter.publish(reading_path);
-                previous_pathinfo.clear();
+                previous_path = "";
             }
 
-            for (int i = 0; !i == robots_num; i++)
+            rtabmap_ros::LoadDatabase srv;
+
+            ROS_INFO("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+            srv.request.database_path = template_database_path + robot_name + std::to_string(database_num) + ".db";
+            srv.request.clear = true;
+
+            database_num += 1;
+
+            if (client.call(srv))
             {
-                rtabmap_ros::LoadDatabase srv;
-
-                srv.request.database_path = template_database_path + std::to_string(database_num) + ".db";
-                srv.request.clear = true;
-
-                database_num += 1;
-
-                if (clients[i].call(srv))
-                {
-                    ROS_INFO("Loading succeeded!");
-                }
-                else
-                {
-                    ROS_ERROR("Failed to call LoadDatabase service");
-                    break;
-                }
-
-                previous_pathinfo.push_back(srv.request.database_path);
+                ROS_INFO("Loading succeeded!");
             }
+            else
+            {
+                ROS_ERROR("Failed to call LoadDatabase service");
+            }
+
+            previous_path = srv.request.database_path;
 
             LoadDatabase_Client::checkCB();
+        }
+        else
+        {
+            ROS_INFO("?????????????????????????????");
         }
     }
 };
@@ -112,11 +130,7 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "LoadDatabase_client");
 
-    ros::NodeHandle pnh("~");
-    int number;
-    pnh.getParam("num", number);
-
-    LoadDatabase_Client client_agent(number);
+    LoadDatabase_Client client_agent("robot1");
 
     ros::spin();
 
