@@ -6,6 +6,10 @@
             <arg name="for_frame" value="robot1/"/>
             <arg name="topic_name" value="/robot1"/>
         </include>
+
+        <node pkg="cpp" type="LoadDatabase_client" name="LoadDatabase_client" output="screen">
+            <param name="name" value="robot1"/>
+        </node>
     </group>
 
     <group ns="robot2">
@@ -13,22 +17,26 @@
             <arg name="for_frame" value="robot2/"/>
             <arg name="topic_name" value="/robot2"/>
         </include>
-    </group>
+        <node pkg="cpp" type="LoadDatabase_client" name="LoadDatabase_client" output="screen">
+            <param name="name" value="robot2"/>
+        </node>
 
-    <!-- <group ns="robot3">
+</group>
+
+<!-- <group ns="robot3">
         <include file="$(find multiple_turtlebots_sim)/launch/for_multi_rtabmap.launch">
             <arg name="for_frame" value="robot3/"/>
             <arg name="topic_name" value="/robot3"/>
         </include>
     </group> -->
 
-    <!-- <node pkg="cpp" type="LoadDatabase_client" name="LoadDatabase_client" output="screen">
+<!-- <node pkg="cpp" type="LoadDatabase_client" name="LoadDatabase_client" output="screen">
         <param name="num" value="2"/>
     </node> -->
 
-    <!--    <node pkg="map_merge_3d" name="merger" type="map_merge_node" output="screen" respawn="false">-->
-    <!--        <param name="robot_map_topic" type="string" value="cloud_map"/>-->
-    <!--        <param name="robot_namespace" type="string" value="robot"/>-->
-    <!--    </node>-->
-    <!-- <node pkg="rviz" name="rviz" type="rviz"/> -->
+<!--    <node pkg="map_merge_3d" name="merger" type="map_merge_node" output="screen" respawn="false">-->
+<!--        <param name="robot_map_topic" type="string" value="cloud_map"/>-->
+<!--        <param name="robot_namespace" type="string" value="robot"/>-->
+<!--    </node>-->
+<!-- <node pkg="rviz" name="rviz" type="rviz"/> -->
 </launch>

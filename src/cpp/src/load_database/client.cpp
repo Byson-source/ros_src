@@ -17,7 +17,6 @@ class LoadDatabase_Client
 protected:
     ros::NodeHandle nh;
 
-    // ros::NodeHandle pnh("~");
     std::string robot_name;
 
     ros::ServiceClient client;
@@ -45,7 +44,6 @@ public:
         ROS_INFO("launching Loaddatabase service...");
         robot_name = name;
 
-        // pnh.getParam("name", robot_name);
         srv_topics = name + template_loaddatabase_topic;
         client = nh.serviceClient<rtabmap_ros::LoadDatabase>(srv_topics);
 
@@ -129,8 +127,12 @@ public:
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "LoadDatabase_client");
+    ros::NodeHandle pnh("~");
+    std::string name;
+    pnh.getParam("name", name);
 
-    LoadDatabase_Client client_agent("robot1");
+
+    LoadDatabase_Client client_agent(name);
 
     ros::spin();
 
