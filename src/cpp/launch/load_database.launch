@@ -1,0 +1,15 @@
+<launch>
+    <!-- <group ns="robot1"> -->
+        <node pkg="cpp" type="LoadDatabase_client" name="LoadDatabase_client1" output="screen">
+            <param name="name" value="robot1"/>
+        </node>
+    <!-- </group> -->
+
+    <!-- <group ns="robot2"> -->
+        <node pkg="cpp" type="LoadDatabase_client" name="LoadDatabase_client2" output="screen">
+            <param name="name" value="robot2"/>
+        </node>
+    <!-- </group> -->
+
+
+</launch>

@@ -39,12 +39,13 @@ protected:
 
 public:
     // LoadDatabase_Client(std::string name) :robot_name{name}
-    LoadDatabase_Client(std::string name)
+    LoadDatabase_Client(std::string name) : robot_name{name}
     {
         ROS_INFO("launching Loaddatabase service...");
-        robot_name = name;
 
-        srv_topics = name + template_loaddatabase_topic;
+        srv_topics = robot_name + template_loaddatabase_topic;
+        ros::service::waitForService(srv_topics);
+
         client = nh.serviceClient<rtabmap_ros::LoadDatabase>(srv_topics);
 
         switch_sub = nh.subscribe(SWITCH_LOAD_TOPIC, 10,
@@ -55,9 +56,7 @@ public:
 
         rtabmap_ros::LoadDatabase srv;
 
-        ROS_INFO("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
-        srv.request.database_path = template_database_path + robot_name + std::to_string(database_num) + ".db";
+        srv.request.database_path = template_database_path + "No" + std::to_string(database_num) + robot_name + ".db";
         srv.request.clear = true;
 
         database_num += 1;
@@ -127,12 +126,12 @@ public:
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "LoadDatabase_client");
+
     ros::NodeHandle pnh("~");
     std::string name;
     pnh.getParam("name", name);
-
-
     LoadDatabase_Client client_agent(name);
+    // LoadDatabase_Client client_agent("robot1");
 
     ros::spin();
 
