@@ -28,7 +28,7 @@ public:
     overloaded_window(int argc,char **argv);
     rtabmap::ParametersMap parameters;
     void gui_Callback(const std_msgs::Int32::ConstPtr &msg);
-    void dir_callback(const std_msgs::String::ConstPtr &msg);
+    // void dir_callback(const std_msgs::String::ConstPtr &msg);
 
 public slots:
     void open_database(const rtabmap::ParametersMap &overridedParameters);
@@ -44,12 +44,11 @@ private:
     QTimer *mytimer;
     QTimer *sub_timer;
     ros::NodeHandle n;
-    ros::Subscriber sub1;
-    ros::Subscriber sub2;
+    ros::Subscriber sub;
 
     int status{0};
     int previous_status=0;
-    QString database_path{"/home/ayumi/.ros/"};
+    QString database_path{"/home/ayumi/.ros/rtabmap.db"};
 
 
 };

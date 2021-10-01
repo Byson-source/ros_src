@@ -10,6 +10,7 @@
 #include <string>
 #include <actionlib/server/simple_action_server.h>
 #include <cpp/LoopClosureAction.h>
+#include <vector>
 
 #define DATABASEPATH "/home/ayumi/Documents/RTAB-MAP/rtabmap.db"
 
@@ -19,6 +20,8 @@ class Loop_Closure
 {
 private:
     ros::NodeHandle n;
+
+    std::vector<int> detection_list;
 
     ros::Rate loop_rate{0.5};
 
@@ -34,15 +37,14 @@ private:
 
 public:
     Loop_Closure(std::string name) : as_(n, name, boost::bind(&Loop_Closure::detection, this, _1), false),
-    action_name{name}
+                                                 action_name{name}
     {
         rtabmap.setTimeThreshold(700.0f); // Time threshold : 700 ms, 0 ms means no limit
 
-        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRtabmapLoopThr(),"0.11"));
+        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRtabmapLoopThr(), "0.11"));
         parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRGBDEnabled(), "false"));
 
         UFile::erase(database_path);
-        
 
         as_.start();
     }
@@ -55,7 +57,6 @@ public:
         rtabmap::CameraImages camera(target_path);
         rtabmap::SensorData data{camera.takeImage()};
 
-        int i{0};
         int nextIndex{1};
 
         UFile::erase(target_path);
@@ -73,24 +74,26 @@ public:
             if (data.imageRaw().empty() == 1 || !as_.isActive())
             {
                 //when the speed of image extractor is low...
-                break;
+                continue;
             }
             else
             {
                 rtabmap.process(data.imageRaw(), nextIndex);
 
-                ++i;
                 if (rtabmap.getLoopClosureId())
                 {
+                    if ((nextIndex - rtabmap.getLoopClosureId()) % 2 == 1)
+                    {
 
-                    ROS_INFO("Loop-closure detected!!");
+                        ROS_INFO("Loop-closure detected!!");
 
-                    rtabmap.close();
+                        rtabmap.close();
 
-                    ROS_INFO("Rtabmap for next is ready...");
-                    result.result = 1;
-                    as_.setSucceeded(result);
-                    break;
+                        ROS_INFO("Rtabmap for next is ready...");
+                        result.result = 1;
+                        as_.setSucceeded(result);
+                        break;
+                    }
                 }
                 else
                 {
@@ -109,6 +112,7 @@ int main(int argc, char **argv)
 {
 
     ros::init(argc, argv, "detection_checker");
+
     Loop_Closure detector("loop_closure");
 
     return 0;

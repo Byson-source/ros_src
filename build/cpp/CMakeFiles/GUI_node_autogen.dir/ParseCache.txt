@@ -4,5 +4,5 @@
 /home/ayumi/catkin_ws/src/cpp/src/gui/include/listener.h
  mmc:Q_OBJECT
 /home/ayumi/catkin_ws/src/cpp/src/gui/src/main.cpp
-/home/ayumi/catkin_ws/src/cpp/src/gui/src/example.cpp
 /home/ayumi/catkin_ws/src/cpp/src/gui/src/listener.cpp
+/home/ayumi/catkin_ws/src/cpp/src/gui/src/example.cpp

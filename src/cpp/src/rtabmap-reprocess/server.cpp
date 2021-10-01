@@ -65,22 +65,9 @@ public:
     Reprocess_Server(std::string name, int argc, char **argv) : as(n, name, boost::bind(&Reprocess_Server::reprocess, this, _1), false),
                                                                 action_name(name), argc{argc}, argv{argv}
     {
-        //register the goal and feeback callbacks
-
         as.start();
     }
 
-    // void preemptCB()
-    // {
-    //     ROS_INFO("%s: Preempted", action_name.c_str());
-    //     // set the action state to preempted
-    //     as.setPreempted();
-    // }
-
-    // void goalCB()
-    // {
-    //     1_target_databasepath = as.acceptNewGoal()->databasepath;
-    // }
     static void sighandler(int sig)
     {
         printf("\nSignal %d caught...\n", sig);
@@ -605,7 +592,7 @@ public:
         printf("Closing database \"%s\"...\n", outputDatabasePath.c_str());
 
         rtabmap.close(true);
-        
+
         printf("Closing database \"%s\"... done!\n", outputDatabasePath.c_str());
         return 1;
     }

@@ -387,6 +387,18 @@ add_dependencies(
   ${cpp_EXPORTED_TARGETS}
 )
 
+add_executable(LoadDatabase_client2 src/load_database/client2.cpp)
+
+target_link_libraries(
+  LoadDatabase_client2 
+  ${catkin_LIBRARIES}
+)
+
+add_dependencies(
+  LoadDatabase_client2
+  ${cpp_EXPORTED_TARGETS}
+)
+
 add_executable(loop_closure_client src/loop_closure/LoopClosure_client.cpp)
 
 target_link_libraries(

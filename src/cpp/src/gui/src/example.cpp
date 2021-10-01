@@ -20,8 +20,7 @@
 
 overloaded_window::overloaded_window(int argc, char **argv)
 {
-    sub1 = n.subscribe(GUI_SWITCH_TOPIC, 10, &overloaded_window::gui_Callback, this);
-    sub2 = n.subscribe(STORED_DIR_TOPIC, 10, &overloaded_window::dir_callback, this);
+    sub = n.subscribe(GUI_SWITCH_TOPIC, 10, &overloaded_window::gui_Callback, this);
 
     parameters = rtabmap::Parameters::parseArguments(argc, argv, false);
 
@@ -51,10 +50,6 @@ void overloaded_window::gui_Callback(const std_msgs::Int32::ConstPtr &msg)
         status = 0;
 }
 
-void overloaded_window::dir_callback(const std_msgs::String::ConstPtr &msg)
-{
-    database_path = QString::fromStdString(msg->data.c_str());
-}
 
 void overloaded_window::open_database(const rtabmap::ParametersMap &overridedParameters)
 {
@@ -69,9 +64,6 @@ void overloaded_window::close_database()
     previous_status = 0;
 }
 
-// void overloaded_window::valueChanged(int n) {}
-
-// void signal0(void) {}
 
 void overloaded_window::status_checker()
 {

@@ -13,8 +13,8 @@
         <include file="$(find multiple_turtlebots_sim)/launch/for_multi_rtabmap.launch">
             <arg name="for_frame" value="robot2/"/>
             <arg name="topic_name" value="/robot2"/>
-        </include>
 
+        </include>
 
     </group>
 
@@ -22,8 +22,18 @@
         <param name="name" value="robot1"/>
     </node>
 
-    <node pkg="cpp" type="LoadDatabase_client" name="LoadDatabase_client2" output="screen">
+    <node pkg="cpp" type="LoadDatabase_client2" name="LoadDatabase_client2" output="screen">
         <param name="name" value="robot2"/>
+    </node>
+
+    <node pkg="multiple_turtlebots_sim" name="image_extractor_1" type="image_extractor.py" output="screen">
+        <param name="robot_number" value="1"/>
+        <param name="total" value="2"/>
+    </node>
+
+    <node pkg="multiple_turtlebots_sim" name="image_extractor_2" type="image_extractor.py" output="screen">
+        <param name="robot_number" value="2"/>
+        <param name="total" value="2"/>
     </node>
 
     <!--    <node pkg="map_merge_3d" name="merger" type="map_merge_node" output="screen" respawn="false">-->

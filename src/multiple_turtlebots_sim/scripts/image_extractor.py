@@ -17,6 +17,7 @@ rospy.init_node('image_listener', anonymous=True)
 robot_number = rospy.get_param("~robot_number")
 total_num = rospy.get_param("~total")
 
+
 # Instantiate CvBridge
 bridge = CvBridge()
 mypath = FIRST_IMAGE_PATH

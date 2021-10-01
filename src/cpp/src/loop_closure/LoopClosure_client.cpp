@@ -10,12 +10,13 @@
 #include <stdio.h>
 
 #define TEMPLATE_IMAGE_PATH "/home/ayumi/Documents/CLOVERs/"
-#define ACTIVATE_LOAD_TOPIC "LoopClosureDetection"
 #define DIR_INFO_TOPIC "dir_info"
 #define REST_TOPIC "take_rest"
 #define RESTART_TOPIC "wait_for_rtabmap_reprocess"
 #define RESULT_INFO "Loop_closure/result"
 #define FIRST_IMAGEPATH "/home/ayumi/Documents/CLOVERs/1-image/"
+#define ROBOT1_ACTIVATE_LOAD_TOPIC "robot1/LoopClosureDetection"
+#define ROBOT2_ACTIVATE_LOAD_TOPIC "robot2/LoopClosureDetection"
 
 class Client
 {
@@ -28,7 +29,8 @@ private:
     ros::Subscriber result_catcher;
 
     //To turn on-off the node that conducts rtabmap-reprocess
-    ros::Publisher load_database_commander;
+    ros::Publisher robot1_load_commander;
+    ros::Publisher robot2_load_commander;
     //To notify the change of location where the image is stored
     ros::Publisher dir_changer;
     //To turn on-off the image extractor node.
@@ -36,6 +38,7 @@ private:
 
     std::string image_path;
     std::string action_name;
+    std::string activate_load_topic{"LoopClosureDetection"};
 
     ros::Rate loop_rate{0.5};
 
@@ -49,7 +52,8 @@ public:
     {
         ROS_INFO("Now launching...");
 
-        load_database_commander = n.advertise<std_msgs::Int32>(ACTIVATE_LOAD_TOPIC, 10);
+        robot1_load_commander = n.advertise<std_msgs::Int32>(ROBOT1_ACTIVATE_LOAD_TOPIC, 10);
+        robot2_load_commander = n.advertise<std_msgs::Int32>(ROBOT2_ACTIVATE_LOAD_TOPIC, 10);
         dir_changer = n.advertise<std_msgs::String>(DIR_INFO_TOPIC, 10);
         rest_commander = n.advertise<std_msgs::Int32>(REST_TOPIC, 10);
 
@@ -79,7 +83,8 @@ public:
             for_load_database.data = 1;
             rest_command.data = 1;
 
-            load_database_commander.publish(for_load_database);
+            robot1_load_commander.publish(for_load_database);
+            robot2_load_commander.publish(for_load_database);
             rest_commander.publish(rest_command);
         }
         else
