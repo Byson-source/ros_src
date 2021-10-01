@@ -12,7 +12,7 @@
 #include <cpp/LoopClosureAction.h>
 #include <vector>
 
-#define DATABASEPATH "/home/ayumi/Documents/RTAB-MAP/rtabmap.db"
+#define DATABASEPATH "/home/ayumi/Documents/RTAB-Map/rtabmap.db"
 
 //detector, dir_changer,rest_commander
 
@@ -26,7 +26,6 @@ private:
     ros::Rate loop_rate{0.5};
 
     actionlib::SimpleActionServer<cpp::LoopClosureAction> as_;
-    std::string action_name;
 
     cpp::LoopClosureResult result;
 
@@ -36,8 +35,7 @@ private:
     rtabmap::ParametersMap parameters;
 
 public:
-    Loop_Closure(std::string name) : as_(n, name, boost::bind(&Loop_Closure::detection, this, _1), false),
-                                                 action_name{name}
+    Loop_Closure(std::string name) : as_(n, name, boost::bind(&Loop_Closure::detection, this, _1), false)
     {
         rtabmap.setTimeThreshold(700.0f); // Time threshold : 700 ms, 0 ms means no limit
 
@@ -74,6 +72,7 @@ public:
             if (data.imageRaw().empty() == 1 || !as_.isActive())
             {
                 //when the speed of image extractor is low...
+                ROS_ERROR("Still waiting......");
                 continue;
             }
             else
@@ -99,7 +98,7 @@ public:
                 {
                     //When no loop closure is detected.
 
-                    // ROS_INFO("Nothing happened...");
+                    ROS_ERROR("Nothing happened...");
                     ++nextIndex;
                     data = camera.takeImage();
                 }
@@ -114,6 +113,8 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "detection_checker");
 
     Loop_Closure detector("loop_closure");
+
+    ros::spin();
 
     return 0;
 }

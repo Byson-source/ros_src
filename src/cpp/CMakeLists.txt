@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(cpp)
 
+set(CMAKE_BUILD_TYPE Debug)
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
@@ -125,6 +126,7 @@ add_message_files(
 add_service_files(
   FILES
   AddThreeInts.srv
+  AddTwoInts.srv
 )
 
 ## Generate actions in the 'action' folder

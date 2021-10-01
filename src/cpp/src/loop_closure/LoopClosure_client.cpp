@@ -9,12 +9,12 @@
 #include <string>
 #include <stdio.h>
 
-#define TEMPLATE_IMAGE_PATH "/home/ayumi/Documents/CLOVERs/"
+#define TEMPLATE_IMAGE_PATH "/home/ayumi/Documents/tohoku_uni/CLOVERs/"
 #define DIR_INFO_TOPIC "dir_info"
 #define REST_TOPIC "take_rest"
 #define RESTART_TOPIC "wait_for_rtabmap_reprocess"
 #define RESULT_INFO "Loop_closure/result"
-#define FIRST_IMAGEPATH "/home/ayumi/Documents/CLOVERs/1-image/"
+#define FIRST_IMAGEPATH "/home/ayumi/Documents/tohoku_uni/CLOVERs/1-image/"
 #define ROBOT1_ACTIVATE_LOAD_TOPIC "robot1/LoopClosureDetection"
 #define ROBOT2_ACTIVATE_LOAD_TOPIC "robot2/LoopClosureDetection"
 
@@ -37,7 +37,6 @@ private:
     ros::Publisher rest_commander;
 
     std::string image_path;
-    std::string action_name;
     std::string activate_load_topic{"LoopClosureDetection"};
 
     ros::Rate loop_rate{0.5};
@@ -47,10 +46,10 @@ private:
     int dir_number{0};
 
 public:
-    Client(std::string name) : action_name(name),image_path{FIRST_IMAGEPATH},
-    ac(action_name,true)
+    Client(std::string name) : image_path{FIRST_IMAGEPATH},ac(name,true)
     {
-        ROS_INFO("Now launching...");
+
+        ROS_INFO("LoopClosure_client now launching...");
 
         robot1_load_commander = n.advertise<std_msgs::Int32>(ROBOT1_ACTIVATE_LOAD_TOPIC, 10);
         robot2_load_commander = n.advertise<std_msgs::Int32>(ROBOT2_ACTIVATE_LOAD_TOPIC, 10);

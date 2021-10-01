@@ -20,7 +20,6 @@ protected:
 
     actionlib::SimpleActionClient<cpp::RtabmapReprocessAction> ac;
 
-    std::string action_name;
     std::string template_databasepath{"/home/ayumi/Documents/RTAB-Map/Experiment/No"};
 
     int status{0};
@@ -36,7 +35,7 @@ protected:
 
 public:
     Reprocess_Client(std::string name, int number)
-        : action_name{name}, ac(action_name, true), robot_number{number}
+        :ac(name, true), robot_number{number}
     {
         ROS_INFO("launching Rtabmap-reprocess...");
 

@@ -34,7 +34,6 @@ protected:
     ros::NodeHandle n;
 
     actionlib::SimpleActionServer<cpp::RtabmapReprocessAction> as;
-    std::string action_name;
 
     std::string inputDatabasePath;
 
@@ -63,7 +62,7 @@ protected:
 
 public:
     Reprocess_Server(std::string name, int argc, char **argv) : as(n, name, boost::bind(&Reprocess_Server::reprocess, this, _1), false),
-                                                                action_name(name), argc{argc}, argv{argv}
+                                                                argc{argc}, argv{argv}
     {
         as.start();
     }
