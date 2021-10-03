@@ -1,23 +1,26 @@
 <launch>
-  <arg name="use_compressed" default="true" />
+    <arg name="use_compressed" default="true" />
 
-  <group if="$(arg use_compressed)">
-    <node name="image_republish" pkg="image_transport" type="republish" args="compressed raw">
-      <remap from="in" to="robot1/data_throttled_image" />
-      <remap from="out" to="robot1/image_exp" />
-    </node>
-    <node name="image_view" pkg="image_view" type="image_view" >
-      <remap from="image" to="robot1/image_exp"/>
-    </node>
-  </group>
-  <group unless="$(arg use_compressed)">
-    <node name="image_view" pkg="image_view" type="image_view" >
-      <remap from="image" to="robot1/data_throttled_image"/>
-    </node>
-  </group>
+    <group if="$(arg use_compressed)">
+        <node name="image_republish" pkg="image_transport" type="republish" args="compressed raw">
+            <remap from="in" to="robot1/data_throttled_image" />
+            <remap from="out" to="robot1/image_exp" />
+        </node>
+        <node name="image_view" pkg="image_view" type="image_view">
+            <remap from="image" to="robot1/image_exp"/>
+        </node>
+    </group>
+    <group unless="$(arg use_compressed)">
+        <node name="image_view" pkg="image_view" type="image_view">
+            <remap from="image" to="robot1/data_throttled_image"/>
+        </node>
+    </group>
     <group ns="robot1">
-  <node pkg="rosbag" type="play" name="rosbag_play_1" output="screen"
-    args="/home/ayumi/Documents/RTAB-Map/map1.bag"/>
+        <node pkg="rosbag" type="play" name="rosbag_play_1" output="screen" args="/home/ayumi/Documents/RTAB-Map/map1.bag">
+            <remap from="base_scan" to="scan"/>
+            <remap from="/base_controller/odom" to="/odom"/>
+            <remap from="data_throttled_camera_info" to="camera/rgb/camera_info"/>
+        </node>
 
     </group>
 </launch>
