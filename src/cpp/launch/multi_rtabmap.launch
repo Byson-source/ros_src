@@ -1,0 +1,74 @@
+<launch>
+    <!-- <include file="$(find multiple_turtlebots_sim)/launch/multi-bot.launch"/> -->
+    <group ns="robot1">
+        <node pkg="rosbag" type="play" name="rosbag_play" output="screen" args="/home/ayumi/Documents/RTAB-Map/map1.bag"/>
+        <node name="RGBimage_republish" pkg="image_transport" type="republish" args="compressed raw">
+            <remap from="in" to="data_throttled_image" />
+            <remap from="out" to="/camera/rgb/image_raw" />
+        </node>
+    </group>
+    <group ns="robot2">
+        <node pkg="rosbag" type="play" name="rosbag_play" output="screen" args="/home/ayumi/Documents/RTAB-Map/map2.bag"/>
+        <node name="RGBimage_republish" pkg="image_transport" type="republish" args="compressed raw">
+            <remap from="in" to="data_throttled_image" />
+            <remap from="out" to="/camera/rgb/image_raw" />
+        </node>
+    </group>
+
+
+
+    <group ns="robot1">
+        <include file="$(find cpp)/launch/for_multi_rtabmap.launch">
+            <arg name="for_frame" value="robot1/"/>
+            <arg name="topic_name" value="/robot1"/>
+        </include>
+
+    </group>
+
+    <group ns="robot2">
+        <include file="$(find cpp)/launch/for_multi_rtabmap.launch">
+            <arg name="for_frame" value="robot2/"/>
+            <arg name="topic_name" value="/robot2"/>
+
+        </include>
+        <node pkg="new_ros" name="driver" type="bug-0.py"/>
+
+    </group>
+
+
+
+    <node pkg="cpp" type="LoadDatabase_client" name="LoadDatabase_client1" output="screen">
+        <param name="name" value="robot1"/>
+    </node>
+
+    <node pkg="cpp" type="LoadDatabase_client2" name="LoadDatabase_client2" output="screen">
+        <param name="name" value="robot2"/>
+    </node>
+
+    <node pkg="multiple_turtlebots_sim" name="image_extractor_1" type="image_extractor.py" output="screen">
+        <param name="robot_number" value="1"/>
+        <param name="total" value="2"/>
+    </node>
+
+    <node pkg="multiple_turtlebots_sim" name="image_extractor_2" type="image_extractor.py" output="screen">
+        <param name="robot_number" value="2"/>
+        <param name="total" value="2"/>
+    </node>
+
+    <node pkg="cpp" name="loop_closure" type="loop_closure_client" output="screen"/>
+
+    <node pkg="cpp" name="reprocess" type="reprocess_client_node" output="screen">
+        <param name="robot_num" value="2"/>
+    </node>
+
+    <node pkg="cpp" name="reprocess_server" type="reprocess_server_node" output="screen"/>
+
+    <node pkg="cpp" name="gui" type="GUI_node" output="screen"/>
+
+
+    <!-- <node pkg="map_merge_3d" name="merger" type="map_merge_node" output="screen" respawn="false"> -->
+    <!--        <param name="robot_map_topic" type="string" value="cloud_map"/>-->
+    <!--        <param name="robot_namespace" type="string" value="robot"/>-->
+    <!--    </node>-->
+    <!-- <node pkg="rviz" name="rviz" type="rviz"/> -->
+</launch>

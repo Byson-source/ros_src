@@ -100,8 +100,8 @@ if __name__ == '__main__':
     cmd=Twist()
     scan=LaserScan()
 
-    rospy.Subscriber('/odom',Odometry,perceive)
-    rospy.Subscriber('/scan',LaserScan,scan_result)
+    rospy.Subscriber('odom',Odometry,perceive)
+    rospy.Subscriber('scan',LaserScan,scan_result)
     command=rospy.Publisher('cmd_vel',Twist,queue_size=1)
     status=0
     status1_iteration=0
@@ -146,13 +146,13 @@ if __name__ == '__main__':
                 print('ideal_direction:%f,present_yaw:%f'%(ideal_direction,present_yaw))
                 change_direction()
                 if 0<(present_yaw-ideal_direction)<=1/360*math.pi:
-                    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+                    # print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
                     stop()
                     status1_iteration=0
                     status+=1
         elif status==2:
             go_straight()
-            print('GO STRAIGHT!!')
+            # print('GO STRAIGHT!!')
             status2_iteration+=1
             if status2_iteration==1:
                 print('C')
@@ -162,7 +162,7 @@ if __name__ == '__main__':
                 print('B')
                 t2=time.time()
                 if t2-t1>10:
-                    print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+                    # print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
                     stop()
                     status=0
 

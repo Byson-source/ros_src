@@ -7,8 +7,12 @@ from cv_bridge import CvBridge, CvBridgeError
 # OpenCV2 for saving an image
 from std_msgs.msg import String
 
+from std_msgs.msg import Int32
+
 import cv2
 import os
+import time
+
 
 FIRST_IMAGE_PATH = "/home/ayumi/Documents/tohoku_uni/CLOVERs/1-image/"
 
@@ -16,7 +20,6 @@ rospy.init_node('image_listener', anonymous=True)
 
 robot_number = rospy.get_param("~robot_number")
 total_num = rospy.get_param("~total")
-
 
 # Instantiate CvBridge
 bridge = CvBridge()
@@ -50,6 +53,8 @@ def image_callback(msg):
         cv2.imwrite(mypath + str(img_number) + ".jpg", cv2_img)
         # Depth image はpng!
         img_number += total_num
+
+        time.sleep(1);
     else:
         rospy.loginfo("Image extractor is waiting for rtabmap-reprocess...")
 
@@ -69,6 +74,6 @@ rospy.Subscriber(image_topic, Image, image_callback)
 # # In order to know that the location is changed as soon as loop-closure detection occurs
 rospy.Subscriber("dir_info", String, dir_callback)
 # # In order to stop storing images during rtabmap-reprocess
-rospy.Subscriber("take_rest", String, rest_callback)
+rospy.Subscriber("take_rest", Int32, rest_callback)
 
 rospy.spin()

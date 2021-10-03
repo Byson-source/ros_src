@@ -5,4 +5,4 @@ string imagepath
 bool result
 ---
 #feedback
-int32 state
+int32 stage

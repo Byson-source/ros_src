@@ -23,13 +23,18 @@ private:
 
     std::vector<int> detection_list;
 
+    int state{0};
+
     ros::Rate loop_rate{0.5};
 
     actionlib::SimpleActionServer<cpp::LoopClosureAction> as_;
 
     cpp::LoopClosureResult result;
+    cpp::LoopClosureFeedback feedback;
 
     std::string database_path{DATABASEPATH};
+
+    int stage{1};
 
     rtabmap::Rtabmap rtabmap;
     rtabmap::ParametersMap parameters;
@@ -39,7 +44,7 @@ public:
     {
         rtabmap.setTimeThreshold(700.0f); // Time threshold : 700 ms, 0 ms means no limit
 
-        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRtabmapLoopThr(), "0.11"));
+        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRtabmapLoopThr(), "0.15"));
         parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRGBDEnabled(), "false"));
 
         UFile::erase(database_path);
@@ -50,6 +55,10 @@ public:
     void detection(const cpp::LoopClosureGoal::ConstPtr &goal)
     {
         // target_path = as_.acceptNewGoal()->imagepath;
+
+        stage += 1;
+        feedback.stage = stage;
+
         std::string target_path{goal->imagepath};
 
         rtabmap::CameraImages camera(target_path);
@@ -61,8 +70,6 @@ public:
 
         rtabmap.init(parameters, DATABASEPATH);
 
-        camera = target_path;
-
         camera.init();
 
         data = camera.takeImage();
@@ -72,7 +79,6 @@ public:
             if (data.imageRaw().empty() == 1 || !as_.isActive())
             {
                 //when the speed of image extractor is low...
-                ROS_ERROR("Still waiting......");
                 continue;
             }
             else
@@ -83,22 +89,33 @@ public:
                 {
                     if ((nextIndex - rtabmap.getLoopClosureId()) % 2 == 1)
                     {
+                        state += 1;
+                        ROS_ERROR("!!!!!!!!!!!!!!!!!!!!!!!!!");
+                        ROS_ERROR_STREAM(state);
+                        ROS_ERROR("!!!!!!!!!!!!!!!!!!!!!!!!!");
+                        if (state == 5)
+                        {
+                            feedback.stage = 0;
+                            state =0;
+                            as_.publishFeedback(feedback);
 
-                        ROS_INFO("Loop-closure detected!!");
+                            ROS_INFO("Loop-closure detected!!");
 
-                        rtabmap.close();
+                            rtabmap.close();
 
-                        ROS_INFO("Rtabmap for next is ready...");
-                        result.result = 1;
-                        as_.setSucceeded(result);
-                        break;
+                            ROS_INFO("Rtabmap for next is ready...");
+                            result.result = 1;
+                            as_.setSucceeded(result);
+
+                            break;
+                        }
                     }
                 }
                 else
                 {
+                    as_.publishFeedback(feedback);
                     //When no loop closure is detected.
-
-                    ROS_ERROR("Nothing happened...");
+                    // ROS_ERROR("Nothing happened...");
                     ++nextIndex;
                     data = camera.takeImage();
                 }
