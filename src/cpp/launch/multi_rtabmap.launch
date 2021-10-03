@@ -1,52 +1,53 @@
 <launch>
     <!-- <include file="$(find multiple_turtlebots_sim)/launch/multi-bot.launch"/> -->
     <group ns="robot1">
-        <node pkg="rosbag" type="play" name="rosbag_play" output="screen" args="/home/ayumi/Documents/RTAB-Map/map1.bag">
-            <remap from="base_scan" to="scan"/>
-            <remap from="/base_controller/odom" to="/odom"/>
-            <remap from="data_throttled_camera_info" to="camera/rgb/camera_info"/>
+
+        <include file="$(find cpp)/launch/for_multi_rtabmap.launch">
+            <arg name="for_frame" value="robot1/"/>
+            <arg name="topic_name" value="/robot1/robot1"/>
+        </include>
+        <node pkg="rosbag" type="play" name="rosbag_play" args="/home/ayumi/Documents/RTAB-Map/map1.bag">
+            <remap from="base_scan" to="robot1/scan"/>
+            <remap from="/base_controller/odom" to="robot1/odom"/>
+            <remap from="data_throttled_camera_info" to="robot1/camera/rgb/camera_info"/>
         </node>
 
         <node name="RGBimage_republish" pkg="image_transport" type="republish" args="compressed raw">
             <remap from="in" to="data_throttled_image" />
-            <remap from="out" to="/camera/rgb/image_raw" />
+            <remap from="out" to="robot1/camera/rgb/image_raw" />
         </node>
 
         <node name="DEPTHimage_republish" pkg="image_transport" type="republish" args="compressed raw">
             <remap from="in" to="data_throttled_image_depth" />
-            <remap from="out" to="/camera/depth/image_raw" />
+            <remap from="out" to="robot1/camera/depth/image_raw" />
         </node>
 
-        <include file="$(find cpp)/launch/for_multi_rtabmap.launch">
-            <arg name="for_frame" value="robot1/"/>
-            <arg name="topic_name" value="/robot1"/>
-        </include>
     </group>
 
 
     <group ns="robot2">
-        <node pkg="rosbag" type="play" name="rosbag_play" output="screen" args="/home/ayumi/Documents/RTAB-Map/map2.bag">
-            <remap from="base_scan" to="scan"/>
-            <remap from="/base_controller/odom" to="/odom"/>
-            <remap from="data_throttled_camera_info" to="camera/rgb/camera_info"/>
-        </node>
 
+        <include file="$(find cpp)/launch/for_multi_rtabmap.launch">
+            <arg name="for_frame" value="robot2/"/>
+            <arg name="topic_name" value="/robot2/robot2"/>
+        </include>
+        <node pkg="new_ros" name="driver" type="bug-0.py"/>
         <node name="RGBimage_republish" pkg="image_transport" type="republish" args="compressed raw">
             <remap from="in" to="data_throttled_image_depth" />
-            <remap from="out" to="/camera/depth/image_raw" />
+            <remap from="out" to="robot2/camera/depth/image_raw" />
         </node>
 
         <node name="DEPTHimage_republish" pkg="image_transport" type="republish" args="compressed raw">
             <remap from="in" to="data_throttled_image" />
-            <remap from="out" to="/camera/rgb/image_raw" />
+            <remap from="out" to="robot2/camera/rgb/image_raw" />
         </node>
-
-        <include file="$(find cpp)/launch/for_multi_rtabmap.launch">
-            <arg name="for_frame" value="robot2/"/>
-            <arg name="topic_name" value="/robot2"/>
-        </include>
-        <node pkg="new_ros" name="driver" type="bug-0.py"/>
+        <node pkg="rosbag" type="play" name="rosbag_play" args="/home/ayumi/Documents/RTAB-Map/map2.bag">
+            <remap from="base_scan" to="robot2/scan"/>
+            <remap from="/base_controller/odom" to="robot2/odom"/>
+            <remap from="data_throttled_camera_info" to="robot2/camera/rgb/camera_info"/>
+        </node>
     </group>
+
 
 
     <node pkg="cpp" type="LoadDatabase_client" name="LoadDatabase_client1" output="screen">
