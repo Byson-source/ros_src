@@ -6,7 +6,7 @@
             <arg name="for_frame" value="robot1/"/>
             <arg name="topic_name" value="/robot1/robot1"/>
         </include>
-        <node pkg="rosbag" type="play" name="rosbag_play" args="/home/ayumi/Documents/RTAB-Map/map1.bag">
+        <node pkg="rosbag" type="play" name="rosbag_play" args="/home/ayumi/Documents/RTAB-Map/map1_changed.bag">
             <remap from="base_scan" to="robot1/scan"/>
             <remap from="/base_controller/odom" to="robot1/odom"/>
             <remap from="data_throttled_camera_info" to="robot1/camera/rgb/camera_info"/>
@@ -17,7 +17,7 @@
             <remap from="out" to="robot1/camera/rgb/image_raw" />
         </node>
 
-        <node name="DEPTHimage_republish" pkg="image_transport" type="republish" args="compressed raw">
+        <node name="DEPTHimage_republish" pkg="image_transport" type="republish" args="compressedDepth raw">
             <remap from="in" to="data_throttled_image_depth" />
             <remap from="out" to="robot1/camera/depth/image_raw" />
         </node>
@@ -31,17 +31,12 @@
             <arg name="for_frame" value="robot2/"/>
             <arg name="topic_name" value="/robot2/robot2"/>
         </include>
-        <node pkg="new_ros" name="driver" type="bug-0.py"/>
-        <node name="RGBimage_republish" pkg="image_transport" type="republish" args="compressed raw">
+
+        <node name="DEPTHimage_republish" pkg="image_transport" type="republish" args="compressedDepth raw">
             <remap from="in" to="data_throttled_image_depth" />
             <remap from="out" to="robot2/camera/depth/image_raw" />
         </node>
-
-        <node name="DEPTHimage_republish" pkg="image_transport" type="republish" args="compressed raw">
-            <remap from="in" to="data_throttled_image" />
-            <remap from="out" to="robot2/camera/rgb/image_raw" />
-        </node>
-        <node pkg="rosbag" type="play" name="rosbag_play" args="/home/ayumi/Documents/RTAB-Map/map2.bag">
+        <node pkg="rosbag" type="play" name="rosbag_play" args="/home/ayumi/Documents/RTAB-Map/map2_changed.bag">
             <remap from="base_scan" to="robot2/scan"/>
             <remap from="/base_controller/odom" to="robot2/odom"/>
             <remap from="data_throttled_camera_info" to="robot2/camera/rgb/camera_info"/>
@@ -50,7 +45,7 @@
 
 
 
-    <node pkg="cpp" type="LoadDatabase_client" name="LoadDatabase_client1" output="screen">
+    <!-- <node pkg="cpp" type="LoadDatabase_client" name="LoadDatabase_client1" output="screen">
         <param name="name" value="robot1"/>
     </node>
 
@@ -76,7 +71,9 @@
 
     <node pkg="cpp" name="reprocess_server" type="reprocess_server_node" output="screen"/>
 
-    <node pkg="cpp" name="gui" type="GUI_node" output="screen"/>
+    <node pkg="cpp" name="gui" type="GUI_node" output="screen"/> -->
+
+    
 
 
     <!-- <node pkg="map_merge_3d" name="merger" type="map_merge_node" output="screen" respawn="false"> -->

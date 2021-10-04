@@ -1,33 +1,3 @@
-<!--
-    DEVELOPMENT VERSION
-        Version of 2020 January 06
-        by Pierre GRAS
-
-    USE:
-        Performs visual odometry and visual SLAM from RGB-D data, either from camera stream or from rosbag.
-
-    NODES:
-    - base_to_camera
-        publish tf /base_link -> /camera_link
-    - camera_to_imu
-        publish tf /camera_link -> /imu_link
-    - rtabmap/rgbd_sync
-        synchronize rgb and depth topics
-    - rtabmap/rgbd_odometry
-        extract visual features and compute visual odometry
-    - rtabmap/rtabmap
-        compute SLAM from RGBD data
-    - rviz
-        UI for mapping vizualization
-    - points_xyzrbg
-        publish 3D RGB pointclouds
-
-    NOTES:
-        Added relevant parameters for RTABMAP Visual Odometry and Visual SLAM
-        Parameters can be found here:
-            https://github.com/introlab/rtabmap/blob/master/corelib/include/rtabmap/core/Parameters.h
--->
-
 <launch>
 
     <arg name="db_recording"            default="true"/> <!-- true: database record - false: visualization only -->
