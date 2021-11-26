@@ -3,6 +3,7 @@
 #include "rtabmap/core/CameraRGB.h"
 #include <opencv2/core/core.hpp>
 #include "rtabmap/utilite/UFile.h"
+#include "rtabmap/utilite/UDirectory.h"
 #include <stdio.h>
 #include "std_msgs/Int32.h"
 #include "std_msgs/String.h"
@@ -11,6 +12,7 @@
 #include <actionlib/server/simple_action_server.h>
 #include <cpp/LoopClosureAction.h>
 #include <vector>
+#include <unistd.h>
 
 #define DATABASEPATH "/home/ayumi/Documents/RTAB-Map/rtabmap.db"
 
@@ -44,7 +46,7 @@ public:
     {
         rtabmap.setTimeThreshold(700.0f); // Time threshold : 700 ms, 0 ms means no limit
 
-        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRtabmapLoopThr(), "0.15"));
+        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRtabmapLoopThr(), "0.2"));
         parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRGBDEnabled(), "false"));
 
         UFile::erase(database_path);
@@ -55,48 +57,58 @@ public:
     void detection(const cpp::LoopClosureGoal::ConstPtr &goal)
     {
         // target_path = as_.acceptNewGoal()->imagepath;
-
-        stage += 1;
-        feedback.stage = stage;
+        feedback.stage = state;
 
         std::string target_path{goal->imagepath};
 
+        sleep(30);
         rtabmap::CameraImages camera(target_path);
-        rtabmap::SensorData data{camera.takeImage()};
+        rtabmap::SensorData data;
 
         int nextIndex{1};
 
         UFile::erase(target_path);
+        UDirectory::makeDir(target_path);
 
         rtabmap.init(parameters, DATABASEPATH);
 
         camera.init();
 
-        data = camera.takeImage();
-
+        std::string jpg{".jpg"};
+        std::string io_num{std::to_string(nextIndex) + jpg};
         while (ros::ok())
         {
-            if (data.imageRaw().empty() == 1 || !as_.isActive())
+            // sleep(0.7);
+            // if (data.imageRaw().empty()){
+            //     std::cout<<"There is still something wrong..."<<std::endl;
+            // }
+            if (UFile::exists(target_path+io_num))
             {
-                //when the speed of image extractor is low...
-                continue;
-            }
-            else
-            {
+                data=camera.takeImage();
+                std::cout<<target_path+io_num<<std::endl;
+                std::cout<<data.imageRaw().empty()<<std::endl;
                 rtabmap.process(data.imageRaw(), nextIndex);
 
                 if (rtabmap.getLoopClosureId())
                 {
+                    printf("time(%fs) STM(%d) WM(%d) hyp(%d) value(%.2f) *LOOP %d->%d*\n",
+                           rtabmap.getLastProcessTime(),
+                           (int)rtabmap.getSTM().size(), // short-term memory
+                           (int)rtabmap.getWM().size(),  // working memory
+                           rtabmap.getLoopClosureId(),
+                           rtabmap.getLoopClosureValue(),
+                           nextIndex,
+                           rtabmap.getLoopClosureId());
                     if ((nextIndex - rtabmap.getLoopClosureId()) % 2 == 1)
                     {
                         state += 1;
                         ROS_ERROR("!!!!!!!!!!!!!!!!!!!!!!!!!");
                         ROS_ERROR_STREAM(state);
                         ROS_ERROR("!!!!!!!!!!!!!!!!!!!!!!!!!");
-                        if (state == 5)
+                        if (state == 100)
                         {
                             feedback.stage = 0;
-                            state =0;
+                            state = 0;
                             as_.publishFeedback(feedback);
 
                             ROS_INFO("Loop-closure detected!!");
@@ -110,15 +122,32 @@ public:
                             break;
                         }
                     }
-                }
-                else
+                    ++nextIndex;
+                    io_num=std::to_string(nextIndex) + jpg;
+                }else
                 {
                     as_.publishFeedback(feedback);
                     //When no loop closure is detected.
                     // ROS_ERROR("Nothing happened...");
                     ++nextIndex;
-                    data = camera.takeImage();
+                    io_num=std::to_string(nextIndex) + jpg;
+
+                    // if (UFile::exists(target_path + io_num))
+                    // {
+                    //     data = camera.takeImage();
+                    // }
+                    // else
+                    // {
+                    //     std::cout << "No file!!" << std::endl;
+                    //     std::cout << "Wait for image to come..." << std::endl;
+                    //     sleep(1);
+                    //     std::cout << UFile::exists(target_path + io_num) << std::endl;
+                    //     data = camera.takeImage();
+                    // }
                 }
+            }else{
+                std::cout<<"I'm waiting..."<<std::endl;
+                sleep(1);
             }
         }
     }

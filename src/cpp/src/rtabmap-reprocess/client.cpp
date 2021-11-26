@@ -6,6 +6,7 @@
 #include <cpp/RtabmapReprocessAction.h>
 #include <cpp/RtabmapReprocessActionResult.h>
 #include <stdio.h>
+#include <iostream>
 #include <vector>
 
 #define CHECK_REPROCESS_FINISH_TOPIC "RtabmapReprocess_node/result"
@@ -35,7 +36,7 @@ protected:
 
 public:
     Reprocess_Client(std::string name, int number)
-        :ac(name, true), robot_number{number}
+        : ac(name, true), robot_number{number}
     {
         ROS_INFO("launching Rtabmap-reprocess...");
 
@@ -74,10 +75,13 @@ public:
             cpp::RtabmapReprocessGoal goal;
 
             for (int i{1}; !i == robot_number + 1; i++)
+            {
+
                 goal.databasepaths.push_back(template_databasepath + std::to_string(database_num) + "_robot" + std::to_string(i) + ".db");
+                ROS_ERROR_STREAM(template_databasepath + std::to_string(database_num) + "_robot" + std::to_string(i) + ".db" );
+            }
 
             goal.goal_path = goal_path;
-            
 
             ac.sendGoal(goal);
         }

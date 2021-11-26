@@ -90,7 +90,7 @@ public:
 
             rtabmap_ros::LoadDatabase srv;
 
-            srv.request.database_path = template_database_path + robot_name + std::to_string(database_num) + ".db";
+            srv.request.database_path = template_database_path + std::to_string(database_num) + "_" + robot_name + ".db";
             srv.request.clear = true;
 
             database_num += 1;

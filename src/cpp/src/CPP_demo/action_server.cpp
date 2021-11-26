@@ -56,6 +56,8 @@ public:
         success = false;
         break;
       }
+
+      
       feedback_.sequence.push_back(feedback_.sequence[i] + feedback_.sequence[i - 1]);
       // publish the feedback
       as_.publishFeedback(feedback_);

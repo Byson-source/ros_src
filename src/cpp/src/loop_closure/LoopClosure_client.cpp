@@ -13,10 +13,9 @@
 #define DIR_INFO_TOPIC "dir_info"
 #define REST_TOPIC "take_rest"
 #define RESTART_TOPIC "wait_for_rtabmap_reprocess"
-#define RESULT_INFO "Loop_closure/result"
+#define RESULT_INFO "loop_closure/result"
 #define FIRST_IMAGEPATH "/home/ayumi/Documents/tohoku_uni/CLOVERs/1-image/"
-#define ROBOT1_ACTIVATE_LOAD_TOPIC "robot1/LoopClosureDetection"
-#define ROBOT2_ACTIVATE_LOAD_TOPIC "robot2/LoopClosureDetection"
+#define ROBOT1_ACTIVATE_LOAD_TOPIC "LoopClosureDetection"
 
 class Client
 {
@@ -27,10 +26,10 @@ private:
 
     ros::Subscriber switch_sub;
     ros::Subscriber result_catcher;
+    ros::Subscriber image_chatter;
 
     //To turn on-off the node that conducts rtabmap-reprocess
     ros::Publisher robot1_load_commander;
-    ros::Publisher robot2_load_commander;
     //To notify the change of location where the image is stored
     ros::Publisher dir_changer;
     //To turn on-off the image extractor node.
@@ -52,12 +51,12 @@ public:
         ROS_INFO("LoopClosure_client now launching...");
 
         robot1_load_commander = n.advertise<std_msgs::Int32>(ROBOT1_ACTIVATE_LOAD_TOPIC, 10);
-        robot2_load_commander = n.advertise<std_msgs::Int32>(ROBOT2_ACTIVATE_LOAD_TOPIC, 10);
         dir_changer = n.advertise<std_msgs::String>(DIR_INFO_TOPIC, 10);
         rest_commander = n.advertise<std_msgs::Int32>(REST_TOPIC, 10);
 
         switch_sub = n.subscribe(RESTART_TOPIC, 10, &Client::switchCB, this);
         result_catcher = n.subscribe(RESULT_INFO, 10, &Client::result_CB, this);
+        image_chattter=n.subscribe("current_image",)
 
         // //At the first time, the client sends the request.
         // actionlib::SimpleActionClient<cpp::LoopClosureAction> ac(action_name, true);
@@ -83,7 +82,6 @@ public:
             rest_command.data = 1;
 
             robot1_load_commander.publish(for_load_database);
-            robot2_load_commander.publish(for_load_database);
             rest_commander.publish(rest_command);
         }
         else
@@ -133,6 +131,7 @@ public:
     {
         if (msg->result.result == 1)
         {
+            ROS_INFO("result was back!!!!");
             status = 0;
             Client::send_command();
         }

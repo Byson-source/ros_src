@@ -34,9 +34,8 @@ def change_frame_id(inbag, outbag, frame_val, topic_):
     outbag = rosbag.Bag(outbag, 'w')
     for topic, msg, t in rosbag.Bag(inbag, 'r').read_messages():
         if topic_ in topic:
-            if msg._has_header:
-                msg.header.frame_id = NAMESPACE+frame_val
-                print(msg.header.frame_id)
+            msg.child_frame_id = NAMESPACE+frame_val
+            print(msg.child_frame_id)
         outbag.write(topic, msg, t)
     i+=1
     outbag.close()
@@ -52,8 +51,10 @@ def two_round(outbag2):
     
     print('Closing output bagfile and exit...')
     outbag2.close()
-i=0
-for frame_val in goal_frame:
-    change_frame_id(out[i], out[i+1], frame_val, topic_list[i])
-    i+=1
-two_round(OUTPUTDATABASE6)
+# i=0
+# for frame_val in goal_frame:
+#     change_frame_id(out[i], out[i+1], frame_val, topic_list[i])
+#     i+=1
+# two_round(OUTPUTDATABASE6)
+change_frame_id("/home/ayumi/Documents/RTAB-Map/out2_.bag", "/home/ayumi/Documents/RTAB-Map/out2.bag", 
+"base_footprint", "/base_controller/odom")
