@@ -3,13 +3,12 @@
   <xacro:arg name="laser_visual"  default="false"/>
   <xacro:arg name="camera_visual" default="false"/>
   <xacro:arg name="imu_visual"    default="false"/>
-  <xacro:arg name="robot"         default=""/>
 
-  <gazebo reference="$(arg robot)base_link">
+  <gazebo reference="base_link">
     <material>Gazebo/DarkGrey</material>
   </gazebo>
 
-  <gazebo reference="$(arg robot)wheel_left_link">
+  <gazebo reference="wheel_left_link">
     <mu1>0.1</mu1>
     <mu2>0.1</mu2>
     <kp>500000.0</kp>
@@ -20,7 +19,7 @@
     <material>Gazebo/FlatBlack</material>
   </gazebo>
 
-  <gazebo reference="$(arg robot)wheel_right_link">
+  <gazebo reference="wheel_right_link">
     <mu1>0.1</mu1>
     <mu2>0.1</mu2>
     <kp>500000.0</kp>
@@ -31,7 +30,7 @@
     <material>Gazebo/FlatBlack</material>
   </gazebo>
 
-  <gazebo reference="$(arg robot)caster_back_right_link">
+  <gazebo reference="caster_back_right_link">
     <mu1>0.1</mu1>
     <mu2>0.1</mu2>
     <kp>1000000.0</kp>
@@ -41,7 +40,7 @@
     <material>Gazebo/FlatBlack</material>
   </gazebo>
 
-  <gazebo reference="$(arg robot)caster_back_left_link">
+  <gazebo reference="caster_back_left_link">
     <mu1>0.1</mu1>
     <mu2>0.1</mu2>
     <kp>1000000.0</kp>
@@ -51,7 +50,7 @@
     <material>Gazebo/FlatBlack</material>
   </gazebo>
 
-  <gazebo reference="$(arg robot)imu_link">
+  <gazebo reference="imu_link">
     <sensor type="imu" name="imu">
       <always_on>true</always_on>
       <visualize>$(arg imu_visual)</visualize>
@@ -63,10 +62,10 @@
     <plugin name="turtlebot3_waffle_controller" filename="libgazebo_ros_diff_drive.so">
       <commandTopic>cmd_vel</commandTopic>
       <odometryTopic>odom</odometryTopic>
-      <odometryFrame>$(arg robot)odom</odometryFrame>
+      <odometryFrame>odom</odometryFrame>
       <odometrySource>world</odometrySource>
       <publishOdomTF>true</publishOdomTF>
-      <robotBaseFrame>$(arg robot)base_footprint</robotBaseFrame>
+      <robotBaseFrame>base_footprint</robotBaseFrame>
       <publishWheelTF>false</publishWheelTF>
       <publishTf>true</publishTf>
       <publishWheelJointState>true</publishWheelJointState>
@@ -85,8 +84,8 @@
   <gazebo>
     <plugin name="imu_plugin" filename="libgazebo_ros_imu.so">
       <alwaysOn>true</alwaysOn>
-      <bodyName>$(arg robot)imu_link</bodyName>
-      <frameName>$(arg robot)imu_link</frameName>
+      <bodyName>imu_link</bodyName>
+      <frameName>imu_link</frameName>
       <topicName>imu</topicName>
       <serviceName>imu_service</serviceName>
       <gaussianNoise>0.0</gaussianNoise>
@@ -111,7 +110,7 @@
     </plugin>
   </gazebo>
 
-  <gazebo reference="$(arg robot)base_scan">
+  <gazebo reference="base_scan">
     <material>Gazebo/FlatBlack</material>
     <sensor type="ray" name="lds_lfcd_sensor">
       <pose>0 0 0 0 0 0</pose>
@@ -139,12 +138,12 @@
       </ray>
       <plugin name="gazebo_ros_lds_lfcd_controller" filename="libgazebo_ros_laser.so">
         <topicName>scan</topicName>
-        <frameName>$(arg robot)base_scan</frameName>
+        <frameName>base_scan</frameName>
       </plugin>
     </sensor>
   </gazebo>
 
-  <gazebo reference="$(arg robot)camera_rgb_frame">
+  <gazebo reference="camera_rgb_frame">
     <sensor type="depth" name="realsense_R200">
       <always_on>true</always_on>
       <visualize>$(arg camera_visual)</visualize>
@@ -166,7 +165,7 @@
         <alwaysOn>true</alwaysOn>
         <updateRate>30.0</updateRate>
         <cameraName>camera</cameraName>
-        <frameName>$(arg robot)camera_rgb_optical_frame</frameName>
+        <frameName>camera_rgb_optical_frame</frameName>
         <imageTopicName>rgb/image_raw</imageTopicName>
         <depthImageTopicName>depth/image_raw</depthImageTopicName>
         <pointCloudTopicName>depth/points</pointCloudTopicName>

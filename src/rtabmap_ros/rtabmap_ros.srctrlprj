@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <config>
     <source_groups>
-        <source_group_e8105149-ca9e-4efe-b1a3-08f55a87d9eb>
+        <source_group_084afaae-7988-4631-9aef-a3cc50504f8a>
             <build_file_path>
                 <compilation_db_path>compile_commands.json</compilation_db_path>
             </build_file_path>
-            <header_search_paths>
-                <header_search_path>../../devel/include</header_search_path>
-            </header_search_paths>
             <indexed_header_paths>
                 <indexed_header_path>devel/include</indexed_header_path>
                 <indexed_header_path>include</indexed_header_path>
@@ -19,7 +16,7 @@
             </pch_flags>
             <status>enabled</status>
             <type>C/C++ from Compilation Database</type>
-        </source_group_e8105149-ca9e-4efe-b1a3-08f55a87d9eb>
+        </source_group_084afaae-7988-4631-9aef-a3cc50504f8a>
     </source_groups>
     <version>8</version>
 </config>

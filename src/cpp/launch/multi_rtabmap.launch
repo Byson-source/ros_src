@@ -72,9 +72,9 @@
         <param name="robot_name" value="2"/>
     </node>
 
-    <node pkg="cpp" name="loop_closure" type="loop_closure_client" output="screen"/>
+    <!-- <node pkg="cpp" name="loop_closure" type="loop_closure_client" output="screen"/>
 
-    <node pkg="cpp" name="loop_closure_server" type="detection_checker" output="screen"/>
+    <node pkg="cpp" name="loop_closure_server" type="detection_checker" output="screen"/> -->
 
     <!--<node pkg="cpp" name="reprocess" type="reprocess_client_node" output="screen">
         <param name="robot_num" value="2"/>

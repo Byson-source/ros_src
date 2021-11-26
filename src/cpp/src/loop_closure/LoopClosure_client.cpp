@@ -56,7 +56,7 @@ public:
 
         switch_sub = n.subscribe(RESTART_TOPIC, 10, &Client::switchCB, this);
         result_catcher = n.subscribe(RESULT_INFO, 10, &Client::result_CB, this);
-        image_chattter=n.subscribe("current_image",)
+        // image_chattter=n.subscribe("current_image",)
 
         // //At the first time, the client sends the request.
         // actionlib::SimpleActionClient<cpp::LoopClosureAction> ac(action_name, true);
