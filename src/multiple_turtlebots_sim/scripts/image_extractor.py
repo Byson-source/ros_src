@@ -14,57 +14,48 @@ import os
 import time
 
 
-first_path = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/1-image/"
-second_path = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/2-image/"
-all_path="/home/ayumi/Documents/tohoku_uni/CLOVERs/images/all-image/"
-depth_path = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/depth-image/"
+FIRST_IMAGE_PATH = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/1-image/"
 
 rospy.init_node('image_listener', anonymous=True)
 
 robot_number = rospy.get_param("~robot_number")
 total_num = rospy.get_param("~total")
+robot_No=rospy.get_param("~robot_name")
 
 # Instantiate CvBridge
 bridge = CvBridge()
 mypath = FIRST_IMAGE_PATH
 dir_number = 0
-state=0
-depth_number,img_number=robot_number,robot_number
+switch = 1
+img_number=robot_number
+
+def dir_callback(data):
+    global mypath, img_number
+    mypath = data.data
+
+    if not os.path.exists(mypath):
+        os.mkdir(mypath)
+        rospy.loginfo("New image path was sucessfully created!")
+    else:
+        rospy.loginfo("The new image path already exists. Now new one is created.")
+        os.rmdir(mypath)
+        os.mkdir(mypath)
+
+    img_number = robot_number
 
 def rgb_callback(msg):
-    global img_number, mypath,state
-    cv2_img = bridge.imgmsg_to_cv2(msg, "bgr8")
-    cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
-    if state==0:
-        
-        cv2.imwrite(first_path + str(img_number) + ".jpg", cv2_img)
-        state=1
-    else:
-        cv2.imwrite(second_path + str(img_number) + ".jpg", cv2_img)
-        state=0
-    # Depth image はpng!
-    img_number += total_num
-    
-    chatter.publish(mypath + str(img_number) + ".jpg")
-
-    time.sleep(1/5);
-
-
-
-def image_callback(msg):
-    global depth_number,switch
+    global img_number,switch
 
     if switch == 1:
-        cv2_img_depth=bridge.imgmsg_to_cv2(msg,"passthrough")
-        # cv2_img_depth=cv2.applyColorMap(cv2.convertScaleAbs(cv2_img_depth, alpha=0.03),cv2.COLORMAP_JET)
-        
-        
-        
-        cv2.imwrite(depth_path + str(depth_number) + ".png", cv2_img_depth)
+        cv2_img = bridge.imgmsg_to_cv2(msg, "bgr8")
+        cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
+        cv2.imwrite(mypath + str(img_number) + ".jpg", cv2_img)
         # Depth image はpng!
-        depth_number += total_num
+        img_number += total_num
+        
+        chatter.publish(mypath + str(img_number) + ".jpg")
 
-        time.sleep(1/5);
+        time.sleep(1);
 
 
 def rest_callback(data):
@@ -77,10 +68,8 @@ def rest_callback(data):
 # Define your image topic
 
 image_topic = "/robot"+str(robot_No)+"/camera/rgb/image_raw"
-depth_topic = "/robot"+str(robot_No)+"/camera/depth/image_raw"
 # # To store the images from camera
 rospy.Subscriber(image_topic, Image, rgb_callback)
-rospy.Subscriber(depth_topic, Image, image_callback)
 # # In order to know that the location is changed as soon as loop-closure detection occurs
 rospy.Subscriber("dir_info", String, dir_callback)
 # # In order to stop storing images during rtabmap-reprocess
