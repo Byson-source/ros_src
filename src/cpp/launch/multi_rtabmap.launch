@@ -63,13 +63,11 @@
     <node pkg="multiple_turtlebots_sim" name="image_extractor_1" type="image_extractor.py" output="screen">
         <param name="robot_number" value="1"/>
         <param name="total" value="2"/>
-        <param name="robot_name" value="1"/>
     </node>
 
     <node pkg="multiple_turtlebots_sim" name="image_extractor_2" type="image_extractor.py" output="screen">
         <param name="robot_number" value="2"/>
         <param name="total" value="2"/>
-        <param name="robot_name" value="2"/>
     </node>
 
     <!-- <node pkg="cpp" name="loop_closure" type="loop_closure_client" output="screen"/>

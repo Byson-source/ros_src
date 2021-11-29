@@ -14,49 +14,40 @@ import os
 import time
 
 
-FIRST_IMAGE_PATH = "/home/ayumi/Documents/tohoku_uni/CLOVERs/1-image/"
-depth_path = "/home/ayumi/Documents/tohoku_uni/CLOVERs/depth_image/"
+first_path = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/1-image/"
+second_path = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/2-image/"
+all_path="/home/ayumi/Documents/tohoku_uni/CLOVERs/images/all-image/"
+depth_path = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/depth-image/"
 
 rospy.init_node('image_listener', anonymous=True)
 
 robot_number = rospy.get_param("~robot_number")
 total_num = rospy.get_param("~total")
-robot_No=rospy.get_param("~robot_name")
 
 # Instantiate CvBridge
 bridge = CvBridge()
 mypath = FIRST_IMAGE_PATH
 dir_number = 0
-switch = 1
+state=0
 depth_number,img_number=robot_number,robot_number
 
-def dir_callback(data):
-    global mypath, img_number
-    mypath = data.data
-
-    if not os.path.exists(mypath):
-        os.mkdir(mypath)
-        rospy.loginfo("New image path was sucessfully created!")
-    else:
-        rospy.loginfo("The new image path already exists. Now new one is created.")
-        os.rmdir(mypath)
-        os.mkdir(mypath)
-
-    img_number = robot_number
-
 def rgb_callback(msg):
-    global img_number, mypath, switch
-
-    if switch == 1:
-        cv2_img = bridge.imgmsg_to_cv2(msg, "bgr8")
-        cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
-        cv2.imwrite(mypath + str(img_number) + ".jpg", cv2_img)
-        # Depth image はpng!
-        img_number += total_num
+    global img_number, mypath,state
+    cv2_img = bridge.imgmsg_to_cv2(msg, "bgr8")
+    cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
+    if state==0:
         
-        chatter.publish(mypath + str(img_number) + ".jpg")
+        cv2.imwrite(first_path + str(img_number) + ".jpg", cv2_img)
+        state=1
+    else:
+        cv2.imwrite(second_path + str(img_number) + ".jpg", cv2_img)
+        state=0
+    # Depth image はpng!
+    img_number += total_num
+    
+    chatter.publish(mypath + str(img_number) + ".jpg")
 
-        time.sleep(1/5);
+    time.sleep(1/5);
 
 
 
