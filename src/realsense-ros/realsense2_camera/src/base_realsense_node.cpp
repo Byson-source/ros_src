@@ -1662,20 +1662,17 @@ void BaseRealSenseNode::frame_callback(rs2::frame frame)
             auto frameset = frame.as<rs2::frameset>();
             ROS_DEBUG("List of frameset before applying filters: size: %d", static_cast<int>(frameset.size()));
 
-            if (frameset.size() == 2)
+            for (auto it = frameset.begin(); it != frameset.end(); ++it)
             {
-                for (auto it = frameset.begin(); it != frameset.end(); ++it)
-                {
-                    auto f = (*it);
-                    auto stream_type = f.get_profile().stream_type();
-                    auto stream_index = f.get_profile().stream_index();
-                    auto stream_format = f.get_profile().format();
-                    auto stream_unique_id = f.get_profile().unique_id();
+                auto f = (*it);
+                auto stream_type = f.get_profile().stream_type();
+                auto stream_index = f.get_profile().stream_index();
+                auto stream_format = f.get_profile().format();
+                auto stream_unique_id = f.get_profile().unique_id();
 
-                    ROS_DEBUG("Frameset contain (%s, %d, %s %d) frame. frame_number: %llu ; frame_TS: %f ; ros_TS(NSec): %lu",
-                              rs2_stream_to_string(stream_type), stream_index, rs2_format_to_string(stream_format), stream_unique_id, frame.get_frame_number(), frame_time, t.toNSec());
-                    runFirstFrameInitialization(stream_type);
-                }
+                ROS_DEBUG("Frameset contain (%s, %d, %s %d) frame. frame_number: %llu ; frame_TS: %f ; ros_TS(NSec): %lu",
+                          rs2_stream_to_string(stream_type), stream_index, rs2_format_to_string(stream_format), stream_unique_id, frame.get_frame_number(), frame_time, t.toNSec());
+                runFirstFrameInitialization(stream_type);
             }
             // Clip depth_frame for max range:
             rs2::depth_frame original_depth_frame = frameset.get_depth_frame();
