@@ -12,30 +12,30 @@
     </node>
 
 
-    <!-- <node pkg="rosbag" type="play" name="rosbag_play2" args="/home/ayumi/Documents/RTAB-Map/out1.bag">
+    <node pkg="rosbag" type="play" name="rosbag_play2" args="/home/ayumi/Documents/RTAB-Map/out1.bag">
         <remap from="robot1/base_scan" to="robot1/scan"/>
         <remap from="robot1/base_controller/odom" to="robot1/odom"/>
         <remap from="robot1/data_throttled_camera_info" to="robot1/camera/rgb/camera_info"/>
-    </node> -->
+    </node>
 
-</launch>
 
-    <!-- <group ns="robot1"> -->
+    <group ns="robot1">
 
         <!-- <include file="$(find cpp)/launch/for_multi_rtabmap.launch">
             <arg name="for_frame" value="robot1/"/>
             <arg name="topic_name" value="/robot1"/>
         </include> -->
 
-        <!-- <node name="RGBimage_republish2" pkg="image_transport" type="republish" args="compressed raw">
+        <node name="RGBimage_republish2" pkg="image_transport" type="republish" args="compressed raw">
             <remap from="in" to="data_throttled_image" />
             <remap from="out" to="camera/rgb/image_raw" />
-        </node> -->
+        </node> 
 
-        <!-- <node name="DEPTHimage_republish2" pkg="image_transport" type="republish" args="compressedDepth raw">
+        <node name="DEPTHimage_republish2" pkg="image_transport" type="republish" args="compressedDepth raw">
             <remap from="in" to="data_throttled_image_depth" />
             <remap from="out" to="camera/depth/image_raw" />
-        </node> -->
+        </node>
 
-    <!-- </group> -->
+    </group>
 
+</launch>
