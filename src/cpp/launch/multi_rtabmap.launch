@@ -61,15 +61,14 @@
 
 
 
-    <!-- <node pkg="cpp" name="image_extractor_1" type="image_extractor.py" output="screen">
-        <param name="robot_number" value="1"/>
+    <node pkg="cpp" name="image_extractor_1" type="image_extractor.py" output="screen">
         <param name="total" value="2"/>
     </node>
 
-    <node pkg="cpp" name="image_extractor_2" type="image_extractor.py" output="screen">
+    <node pkg="cpp" name="image_extractor_2" type="any_image_extractor.py" output="screen">
         <param name="robot_number" value="2"/>
         <param name="total" value="2"/>
-    </node> -->
+    </node>
 
 
 

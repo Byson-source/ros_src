@@ -236,7 +236,7 @@ src/gui/include
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-  scripts/gen_numbers.py scripts/image_extractor.py
+  scripts/gen_numbers.py scripts/any_image_extractor.py scripts/image_extractor.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
