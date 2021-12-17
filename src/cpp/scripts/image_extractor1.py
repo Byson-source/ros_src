@@ -7,6 +7,8 @@ from cv_bridge import CvBridge, CvBridgeError
 # OpenCV2 for saving an image
 from rtabmap_ros.msg import Info
 
+from std_msgs.msg import Int32
+
 import message_filters
 
 import cv2
@@ -44,7 +46,12 @@ def callback(rgb, id):
     
     while (("second" not in state) or (state["second"]==0)):
         time.sleep(0.0000001)
+        
+    int_msg=Int32()
+    int_msg.data=1
+    path_changer.publish(int_msg)
     
+
     # Define your image topic
     
 def state_CB(id):
@@ -58,17 +65,14 @@ rgb_topic2 = "/robot2/camera/rgb/image_raw"
 ID_topic2 = "/robot2/rtabmap/info"
 # # To store the images from camera
 rgb_sub = message_filters.Subscriber(rgb_topic, Image)
-rgb_sub2 = message_filters.Subscriber(rgb_topic2, Image)
 
 myid_sub = message_filters.Subscriber(ID_topic, Info)
-myid_sub2 = message_filters.Subscriber(ID_topic2, Info)
 
 id_monitor = rospy.Subscriber(ID_topic, Info, state_CB)
 
+path_changer=rospy.Publisher("comd_about_imagepath",Int32,queue_size=1)
+
 ts = message_filters.TimeSynchronizer([rgb_sub, myid_sub], 10)
 ts.registerCallback(callback)
-
-ts2 = message_filters.TimeSynchronizer([rgb_sub2, myid_sub2], 10)
-ts2.registerCallback(callback2)
 # rospy.Subscriber(image_topic, Image, rgb_callback)
 rospy.spin()
