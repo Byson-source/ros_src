@@ -30,7 +30,7 @@ def two_round(outbag2):
     for topic, msg, t in rosbag.Bag(OUTPUTDATABASE5, 'r').read_messages():
             if topic in "tf":
                 for val in msg.transforms:
-                    val.header.frame_id=NAME+val.header.frame_id
+             　       val.header.frame_id=NAME+val.header.frame_id
                     val.child_frame_id=NAME+val.child_frame_id
             outbag2.write(topic, msg, t)
     

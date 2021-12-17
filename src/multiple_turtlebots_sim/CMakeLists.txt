@@ -161,7 +161,7 @@ include_directories(
 ## in contrast to setup.py, you can choose the destination
 
 catkin_install_python(PROGRAMS
-scripts/tf_prefix.py scripts/image_extractor.py
+scripts/tf_prefix.py
 DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

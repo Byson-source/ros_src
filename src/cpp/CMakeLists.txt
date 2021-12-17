@@ -16,6 +16,9 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   tf
+  sensor_msgs
+  cv_bridge
+  image_transport
 )
 ########################################################
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}")
@@ -233,7 +236,7 @@ src/gui/include
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-  scripts/gen_numbers.py
+  scripts/gen_numbers.py scripts/image_extractor1.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

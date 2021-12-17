@@ -17,7 +17,7 @@ protected:
     std::string robot_name;
 
     std::string switch_load_topic{START_LOAD};
-    
+
     ros::ServiceClient client;
 
     std::string template_database_path{"/home/ayumi/Documents/RTAB-Map/Experiment/No"};
@@ -39,7 +39,6 @@ public:
         ROS_INFO("launching Loaddatabase service...");
 
         srv_topics = robot_name + "/" + template_loaddatabase_topic;
-
 
         ros::service::waitForService(srv_topics);
 
@@ -66,7 +65,6 @@ public:
             ROS_ERROR("Failed to call LoadDatabase service");
         }
     }
-
 
     void switchCB(const std_msgs::Int32::ConstPtr &msg)
     {
@@ -97,7 +95,7 @@ public:
             previous_path = srv.request.database_path;
 
             std_msgs::Int32 data;
-            data.data=1;
+            data.data = 1;
             to_client2.publish(data);
         }
     }

@@ -1,29 +1,18 @@
 <launch>
     <!-- <include file="$(find multiple_turtlebots_sim)/launch/multi-bot.launch"/> -->
-    <node pkg="rosbag" type="play" name="rosbag_play1" args="/home/ayumi/Downloads/bag_dataset/Arc.bag">
+    <node pkg="rosbag" type="play" name="rosbag_play1" args="/home/ayumi/Documents/RTAB-Map/out1.bag">
         <remap from="robot1/base_scan" to="robot1/scan"/>
         <remap from="robot1/base_controller/odom" to="robot1/odom"/>
         <remap from="robot1/data_throttled_camera_info" to="robot1/camera/rgb/camera_info"/>
     </node>
 
-    <node name="RGBimage_republish" pkg="image_transport" type="republish" args="compressed raw">
-        <remap from="in" to="camera/rgb/image_color" />
-        <remap from="out" to="camera/rgb/image_raw" />
+    <node pkg="rosbag" type="play" name="rosbag_play2" args="/home/ayumi/Documents/RTAB-Map/out2.bag">
+        <remap from="robot2/base_scan" to="robot2/scan"/>
+        <remap from="robot2/base_controller/odom" to="robot2/odom"/>
+        <remap from="robot2/data_throttled_camera_info" to="robot2/camera/rgb/camera_info"/>
     </node>
 
-</launch>
-
-
-
-
-
-    <!-- <node pkg="rosbag" type="play" name="rosbag_play2" args="--rate 5 /home/ayumi/Documents/RTAB-Map/out2.bag"> -->
-    <!-- <remap from="robot2/base_scan" to="robot2/scan"/>
-        <remap from="robot2/base_controller/odom" to="robot2/odom"/>
-        <remap from="robot2/data_throttled_camera_info" to="robot2/camera/rgb/camera_info"/> -->
-</node>
-
-<!-- <group ns="robot1">
+    <group ns="robot1">
 
         <include file="$(find cpp)/launch/for_multi_rtabmap.launch">
             <arg name="for_frame" value="robot1/"/>
@@ -59,41 +48,39 @@
             <remap from="in" to="data_throttled_image_depth" />
             <remap from="out" to="camera/depth/image_raw" />
         </node>
-    </group> -->
+    </group>
 
 
 
-<!-- <node pkg="cpp" type="LoadDatabase_client" name="LoadDatabase_client1" output="screen">
+    <!-- <node pkg="cpp" type="LoadDatabase_client" name="LoadDatabase_client1" output="screen">
         <param name="name" value="robot1"/>
     </node>
-
     <node pkg="cpp" type="LoadDatabase_client2" name="LoadDatabase_client2" output="screen">
         <param name="name" value="robot2"/>
     </node>  -->
 
 
 
-<!-- <node pkg="multiple_turtlebots_sim" name="image_extractor_1" type="image_extractor.py" output="screen">
+    <!-- <node pkg="cpp" name="image_extractor_1" type="image_extractor.py" output="screen">
         <param name="robot_number" value="1"/>
         <param name="total" value="2"/>
     </node>
 
-    <node pkg="multiple_turtlebots_sim" name="image_extractor_2" type="image_extractor.py" output="screen">
+    <node pkg="cpp" name="image_extractor_2" type="image_extractor.py" output="screen">
         <param name="robot_number" value="2"/>
         <param name="total" value="2"/>
     </node> -->
 
 
 
-<!-- <node pkg="cpp" name="loop_closure" type="loop_closure_client" output="screen"/>
-
+    <!-- <node pkg="cpp" name="loop_closure" type="loop_closure_client" output="screen"/>
     <node pkg="cpp" name="loop_closure_server" type="detection_checker" output="screen"/> -->
 
-<!--<node pkg="cpp" name="reprocess" type="reprocess_client_node" output="screen">
+    <!--<node pkg="cpp" name="reprocess" type="reprocess_client_node" output="screen">
         <param name="robot_num" value="2"/>
     </node>
-
     <node pkg="cpp" name="reprocess_server" type="reprocess_server_node" output="screen"/>
-
     <node pkg="cpp" name="gui" type="GUI_node" output="screen"/-->
 
+
+</launch>
