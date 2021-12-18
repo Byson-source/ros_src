@@ -1,5 +1,7 @@
 #! /usr/bin/python
 import rospy
+
+import os
 # ROS Image message
 from sensor_msgs.msg import Image
 # ROS Image message -> OpenCV2 image converter
@@ -26,6 +28,10 @@ img_number = rospy.get_param("~robot_number")
 bridge = CvBridge()
 state=1
 state_beta=1
+
+if not (os.path.isdir(all_rgb) or os.path.isdir(path+"1_rgb") 
+        or os.path.isdir(path+"2_rgb")):
+    time.sleep(0.0001)
 
 def callback(rgb, id):
     global img_number,state,state_beta
