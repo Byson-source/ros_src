@@ -1,4 +1,10 @@
-//Input the first target_path!!
+// TODO Subscribe whether image node finishes storing
+// TODO Subscribe where this should read
+// TODO Remove actionlib
+// TODO Judge whether is is true positive
+// TODO transmit which images are image pairs and how many sequences
+
+
 #include "rtabmap/core/Rtabmap.h"
 #include "rtabmap/core/CameraRGB.h"
 #include <opencv2/core/core.hpp>
@@ -9,8 +15,6 @@
 #include "std_msgs/String.h"
 #include <ros/ros.h>
 #include <string>
-#include <actionlib/server/simple_action_server.h>
-#include <cpp/LoopClosureAction.h>
 #include <vector>
 #include <unistd.h>
 
@@ -29,11 +33,6 @@ private:
 
     ros::Rate loop_rate{0.5};
 
-    actionlib::SimpleActionServer<cpp::LoopClosureAction> as_;
-
-    cpp::LoopClosureResult result;
-    cpp::LoopClosureFeedback feedback;
-
     std::string database_path{DATABASEPATH};
 
     int stage{1};
@@ -42,7 +41,7 @@ private:
     rtabmap::ParametersMap parameters;
 
 public:
-    Loop_Closure(std::string name) : as_(n, name, boost::bind(&Loop_Closure::detection, this, _1), false)
+    Loop_Closure(std::string name) 
     {
         rtabmap.setTimeThreshold(700.0f); // Time threshold : 700 ms, 0 ms means no limit
 
@@ -50,13 +49,10 @@ public:
         parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRGBDEnabled(), "false"));
 
         UFile::erase(database_path);
-
-        as_.start();
     }
 
     void detection(const cpp::LoopClosureGoal::ConstPtr &goal)
     {
-        // target_path = as_.acceptNewGoal()->imagepath;
         feedback.stage = state;
 
         std::string target_path{goal->imagepath};

@@ -1,3 +1,6 @@
+#FIXME You need to get the feedback from loop_closure node that it finishes reading two images in that directory
+
+# NOTE This node works only for robot1. And gives commands to any_image_extractorand loop closure node
 #! /usr/bin/python
 import rospy
 
@@ -43,6 +46,7 @@ def callback(rgb, id):
     global img_number,state,dir_num
 
     cv2_img = bridge.imgmsg_to_cv2(rgb, "bgr8")
+# FIXME Maybe should change to (640,480)
     cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
     
     cv2.imwrite(path + str(dir_num)+"_rgb/"+str(img_number) + ".jpg", cv2_img)
@@ -73,6 +77,7 @@ def state_CB(id):
 
 rgb_topic = "/robot1/camera/rgb/image_raw"
 ID_topic = "/robot1/rtabmap/info"
+#FIXME Fix to make it more easy to use for any-number usage
 monitor_id="/robot2/rtabmap/info"
 # # To store the images from camera
 

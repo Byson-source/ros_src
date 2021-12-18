@@ -351,7 +351,6 @@ void RealSenseNodeFactory::StartDevice()
 	{
 		ros::NodeHandle nh = getNodeHandle();
 		ros::NodeHandle privateNh = getPrivateNodeHandle();
-		// TODO
 		std::string pid_str(_device.get_info(RS2_CAMERA_INFO_PRODUCT_ID));
 		uint16_t pid = std::stoi(pid_str, 0, 16);
 		switch(pid)
