@@ -39,9 +39,11 @@ dir_num2=1
 
 iteration = 0
 
+former=0
+
 
 def callback(rgb, id):
-    global img_number, state, dir_num, already_loop, iteration
+    global img_number, state, dir_num, already_loop, iteration,former
 
     iteration += 1
 
@@ -55,8 +57,10 @@ def callback(rgb, id):
 
     state["first"] = 1
 
-    while (("second" not in state) or (state["second"] == 0)):
+    while ("second" not in state):
         time.sleep(0.0000000000001)
+    
+    former=1
 
     # if (iteration > 1):
     #     if dir_num == 1:
@@ -76,7 +80,7 @@ def callback(rgb, id):
 
 
 def callback2(rgb, id):
-    global img_number2, state, dir_num2, already_loop,iteration
+    global img_number2, state, dir_num2, already_loop,iteration,former
 
     cv2_img = bridge.imgmsg_to_cv2(rgb, "bgr8")
 # FIXME Maybe should change to (640,480)
@@ -86,8 +90,10 @@ def callback2(rgb, id):
     cv2.imwrite(path + str(dir_num2)+"_rgb/"+str(img_number2) + ".jpg", cv2_img)
     cv2.imwrite(all_rgb + str(img_number2) + ".jpg", cv2_img)
 
-
     state["second"] = 1
+    
+    while ("first" not in state):
+        time.sleep(0.0000000000001)
 
     img_number2 += total_num
 
@@ -95,6 +101,8 @@ def callback2(rgb, id):
         dir_num2 = 2
     else:
         dir_num2 = 1
+
+    state.clear()
 
 # NOTE wait until detection finishes
 def loop_CB(loop):
