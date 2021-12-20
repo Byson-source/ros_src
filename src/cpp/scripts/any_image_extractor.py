@@ -15,40 +15,46 @@ import message_filters
 
 import cv2
 import time
+import os
 
 path = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/"
 
 all_rgb = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/all_rgb/"
 
-rospy.init_node('image_listener', anonymous=True)
 
-total_num = rospy.get_param("~total")
-img_number = rospy.get_param("~robot_number")
+total_num = 2
+img_number = 2
+dir_num=1
 # Instantiate CvBridge
 bridge = CvBridge()
 state=1
 state_beta=1
 iteration=0
 
-
 def callback(rgb, id):
-    global img_number,state,state_beta,iteration
+    global img_number,state,state_beta,iteration,dir_num
     
     if state_beta==1:
-
         cv2_img = bridge.imgmsg_to_cv2(rgb, "bgr8")
         cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
-        # NOTE Let image_extractor store his image faster
-        # while not (os.path.exists(path+str(state)+"_rgb/"+str(img_number-1)+".jpg")):
-        #     print("EEE")
-        #     pass
+
         cv2.imwrite(path + str(state)+"_rgb/"+str(img_number) + ".jpg", cv2_img)
         cv2.imwrite(all_rgb + str(img_number) + ".jpg", cv2_img)
         
-        img_number += total_num
         state_beta=0
     # こちらのノードのほうが早く動くと、同じディレクトリに連続で写真を保存してしまうため
         iteration+=1
+
+        while not (os.path.exists(path + str(dir_num)+"_rgb/"+str(img_number-1) + ".jpg")):
+            pass
+
+        if (iteration > 1):
+            if dir_num == 1:
+                os.remove(path + "2_rgb/"+str(img_number-2) + ".jpg")
+            if dir_num == 2:
+                os.remove(path + "1_rgb/"+str(img_number-2) + ".jpg")
+
+        img_number += total_num
     else:
         pass
     
@@ -63,9 +69,10 @@ def changeCB(data):
 
 if __name__=='__main__':
 
+    rospy.init_node('image_listener', anonymous=True)
     if not (os.path.isdir(all_rgb) or os.path.isdir(path+"1_rgb")
             or os.path.isdir(path+"2_rgb")):
-        time.sleep(0.00000001)
+        time.sleep(0.0001)
     rgb_topic = "/robot"+str(img_number)+"/camera/rgb/image_raw"
     ID_topic = "/robot"+str(img_number)+"/rtabmap/info"
     # # To store the images from camera
