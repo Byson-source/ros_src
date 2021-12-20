@@ -60,7 +60,7 @@ def callback(rgb, id):
     state["first"] = 1
 
     while (("second" not in state) or (state["second"] == 0)):
-        time.sleep(0.0001)
+        time.sleep(0.0000000000001)
 
     int_msg = Int32()
     int_msg.data = 1

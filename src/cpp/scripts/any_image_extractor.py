@@ -39,9 +39,9 @@ def callback(rgb, id):
         cv2_img = bridge.imgmsg_to_cv2(rgb, "bgr8")
         cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
         # NOTE Let image_extractor store his image faster
-        if not (os.path.isdir(path+str(state)+"_rgb/"+str(img_number-1)+".jpg")):
-            print("??????????")
-            time.sleep(0.0001)
+        # while not (os.path.exists(path+str(state)+"_rgb/"+str(img_number-1)+".jpg")):
+        #     print("EEE")
+        #     pass
         cv2.imwrite(path + str(state)+"_rgb/"+str(img_number) + ".jpg", cv2_img)
         cv2.imwrite(all_rgb + str(img_number) + ".jpg", cv2_img)
         
@@ -65,7 +65,7 @@ if __name__=='__main__':
 
     if not (os.path.isdir(all_rgb) or os.path.isdir(path+"1_rgb")
             or os.path.isdir(path+"2_rgb")):
-        time.sleep(0.0001)
+        time.sleep(0.00000001)
     rgb_topic = "/robot"+str(img_number)+"/camera/rgb/image_raw"
     ID_topic = "/robot"+str(img_number)+"/rtabmap/info"
     # # To store the images from camera
