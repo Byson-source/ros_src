@@ -1,5 +1,5 @@
 #FIXME You need to get the feedback from loop_closure node that it finishes reading two images in that directory
-
+#TODO Erase the remaining images
 # NOTE This node works only for robot1. And gives commands to any_image_extractorand loop closure node
 #! /usr/bin/python
 import rospy

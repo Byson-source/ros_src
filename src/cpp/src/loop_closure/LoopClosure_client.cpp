@@ -45,7 +45,7 @@ private:
     int dir_number{0};
 
 public:
-    Client(std::string name) : image_path{FIRST_IMAGEPATH},ac(name,true)
+    Client(std::string name) : image_path{FIRST_IMAGEPATH}, ac(name, true)
     {
 
         ROS_INFO("LoopClosure_client now launching...");
