@@ -1,8 +1,0 @@
-prefix=/home/ayumi/catkin_ws/install
-
-Name: actionlib_tutorial
-Description: Description of actionlib_tutorial
-Version: 0.0.0
-Cflags: -I${prefix}/include
-Libs: -L${prefix}/lib 
-Requires: 

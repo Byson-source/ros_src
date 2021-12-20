@@ -1,8 +1,0 @@
-prefix=/home/ayumi/catkin_ws/devel
-
-Name: PointToScan
-Description: Description of PointToScan
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

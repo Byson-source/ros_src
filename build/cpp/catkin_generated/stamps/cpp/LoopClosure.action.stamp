@@ -1,8 +1,0 @@
-#goal definition
-string imagepath
----
-#result definition
-bool result
----
-#feedback
-int32 state

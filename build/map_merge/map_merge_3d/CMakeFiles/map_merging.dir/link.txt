@@ -1,2 +1,0 @@
-/usr/bin/ar qc /home/ayumi/catkin_ws/devel/lib/libmap_merging.a CMakeFiles/map_merging.dir/src/features.cpp.o CMakeFiles/map_merging.dir/src/graph.cpp.o CMakeFiles/map_merging.dir/src/map_merging.cpp.o CMakeFiles/map_merging.dir/src/matching.cpp.o
-/usr/bin/ranlib /home/ayumi/catkin_ws/devel/lib/libmap_merging.a

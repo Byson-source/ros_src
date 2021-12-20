@@ -1,8 +1,0 @@
-prefix=/home/ayumi/catkin_ws/install
-
-Name: cpp
-Description: Description of cpp
-Version: 0.0.0
-Cflags: -I${prefix}/include
-Libs: -L${prefix}/lib 
-Requires: 

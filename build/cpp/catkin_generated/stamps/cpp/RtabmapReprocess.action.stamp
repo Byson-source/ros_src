@@ -1,9 +1,0 @@
-#goal definition
-string[] databasepaths
-string goal_path
----
-#result definition
-int32 result
----
-#feedback
-int32 state

@@ -1,8 +1,0 @@
-prefix=/home/ayumi/catkin_ws/install
-
-Name: multiple_turtlebots_sim
-Description: Description of multiple_turtlebots_sim
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

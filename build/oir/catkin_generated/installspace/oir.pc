@@ -1,8 +1,0 @@
-prefix=/home/ayumi/catkin_ws/install
-
-Name: oir
-Description: Description of oir
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 
