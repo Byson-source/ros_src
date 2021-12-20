@@ -380,43 +380,43 @@ add_dependencies(
 )
 
 
-add_executable(LoadDatabase_client src/load_database/client.cpp)
+# add_executable(LoadDatabase_client src/load_database/client.cpp)
 
-target_link_libraries(
-  LoadDatabase_client 
-  ${catkin_LIBRARIES}
-)
+# target_link_libraries(
+#   LoadDatabase_client 
+#   ${catkin_LIBRARIES}
+# )
 
-add_dependencies(
-  LoadDatabase_client
-  ${cpp_EXPORTED_TARGETS}
-)
+# add_dependencies(
+#   LoadDatabase_client
+#   ${cpp_EXPORTED_TARGETS}
+# )
 
-add_executable(LoadDatabase_client2 src/load_database/client2.cpp)
+# add_executable(LoadDatabase_client2 src/load_database/client2.cpp)
 
-target_link_libraries(
-  LoadDatabase_client2 
-  ${catkin_LIBRARIES}
-)
+# target_link_libraries(
+#   LoadDatabase_client2 
+#   ${catkin_LIBRARIES}
+# )
 
-add_dependencies(
-  LoadDatabase_client2
-  ${cpp_EXPORTED_TARGETS}
-)
+# add_dependencies(
+#   LoadDatabase_client2
+#   ${cpp_EXPORTED_TARGETS}
+# )
 
-add_executable(loop_closure_client src/loop_closure/LoopClosure_client.cpp)
+# add_executable(loop_closure_client src/loop_closure/LoopClosure_client.cpp)
 
-target_link_libraries(
-  loop_closure_client
-  ${catkin_LIBRARIES}
-)
+# target_link_libraries(
+#   loop_closure_client
+#   ${catkin_LIBRARIES}
+# )
 
-add_dependencies(
-  loop_closure_client
-  ${cpp_EXPORTED_TARGETS}
-)
+# add_dependencies(
+#   loop_closure_client
+#   ${cpp_EXPORTED_TARGETS}
+# )
 
-add_executable(detection_checker src/loop_closure/LoopClosure_server.cpp)
+add_executable(detection_checker src/loop_closure/LoopClosure.cpp)
 
 target_link_libraries(
   detection_checker
@@ -429,53 +429,53 @@ add_dependencies(
   ${cpp_EXPORTED_TARGETS}
 )
 
-add_executable(reprocess_client_node src/rtabmap-reprocess/client.cpp)
+# add_executable(reprocess_client_node src/rtabmap-reprocess/client.cpp)
 
-target_link_libraries(
-  reprocess_client_node
-  ${catkin_LIBRARIES}
-  ${LIBRARIES}
-)
+# target_link_libraries(
+#   reprocess_client_node
+#   ${catkin_LIBRARIES}
+#   ${LIBRARIES}
+# )
 
-add_dependencies(
-  reprocess_client_node
-  ${cpp_EXPORTED_TARGETS}
-)
+# add_dependencies(
+#   reprocess_client_node
+#   ${cpp_EXPORTED_TARGETS}
+# )
 
 
-add_executable(reprocess_server_node src/rtabmap-reprocess/server.cpp)
+# add_executable(reprocess_server_node src/rtabmap-reprocess/server.cpp)
 
-target_link_libraries(
-  reprocess_server_node
-  ${catkin_LIBRARIES}
-  ${LIBRARIES}
-)
+# target_link_libraries(
+#   reprocess_server_node
+#   ${catkin_LIBRARIES}
+#   ${LIBRARIES}
+# )
 
-add_dependencies(
-  reprocess_server_node
-  ${cpp_EXPORTED_TARGETS}
-)
+# add_dependencies(
+#   reprocess_server_node
+#   ${cpp_EXPORTED_TARGETS}
+# )
 
-INSTALL(TARGETS reprocess_server_node
-    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT runtime
-    BUNDLE DESTINATION "${CMAKE_BUNDLE_LOCATION}" COMPONENT runtime)
+# INSTALL(TARGETS reprocess_server_node
+#     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT runtime
+#     BUNDLE DESTINATION "${CMAKE_BUNDLE_LOCATION}" COMPONENT runtime)
 
-add_executable(GUI_node 
-src/gui/src/main.cpp
-src/gui/src/example.cpp
-src/gui/include/example.h
-)
+# add_executable(GUI_node 
+# src/gui/src/main.cpp
+# src/gui/src/example.cpp
+# src/gui/include/example.h
+# )
 
-target_link_libraries(
-  GUI_node
-  ${catkin_LIBRARIES}
-  ${LIBRARIES}
-  Qt5::Widgets
-)
+# target_link_libraries(
+#   GUI_node
+#   ${catkin_LIBRARIES}
+#   ${LIBRARIES}
+#   Qt5::Widgets
+# )
 
-# target_link_libraries(GUI_node PRIVATE Qt5::Widgets)
+# # target_link_libraries(GUI_node PRIVATE Qt5::Widgets)
 
-add_dependencies(
-  GUI_node
-  ${cpp_EXPORTED_TARGETS}
-)
+# add_dependencies(
+#   GUI_node
+#   ${cpp_EXPORTED_TARGETS}
+# )

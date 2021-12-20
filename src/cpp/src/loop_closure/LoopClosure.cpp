@@ -48,7 +48,7 @@ private:
     int nextIndex{1};
 
 public:
-    Loop_Closure(int num) : status(1), dir_number(1), robot_number(num)
+    Loop_Closure(int num) : dir_number(1), robot_number(num)
     {
         rtabmap.setTimeThreshold(700.0f); // Time threshold : 700 ms, 0 ms means no limit
 
@@ -114,14 +114,14 @@ public:
         index_array.data.resize(who_detect.size() - 2);
         val_array.data.resize(who_detect.size() - 2);
 
-        for (int iter{0}, iter < who_detect.size() - 2; ++iter)
+        for (int iter{0};iter < who_detect.size() - 2; ++iter)
         {
             index_array.data[iter] = detect_index[iter];
             val_array.data[iter] = detect_val[iter];
         }
 
         index_pub.publish(index_array);
-        val_array.publish(val_array);
+        val_pub.publish(val_array);
     }
 
     void detection(void)
@@ -136,7 +136,8 @@ public:
         for (int iter{0}; iter < robot_number; ++iter)
         {
 
-            if (UFile::exists(target_path + io_num))
+            if (UFile::exists(template_path + std::to_string(dir_number) + template_path2
+            + io_num))
             {
                 data = camera.takeImage();
                 rtabmap.process(data.imageRaw(), nextIndex);
