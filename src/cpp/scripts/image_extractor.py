@@ -1,5 +1,4 @@
 #FIXME You need to get the feedback from loop_closure node that it finishes reading two images in that directory
-#TODO Erase the remaining images
 # NOTE This node works only for robot1. And gives commands to any_image_extractorand loop closure node
 #! /usr/bin/python
 import rospy
@@ -58,10 +57,17 @@ def callback(rgb, id):
     
     while (("second" not in state) or (state["second"]==0)):
         time.sleep(0.0001)
+
+    # Remove stored images
+    os.remove(path + str(dir_num)+"_rgb/"+str(img_number) + ".jpg")
+    try:
+        os.remove(path + str(dir_num)+"_rgb/"+str(img_number+1) + ".jpg")
+    except FileNotFoundError:
+        os.remove(path + str(dir_num)+"_rgb/"+str(img_number-1) + ".jpg")
     
     if dir_num==1:dir_num=2
     else:dir_num=1
-        
+    
     int_msg=Int32()
     int_msg.data=1
     path_changer.publish(int_msg)
