@@ -38,8 +38,10 @@ def callback(rgb, id):
 
         cv2_img = bridge.imgmsg_to_cv2(rgb, "bgr8")
         cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
-
-
+        # NOTE Let image_extractor store his image faster
+        if not (os.path.isdir(path+str(state)+"_rgb/"+str(img_number-1)+".jpg")):
+            print("??????????")
+            time.sleep(0.0001)
         cv2.imwrite(path + str(state)+"_rgb/"+str(img_number) + ".jpg", cv2_img)
         cv2.imwrite(all_rgb + str(img_number) + ".jpg", cv2_img)
         

@@ -56,7 +56,6 @@ def callback(rgb, id):
     cv2.imwrite(path + str(dir_num)+"_rgb/"+str(img_number) + ".jpg", cv2_img)
     cv2.imwrite(all_rgb + str(img_number) + ".jpg", cv2_img)
 
-    img_number += total_num
 
     state["first"] = 1
 
@@ -65,21 +64,21 @@ def callback(rgb, id):
 
     int_msg = Int32()
     int_msg.data = 1
-    path_changer.publish(int_msg)
 
     # while(already_loop==0):
     #     time.sleep(0.0001)
 
     # Remove stored images
-    # if (iteration > 1):
-    #     if dir_num == 1:
-    #         os.remove(path + "2_rgb/"+str(img_number-2) + ".jpg")
-    #         os.remove(path + "2_rgb/"+str(img_number-1) + ".jpg")
-    #     if dir_num == 2:
-    #         print(img_number)
-    #         os.remove(path + "1_rgb/"+str(img_number-2) + ".jpg")
-    #         os.remove(path + "1_rgb/"+str(img_number-1) + ".jpg")
-    print(img_number)
+    if (iteration > 1):
+        if dir_num == 1:
+            os.remove(path + "2_rgb/"+str(img_number-2) + ".jpg")
+            os.remove(path + "2_rgb/"+str(img_number-1) + ".jpg")
+        if dir_num == 2:
+            os.remove(path + "1_rgb/"+str(img_number-2) + ".jpg")
+            os.remove(path + "1_rgb/"+str(img_number-1) + ".jpg")
+
+    path_changer.publish(int_msg)
+    img_number += total_num
     if dir_num == 1:
         dir_num = 2
     else:
