@@ -1,4 +1,4 @@
-# FIXME You need to get the feedback from loop_closure node that it finishes reading two images in that directory
+# TODO You need to get the feedback from loop_closure node that it finishes reading two images in that directory
 # FIXME This works only for few robots. If you want, convert this into C++.
 #! /usr/bin/python
 import rospy
@@ -28,99 +28,36 @@ total_num = 2
 
 img_number = 1
 img_number2=2
+
 # Instantiate CvBridge
 bridge = CvBridge()
-state = {}
-
-dir_num = 1
-dir_num2=1
-
-iteration = 0
-
-former=0
-
 
 def callback(rgb, id):
-    global img_number, state, dir_num, iteration,former
-
-    iteration += 1
+    global img_number, already_loop
 
     cv2_img = bridge.imgmsg_to_cv2(rgb, "bgr8")
 # FIXME Maybe should change to (640,480)
     cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
 
-    cv2.imwrite(path + str(dir_num)+"_rgb/"+str(img_number) + ".jpg", cv2_img)
+    cv2.imwrite(path + "rgb/"+str(img_number) + ".jpg", cv2_img)
     cv2.imwrite(all_rgb + str(img_number) + ".jpg", cv2_img)
 
-
-    state["first"] = 1
-    # まだ相方の写真がない時
-    if("second" not in state):
-        while ("second" not in state):
-            time.sleep(0.0000000000001)
-
-        if (iteration > 1):
-            if dir_num == 1:
-                os.remove(path + "2_rgb/"+str(img_number-2) + ".jpg")
-            if dir_num == 2:
-                os.remove(path + "1_rgb/"+str(img_number-2) + ".jpg")
-
-        img_number += total_num
-        # もう既にある時
-        if dir_num == 1:
-            dir_num = 2
-        else:
-            dir_num = 1
-    else:
-        if (iteration > 1):
-            if dir_num == 1:
-                os.remove(path + "2_rgb/"+str(img_number-2) + ".jpg")
-            if dir_num == 2:
-                os.remove(path + "1_rgb/"+str(img_number-2) + ".jpg")
-
-        img_number += total_num
-
+    
+    img_number += total_num
 
 
 def callback2(rgb, id):
-    global img_number2, state, dir_num, iteration,former
+    global img_number2, already_loop
 
     cv2_img = bridge.imgmsg_to_cv2(rgb, "bgr8")
 # FIXME Maybe should change to (640,480)
     cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
 
 
-    cv2.imwrite(path + str(dir_num)+"_rgb/"+str(img_number2) + ".jpg", cv2_img)
+    cv2.imwrite(path + "rgb/"+str(img_number2) + ".jpg", cv2_img)
     cv2.imwrite(all_rgb + str(img_number2) + ".jpg", cv2_img)
 
-    state["second"] = 1
-    if("first" not in state):
-        while ("first" not in state):
-            time.sleep(0.0000000000001)
-
-        if (iteration > 1):
-            if dir_num == 1:
-                os.remove(path + "2_rgb/"+str(img_number2-2) + ".jpg")
-            if dir_num == 2:
-                os.remove(path + "1_rgb/"+str(img_number2-2) + ".jpg")
-
-        img_number2 += total_num
-        if dir_num == 1:
-            dir_num = 2
-        else:
-            dir_num = 1
-            
-    else:
-        if (iteration > 1):
-            if dir_num == 1:
-                os.remove(path + "2_rgb/"+str(img_number2-2) + ".jpg")
-            if dir_num == 2:
-                os.remove(path + "1_rgb/"+str(img_number2-2) + ".jpg")
-
-        img_number2 += total_num
-
-
-    state.clear()
+    img_number2 += total_num
 
 # NOTE wait until detection finishes
 def loop_CB(loop):
@@ -135,8 +72,7 @@ if __name__ == '__main__':
 
     os.mkdir(path)
     os.mkdir(all_rgb)
-    os.mkdir(path+"/1_rgb/")
-    os.mkdir(path+"/2_rgb/")
+    os.mkdir(path+"/rgb/")
 
     rospy.init_node('image_listener', anonymous=True)
 
