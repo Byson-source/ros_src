@@ -61,7 +61,7 @@
 
 
 
-    <node pkg="cpp" name="image_extractor_1" type="image_extractor.py" output="screen"/>
+    <node pkg="cpp" name="image_extractor" type="image_extractor.py" output="screen"/>
 
 
 

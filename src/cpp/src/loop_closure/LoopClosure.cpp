@@ -1,3 +1,4 @@
+// TODO Notify image extractor to stop and restart its storing
 #include "rtabmap/core/Rtabmap.h"
 #include "rtabmap/core/CameraRGB.h"
 #include <opencv2/core/core.hpp>

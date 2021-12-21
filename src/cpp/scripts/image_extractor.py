@@ -1,4 +1,5 @@
-# TODO You need to get the feedback from loop_closure node that it finishes reading two images in that directory
+# TODO You need to get the feedback from loop_closure node that tells when to start and to restart again.
+# TODO lop検出中に来た画像を保留しておくこと。
 # FIXME This works only for few robots. If you want, convert this into C++.
 #! /usr/bin/python
 import rospy
@@ -29,40 +30,70 @@ total_num = 2
 img_number = 1
 img_number2=2
 
+already_loop=1
+
+stock={}
+start2end={"end":0}
+# start ,end,previous_end
+
+# index:img
+
 # Instantiate CvBridge
 bridge = CvBridge()
 
 def callback(rgb, id):
-    global img_number, already_loop
+    global img_number,img_number2,already_loop,stock,start2end
 
     cv2_img = bridge.imgmsg_to_cv2(rgb, "bgr8")
 # FIXME Maybe should change to (640,480)
     cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
+    if already_loop==1:
+        cv2.imwrite(path + "rgb/"+str(img_number) + ".jpg", cv2_img)
+        cv2.imwrite(all_rgb + str(img_number) + ".jpg", cv2_img)
 
-    cv2.imwrite(path + "rgb/"+str(img_number) + ".jpg", cv2_img)
-    cv2.imwrite(all_rgb + str(img_number) + ".jpg", cv2_img)
+        img_number += total_num
+    else:
+        start2end["start"]=start2end["end"]+1
+        if img_number>img_number2:
+            start2end["end"]=img_number
+        else:
+            start2end["end"]=img_number2
 
-    
-    img_number += total_num
+        stock[str(img_number)]=cv2_img
 
 
 def callback2(rgb, id):
-    global img_number2, already_loop
+    global img_number2, already_loop,stock
 
     cv2_img = bridge.imgmsg_to_cv2(rgb, "bgr8")
 # FIXME Maybe should change to (640,480)
     cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
 
+    if already_loop==1:
+        cv2.imwrite(path + "rgb/"+str(img_number2) + ".jpg", cv2_img)
+        cv2.imwrite(all_rgb + str(img_number2) + ".jpg", cv2_img)
 
-    cv2.imwrite(path + "rgb/"+str(img_number2) + ".jpg", cv2_img)
-    cv2.imwrite(all_rgb + str(img_number2) + ".jpg", cv2_img)
+        img_number2 += total_num
+    else:
+        stock[str(img_number2)]=cv2_img
 
-    img_number2 += total_num
+    
 
 # NOTE wait until detection finishes
 def loop_CB(loop):
-    global already_loop
-    already_loop=1
+    global already_loop,stock,start2end
+    # 再開
+    if already_loop==0:
+        for file_num in range(start2end["start"],start2end["end"]):
+            os.remove(path + "rgb/"+str(file_num) + ".jpg")
+            
+        for index,img in stock:
+            cv2.imwrite(path + "rgb/"+str(index) + ".jpg", img)
+        already_loop=1
+
+    else:
+    # 中止
+        already_loop=0
 
 
 
@@ -93,7 +124,7 @@ if __name__ == '__main__':
     myid_sub = message_filters.Subscriber(ID_topic, Info)
     myid_sub2 = message_filters.Subscriber(ID_topic2, Info)
 
-    detect_finish=rospy.Subscriber("loop",String,loop_CB)
+    detect_note=rospy.Subscriber("loop",String,loop_CB)
 
 
     # ts = message_filters.TimeSynchronizer([rgb_sub, myid_sub], 10)
