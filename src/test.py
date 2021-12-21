@@ -1,3 +1,4 @@
 test={}
 test["r"]=1
-print(next(iter(test)))
+if test["o"]==0:
+	print("yes")
