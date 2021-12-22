@@ -124,7 +124,6 @@ def loop_CB(loop):
     if already_loop == 0:
         # 再開
         already_loop = 1
-
     else:
         # 中止
         already_loop = 0

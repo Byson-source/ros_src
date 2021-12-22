@@ -1,4 +1,3 @@
-// TODO Notify image extractor to stop and restart its storing
 #include "rtabmap/core/Rtabmap.h"
 #include "rtabmap/core/CameraRGB.h"
 #include <opencv2/core/core.hpp>
@@ -22,34 +21,32 @@ class Loop_Closure
 private:
     ros::NodeHandle n;
 
-    int dir_number;
-
     std::vector<int> detection_list;
 
     int robot_number;
 
-    std::string template_path{"/home/ayumi/Documents/tohoku_uni/CLOVERs/images/"};
-    std::string template_path2{"_rgb"};
+    std::string template_path{"/home/ayumi/Documents/tohoku_uni/CLOVERs/images/rgb/"};
 
+    // NOTE 二秒ごとにimageをチェックする。
     ros::Rate loop_rate{0.5};
 
     std::string database_path{DATABASEPATH};
 
-    std::vector<int> detect_index;
-    std::vector<int> detect_val;
-    std::map<int, int> who_detect;
+    //FIXME who_detectを辞書化
+    std::map < int, std::map<std::string, std::vector<int>> who_detect;
+    // NOTE {int robotID;{"index":std::vector<int>,"LoopID":std::vector<int>}} このindexには連続するものしか入らない
 
     rtabmap::Rtabmap rtabmap;
     rtabmap::ParametersMap parameters;
     rtabmap::SensorData data;
 
-    ros::Subscriber switch_sub;
     ros::Publisher index_pub;
     ros::Publisher val_pub;
+    ros::Publisher img_switch;
     int nextIndex{1};
 
 public:
-    Loop_Closure(int num) : dir_number(1), robot_number(num)
+    Loop_Closure(int num) : robot_number(num)
     {
         rtabmap.setTimeThreshold(700.0f); // Time threshold : 700 ms, 0 ms means no limit
 
@@ -58,89 +55,74 @@ public:
 
         rtabmap.init(parameters, DATABASEPATH);
 
-        switch_sub = n.subscribe("imagepath_change", 10, &Loop_Closure::switchCB, this);
-
+        img_switch = n.advertise<std_msgs::Int32>("loop", 10);
         index_pub = n.advertise<std_msgs::Int32MultiArray>("index_array", 10);
         val_pub = n.advertise<std_msgs::Int32MultiArray>("val_array", 10);
 
         UFile::erase(database_path);
 
-        who_detect[-1] = 0;
-        who_detect[0] = 0;
+        std::map<std::string, std::vector<int>> R1_info;
+        std::map<std::string, std::vector<int>> R2_info;
+
+        who_detect["R1"] = R1_info;
+        who_detect["R2"] = R2_info;
         // NOTE key -1は何回連続でloopが続いているか
         // NOTE key 0 はどのロボット（インデックス）がloopを感知し続けているのか？？
     }
 
-    void switchCB(const std_msgs::Int32::ConstPtr &msg)
-    {
-        if (dir_number == 1)
-            dir_number = 2;
-        else
-            dir_number = 1;
-
-        Loop_Closure::detection();
-    }
-
     void send_command(int threshold = 0)
     {
-        if (threshold != 0)
+        for (auto [key, val]; who_detect)
         {
-            if (who_detect.size() > threshold + 2)
+            std_msgs::Int32MultiArray index_array{[key]};
+            // NOTE　最初のインデックスに1とあったらR1のdetection、2とあったらR2のもの
+            std_msgs::Int32MultiArray val_array{[key]};
+            // NOTE　最初のインデックスに1とあったらR1のdetection、2とあったらR2のもの
+
+            index_array.data.resize(val["index"].size() + 1);
+            val_array.data.resize(val["index"].size() + 1);
+
+            for (int iter{0}; iter < who_detect.size() - 2; ++iter)
             {
-                for (auto [key, val] : who_detect)
+                if (iter == 0)
                 {
-                    if ((key != -1) && (key != 0))
-                    {
-                        detect_index.push_back(key);
-                        detect_val.push_back(val);
-                    }
+                    index_array.data[iter] = key;
+                    val_array.data[iter] = key;
+                }
+                else
+                {
+                    index_array.data[iter] = detect_index[iter];
+                    val_array.data[iter] = detect_val[iter];
                 }
             }
-        }
-        else
-        {
-            for (auto [key, val] : who_detect)
-            {
-                if ((key != -1) && (key != 0))
-                {
-                    detect_index.push_back(key);
-                    detect_val.push_back(val);
-                }
-            }
-        }
 
-        std_msgs::Int32MultiArray index_array;
-        std_msgs::Int32MultiArray val_array;
-        // NOTE Ignore keys -1 and 0
-        index_array.data.resize(who_detect.size() - 2);
-        val_array.data.resize(who_detect.size() - 2);
-
-        for (int iter{0};iter < who_detect.size() - 2; ++iter)
-        {
-            index_array.data[iter] = detect_index[iter];
-            val_array.data[iter] = detect_val[iter];
+            index_pub.publish(index_array);
+            val_pub.publish(val_array);
         }
-
-        index_pub.publish(index_array);
-        val_pub.publish(val_array);
     }
 
     void detection(void)
     {
-        rtabmap::CameraImages camera(template_path + std::to_string(dir_number) + template_path2);
+
+        std_msgs::Int32 msg;
+        msg.data = 1;
+
+        img_switch.publish(msg);
+        // NOTE Loop Detect開始(msgの内容はどうでもいい)
+
+        rtabmap::CameraImages camera(template_path);
 
         camera.init();
 
         std::string jpg{".jpg"};
         std::string io_num{std::to_string(nextIndex) + jpg};
 
-        for (int iter{0}; iter < robot_number; ++iter)
+        data = camera.takeImage();
+        // NOTE この時点で、imgの保存が止まっている必要がある
+        while (!data.imageRaw().empty())
         {
-
-            if (UFile::exists(template_path + std::to_string(dir_number) + template_path2
-            + io_num))
+            if (UFile::exists(template_path + io_num))
             {
-                data = camera.takeImage();
                 rtabmap.process(data.imageRaw(), nextIndex);
 
                 if (rtabmap.getLoopClosureId())
@@ -167,21 +149,22 @@ public:
 
                         ROS_ERROR("!!!!!!!!!!!!!!!!!!!!!!!!!");
                     }
-                    // NOTE もし,loopが五回以上検出されたら
 
                     send_command(5);
                 }
                 else
+                // NOTE loopが検出されなくなった瞬間
                 {
                     ++nextIndex;
                     io_num = std::to_string(nextIndex) + jpg;
 
-                    if (who_detect.size() > 4)
-                        send_command();
+                    send_command();
                     who_detect.clear();
                     who_detect[-1] = 0;
                     who_detect[0] = 0;
                 }
+
+                data = camera.takeImage();
             }
             else
             {
@@ -191,6 +174,10 @@ public:
                 who_detect[0] = 0;
             }
         }
+        // NOTE loop detect終了
+        img_switch.publish(msg);
+        ros::spinOnce();
+        loop_rate.sleep();
     }
 };
 
@@ -205,7 +192,10 @@ int main(int argc, char **argv)
 
     Loop_Closure detector(number);
 
-    ros::spin();
+    while (ros::ok())
+    {
+        detector.detection();
+    }
 
     return 0;
 }
