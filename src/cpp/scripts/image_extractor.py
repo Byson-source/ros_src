@@ -1,4 +1,5 @@
 # FIXME This works only for few robots. If you want, convert this into C++.
+# TODO 連番が崩れるときがあるので、loop nodeに許可を与えるときに工夫する
 #! /usr/bin/python
 import rospy
 
@@ -26,11 +27,14 @@ img_number = 1
 img_number2 = 2
 
 already_loop = 1
-# callback1's condition,2's condition
-
+#NOTE callback1's condition,2's condition
 condition = {"cb1 storing":1,
             "cb1 stocking":0}
+
+# NOTE index;img detection中に入ってきた画像を格納しておく
 stock = {}
+# NOTE loop nodeには連番した画像のみを読ませたい。そのために、連番になっていない画像を一時的に避難させておく。
+temp_stock={}
 start2end = {"end": 0}
 # index:img
 bridge = CvBridge()
@@ -68,12 +72,16 @@ def callback(rgb, id):
                 for index, img in stock:
                     cv2.imwrite(path + "rgb/"+str(index) + ".jpg", img)
 
+                for index,img in temp_stock:
+                    cv2.imwrite(path + "rgb/"+str(index) + ".jpg", img)
+
             condition["cb1 recovering"] = 0
 
         # NOTE ↓normal
         condition["cb1 storing"] = 1
         cv2.imwrite(path + "rgb/"+str(img_number) + ".jpg", cv2_img)
         cv2.imwrite(all_rgb + str(img_number) + ".jpg", cv2_img)
+        print(img_number)
 
         img_number += 2
 
@@ -88,10 +96,22 @@ def callback(rgb, id):
             while(condition["cb2 storing"] == 1):
                 pass
             
-            # NOTE loop closure nodeに画像が保存し終わったことを伝える
+            # TODO 連続していないものをtemp_stockに避難させておく.
+            l=[img_number,img_number2]
+            l_no=max(l)
+            while True:
+                if (os.path.exists(path+"rgb/"+str(l_no-1)+".jpg")):
+                    break
+                temp_stock[l_no]=cv2.imread(path+"rgb/"+str(l_no)+".jpg")
+                os.remove(path+"rgb/"+str(l_no)+".jpg")
+                l_no-=2
+            # NOTE これで連番になった
+            # condition["seq_end"]=l_no
+
+                # NOTE loop closure nodeに画像が保存し終わったことを伝える
             msg=Int32()
             msg.data=1
-            
+
             # NOTE detectの対象ファイルをまとめる [start:int,end:int]
             confirm.publish(msg)
             start2end["start"] = start2end["end"]+1
@@ -116,6 +136,7 @@ def callback2(rgb, id):
         condition["cb2 storing"] = 1
         cv2.imwrite(path + "rgb/"+str(img_number2) + ".jpg", cv2_img)
         cv2.imwrite(all_rgb + str(img_number2) + ".jpg", cv2_img)
+        print(img_number2)
 
         img_number2 += 2
     # 中止
