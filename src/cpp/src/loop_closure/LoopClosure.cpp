@@ -32,10 +32,9 @@ private:
 
     std::string database_path{DATABASEPATH};
 
-    //FIXME who_detectを辞書化
-    std::map < int, std::map<std::string, std::vector<int>> who_detect;
+    std::map<int, std::map<std::string, std::vector<int>>> who_detect;
     // NOTE {int robotID;{"index":std::vector<int>,"LoopID":std::vector<int>}} このindexには連続するものしか入らない
-    std::map < int, std::map<std::string, std::vector<int>> all_loop;
+    std::map<int, std::map<std::string, std::vector<int>>> all_loop;
     // NOTE {int robotID;{"index":std::vector<int>,"LoopID":std::vector<int>}} このindexにはロボット間の検知だったら全て格納する
 
     rtabmap::Rtabmap rtabmap;
@@ -66,29 +65,29 @@ public:
         std::map<std::string, std::vector<int>> R1_info;
         std::map<std::string, std::vector<int>> R2_info;
 
-        who_detect["R1"] = R1_info;
-        who_detect["R2"] = R2_info;
+        who_detect[1] = R1_info;
+        who_detect[2] = R2_info;
 
         std::map<std::string, std::vector<int>> R1_loop;
         std::map<std::string, std::vector<int>> R2_loop;
 
-        all_loop["R1"] = R1_loop;
-        all_loop["R2"] = R2_loop;
+        all_loop[1] = R1_loop;
+        all_loop[2] = R2_loop;
     }
 
     void send_command(int threshold = 0)
     {
-        for (auto [key, val]; who_detect)
+        for (auto [key, val]: who_detect)
         {
-            std_msgs::Int32MultiArray index_array{[key]};
+            std_msgs::Int32MultiArray index_array;
             // NOTE　最初のインデックスに1とあったらR1のdetection、2とあったらR2のもの
-            std_msgs::Int32MultiArray val_array{[key]};
+            std_msgs::Int32MultiArray val_array;
             // NOTE　最初のインデックスに1とあったらR1のdetection、2とあったらR2のもの
 
             index_array.data.resize(val["index"].size() + 1);
             val_array.data.resize(val["index"].size() + 1);
 
-            for (int iter{0}; iter < who_detect.size() - 2; ++iter)
+            for (int iter{0}; iter < val["index"].size() + 1; ++iter)
             {
                 if (iter == 0)
                 {
@@ -97,8 +96,8 @@ public:
                 }
                 else
                 {
-                    index_array.data[iter] = detect_index[iter];
-                    val_array.data[iter] = detect_val[iter];
+                    index_array.data[iter] = val["index"][iter - 1];
+                    val_array.data[iter] = val["LoopID"][iter - 1];
                 }
             }
 
@@ -109,21 +108,21 @@ public:
 
     void clear_dir(void)
     {
-        who_detect["R1"]["index"].clear();
-        who_detect["R2"]["index"].clear();
-        who_detect["R1"]["LoopID"].clear();
-        who_detect["R2"]["LoopID"].clear();
+        who_detect[1]["index"].clear();
+        who_detect[2]["index"].clear();
+        who_detect[1]["LoopID"].clear();
+        who_detect[2]["LoopID"].clear();
 
-        all_loop["R1"]["index"].clear();
-        all_loop["R2"]["index"].clear();
-        all_loop["R1"]["LoopID"].clear();
-        all_loop["R2"]["LoopID"].clear();
+        all_loop[1]["index"].clear();
+        all_loop[2]["index"].clear();
+        all_loop[1]["LoopID"].clear();
+        all_loop[2]["LoopID"].clear();
     }
 
     void detection(void)
     {
-
         std_msgs::Int32 msg;
+
         msg.data = 1;
 
         img_switch.publish(msg);
@@ -143,74 +142,75 @@ public:
             if (UFile::exists(template_path + io_num))
             {
                 rtabmap.process(data.imageRaw(), nextIndex);
+            }
 
-                if (rtabmap.getLoopClosureId())
+            if (rtabmap.getLoopClosureId())
+            {
+                printf("time(%fs) STM(%d) WM(%d) hyp(%d) value(%.2f) *LOOP %d->%d*\n",
+                       rtabmap.getLastProcessTime(),
+                       (int)rtabmap.getSTM().size(), // short-term memory
+                       (int)rtabmap.getWM().size(),  // working memory
+                       rtabmap.getLoopClosureId(),
+                       rtabmap.getLoopClosureValue(),
+                       nextIndex,
+                       rtabmap.getLoopClosureId());
+                ++nextIndex;
+                io_num = std::to_string(nextIndex) + jpg;
+                if ((nextIndex - rtabmap.getLoopClosureId()) % 2 == 1)
                 {
-                    printf("time(%fs) STM(%d) WM(%d) hyp(%d) value(%.2f) *LOOP %d->%d*\n",
-                           rtabmap.getLastProcessTime(),
-                           (int)rtabmap.getSTM().size(), // short-term memory
-                           (int)rtabmap.getWM().size(),  // working memory
-                           rtabmap.getLoopClosureId(),
-                           rtabmap.getLoopClosureValue(),
-                           nextIndex,
-                           rtabmap.getLoopClosureId());
-                    ++nextIndex;
-                    io_num = std::to_string(nextIndex) + jpg;
-
-                    if ((nextIndex - rtabmap.getLoopClosureId()) % 2 == 1)
-                        if (nextIndex % 2 == 1)
+                    if (nextIndex % 2 == 1)
+                    {
                         // NOTE R1が検知
+                        // NOTE loopが連続しているか否か
+                        if ((all_loop[1]["index"].size() > 0) && (all_loop[1]["index"].back() == nextIndex - 1))
                         {
-                            // NOTE loopが連続しているか否か
-                            if((all_loop["R1"]["index"].size()>0) && (all_loop["R1"]["index"].back()==nextIndex-1){
-                                who_detect["R1"]["index"].push_back(nextIndex);
-                                who_detect["R1"]["LoopID"].push_back(rtabmap.getLoopClosureId());
-                            }
-                            all_loop["R1"]["index"].push_back(nextIndex);
-                            all_loop["R1"]["LoopID"].push_back(rtabmap.getLoopClosureId());
+                            who_detect[1]["index"].push_back(nextIndex);
+                            who_detect[1]["LoopID"].push_back(rtabmap.getLoopClosureId());
                         }
-                        else
-                        // NOTE R2が検知
-                        {
-                            if ((all_loop["R2"]["index"].size() > 0) && (all_loop["R2"]["index"].back() == nextIndex - 1))
-                            {
-                                who_detect["R2"]["index"].push_back(nextIndex);
-                                who_detect["R2"]["LoopID"].push_back(rtabmap.getLoopClosureId());
-                            }
+                    }
 
-                            all_loop["R2"]["index"].push_back(nextIndex);
-                            all_loop["R2"]["LoopID"].push_back(rtabmap.getLoopClosureId());
+                    else
+                    // NOTE R2が検知
+                    {
+                        if ((all_loop[2]["index"].size() > 0) && (all_loop[2]["index"].back() == nextIndex - 1))
+                        {
+                            who_detect[2]["index"].push_back(nextIndex);
+                            who_detect[2]["LoopID"].push_back(rtabmap.getLoopClosureId());
                         }
+
+                        all_loop[2]["index"].push_back(nextIndex);
+                        all_loop[2]["LoopID"].push_back(rtabmap.getLoopClosureId());
+                    }
 
                     ROS_ERROR("!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+                    send_command(5);
+                }
+                else
+                // NOTE loopが検出されなくなった瞬間
+                {
+                    ++nextIndex;
+
+                    clear_dir();
+
+                    io_num = std::to_string(nextIndex) + jpg;
+
+                    send_command();
                 }
 
-                send_command(5);
+                data = camera.takeImage();
             }
             else
-            // NOTE loopが検出されなくなった瞬間
             {
-                ++nextIndex;
+                ROS_ERROR("Images are not stored yet...");
 
-                clear_dir();
-
-                io_num = std::to_string(nextIndex) + jpg;
-
-                send_command();
+                exit(1);
             }
-
-            data = camera.takeImage();
+            // NOTE loop detect終了
+            img_switch.publish(msg);
+            ros::spinOnce();
+            loop_rate.sleep();
         }
-        else
-        {
-            ROS_ERROR("Images are not stored yet...");
-
-            exit(1);
-        }
-        // NOTE loop detect終了
-        img_switch.publish(msg);
-        ros::spinOnce();
-        loop_rate.sleep();
     }
 };
 
