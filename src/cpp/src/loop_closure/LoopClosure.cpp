@@ -35,6 +35,8 @@ private:
     //FIXME who_detectを辞書化
     std::map < int, std::map<std::string, std::vector<int>> who_detect;
     // NOTE {int robotID;{"index":std::vector<int>,"LoopID":std::vector<int>}} このindexには連続するものしか入らない
+    std::map < int, std::map<std::string, std::vector<int>> all_loop;
+    // NOTE {int robotID;{"index":std::vector<int>,"LoopID":std::vector<int>}} このindexにはロボット間の検知だったら全て格納する
 
     rtabmap::Rtabmap rtabmap;
     rtabmap::ParametersMap parameters;
@@ -66,8 +68,12 @@ public:
 
         who_detect["R1"] = R1_info;
         who_detect["R2"] = R2_info;
-        // NOTE key -1は何回連続でloopが続いているか
-        // NOTE key 0 はどのロボット（インデックス）がloopを感知し続けているのか？？
+
+        std::map<std::string, std::vector<int>> R1_loop;
+        std::map<std::string, std::vector<int>> R2_loop;
+
+        all_loop["R1"] = R1_loop;
+        all_loop["R2"] = R2_loop;
     }
 
     void send_command(int threshold = 0)
@@ -99,6 +105,19 @@ public:
             index_pub.publish(index_array);
             val_pub.publish(val_array);
         }
+    }
+
+    void clear_dir(void)
+    {
+        who_detect["R1"]["index"].clear();
+        who_detect["R2"]["index"].clear();
+        who_detect["R1"]["LoopID"].clear();
+        who_detect["R2"]["LoopID"].clear();
+
+        all_loop["R1"]["index"].clear();
+        all_loop["R2"]["index"].clear();
+        all_loop["R1"]["LoopID"].clear();
+        all_loop["R2"]["LoopID"].clear();
     }
 
     void detection(void)
@@ -139,40 +158,54 @@ public:
                     io_num = std::to_string(nextIndex) + jpg;
 
                     if ((nextIndex - rtabmap.getLoopClosureId()) % 2 == 1)
-                    {
-                        // NOTE This system only considers only one of them detects where the other passes.
-
-                        if ((who_detect[-1] > 0) && (iter == who_detect[0]))
+                        if (nextIndex % 2 == 1)
+                        // NOTE R1が検知
                         {
-                            who_detect[nextIndex] = rtabmap.getLoopClosureId();
+                            // NOTE loopが連続しているか否か
+                            if((all_loop["R1"]["index"].size()>0) && (all_loop["R1"]["index"].back()==nextIndex-1){
+                                who_detect["R1"]["index"].push_back(nextIndex);
+                                who_detect["R1"]["LoopID"].push_back(rtabmap.getLoopClosureId());
+                            }
+                            all_loop["R1"]["index"].push_back(nextIndex);
+                            all_loop["R1"]["LoopID"].push_back(rtabmap.getLoopClosureId());
+                        }
+                        else
+                        // NOTE R2が検知
+                        {
+                            if ((all_loop["R2"]["index"].size() > 0) && (all_loop["R2"]["index"].back() == nextIndex - 1))
+                            {
+                                who_detect["R2"]["index"].push_back(nextIndex);
+                                who_detect["R2"]["LoopID"].push_back(rtabmap.getLoopClosureId());
+                            }
+
+                            all_loop["R2"]["index"].push_back(nextIndex);
+                            all_loop["R2"]["LoopID"].push_back(rtabmap.getLoopClosureId());
                         }
 
-                        ROS_ERROR("!!!!!!!!!!!!!!!!!!!!!!!!!");
-                    }
-
-                    send_command(5);
-                }
-                else
-                // NOTE loopが検出されなくなった瞬間
-                {
-                    ++nextIndex;
-                    io_num = std::to_string(nextIndex) + jpg;
-
-                    send_command();
-                    who_detect.clear();
-                    who_detect[-1] = 0;
-                    who_detect[0] = 0;
+                    ROS_ERROR("!!!!!!!!!!!!!!!!!!!!!!!!!");
                 }
 
-                data = camera.takeImage();
+                send_command(5);
             }
             else
+            // NOTE loopが検出されなくなった瞬間
             {
-                std::cout << "Images are not stored yet..." << std::endl;
-                who_detect.clear();
-                who_detect[-1] = 0;
-                who_detect[0] = 0;
+                ++nextIndex;
+
+                clear_dir();
+
+                io_num = std::to_string(nextIndex) + jpg;
+
+                send_command();
             }
+
+            data = camera.takeImage();
+        }
+        else
+        {
+            ROS_ERROR("Images are not stored yet...");
+
+            exit(1);
         }
         // NOTE loop detect終了
         img_switch.publish(msg);
