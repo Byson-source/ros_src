@@ -44,6 +44,10 @@ private:
     ros::Publisher index_pub;
     ros::Publisher val_pub;
     ros::Publisher img_switch;
+
+    ros::Subscriber confirm;
+
+    int confirm_num{0};
     int nextIndex{1};
 
 public:
@@ -59,6 +63,8 @@ public:
         img_switch = n.advertise<std_msgs::Int32>("loop", 10);
         index_pub = n.advertise<std_msgs::Int32MultiArray>("index_array", 10);
         val_pub = n.advertise<std_msgs::Int32MultiArray>("val_array", 10);
+
+        confirm = n.subscribe("stop_storing", 1000, &Loop_Closure::confirmCB, this);
 
         UFile::erase(database_path);
 
@@ -77,7 +83,7 @@ public:
 
     void send_command(int threshold = 0)
     {
-        for (auto [key, val]: who_detect)
+        for (auto [key, val] : who_detect)
         {
             std_msgs::Int32MultiArray index_array;
             // NOTE　最初のインデックスに1とあったらR1のdetection、2とあったらR2のもの
@@ -137,6 +143,12 @@ public:
 
         data = camera.takeImage();
         // NOTE この時点で、imgの保存が止まっている必要がある
+        while (confirm_num != 1)
+        {
+            if (confirm_num == 1)
+                break;
+        }
+
         while (!data.imageRaw().empty())
         {
             if (UFile::exists(template_path + io_num))
@@ -211,6 +223,11 @@ public:
             ros::spinOnce();
             loop_rate.sleep();
         }
+    }
+
+    void confirmCB(const std_msgs::Int32::ConstPtr &msg)
+    {
+        confirm_num = 1;
     }
 };
 

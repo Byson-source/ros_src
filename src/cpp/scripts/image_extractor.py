@@ -10,7 +10,7 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 # OpenCV2 for saving an image
 from rtabmap_ros.msg import Info
-from std_msgs.msg import String
+from std_msgs.msg import Int32
 
 
 import message_filters
@@ -87,9 +87,14 @@ def callback(rgb, id):
             # NOTE callback2が画像を保存するのをやめるまで待つ
             while(condition["cb2 storing"] == 1):
                 pass
+            
+            # NOTE loop closure nodeに画像が保存し終わったことを伝える
+            msg=Int32()
+            msg.data=1
+            
             # NOTE detectの対象ファイルをまとめる [start:int,end:int]
+            confirm.publish(msg)
             start2end["start"] = start2end["end"]+1
-
             if img_number > img_number2:
                 start2end["end"] = img_number
             else:
@@ -155,7 +160,8 @@ if __name__ == '__main__':
     myid_sub = message_filters.Subscriber(ID_topic, Info)
     myid_sub2 = message_filters.Subscriber(ID_topic2, Info)
 
-    button = rospy.Subscriber("loop", String, loop_CB)
+    button = rospy.Subscriber("loop", Int32, loop_CB)
+    confirm=rospy.Publisher("stop_storing",Int32,queue_size=1)
 
     # ts = message_filters.TimeSynchronizer([rgb_sub, myid_sub], 10)
     ts = message_filters.ApproximateTimeSynchronizer(
