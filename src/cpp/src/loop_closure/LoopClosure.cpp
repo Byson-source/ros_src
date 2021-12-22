@@ -143,8 +143,10 @@ public:
 
         data = camera.takeImage();
         // NOTE この時点で、imgの保存が止まっている必要がある
+        // FIXME そもそも1ループもしていない
         while (confirm_num != 1)
         {
+            std::cout<<"YEEEEE"<<std::endl;
             if (confirm_num == 1)
                 break;
         }
