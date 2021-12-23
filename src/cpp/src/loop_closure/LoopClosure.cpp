@@ -124,7 +124,8 @@ public:
         all_loop[1]["LoopID"].clear();
         all_loop[2]["LoopID"].clear();
     }
-
+    // FIXME whileの中にwhileがあるから動かない？？
+    // NOTE 大量のforを回すことで解決？
     void detection(void)
     {
         std_msgs::Int32 msg;
@@ -144,15 +145,23 @@ public:
         data = camera.takeImage();
         // NOTE この時点で、imgの保存が止まっている必要がある
         // FIXME そもそも1ループもしていない
-        while (confirm_num != 1)
+        for (int wait{0}; wait < 10 ^ 10; ++wait)
         {
-            std::cout<<"YEEEEE"<<std::endl;
-            if (confirm_num == 1)
+            if (wait == 10 ^ 10 - 1)
+            {
+                ROS_ERROR("Can't wait anymore!!");
+                exit(1);
+            }
+            else if (confirm_num == 1)
                 break;
         }
+        // while (confirm_num != 1)
+        // {
+        //     if (confirm_num == 1)
+        //         break;
+        // }
+        for (int wait{0};wait<10^10;++wait){
 
-        while (!data.imageRaw().empty())
-        {
             if (UFile::exists(template_path + io_num))
             {
                 rtabmap.process(data.imageRaw(), nextIndex);
@@ -222,9 +231,11 @@ public:
             }
             // NOTE loop detect終了
             img_switch.publish(msg);
-            ros::spinOnce();
-            loop_rate.sleep();
         }
+        // while (!data.imageRaw().empty())
+        // {
+        ros::spinOnce();
+        loop_rate.sleep();
     }
 
     void confirmCB(const std_msgs::Int32::ConstPtr &msg)
@@ -246,6 +257,7 @@ int main(int argc, char **argv)
 
     while (ros::ok())
     {
+        std::cout << "check" << std::endl;
         detector.detection();
     }
 

@@ -81,7 +81,7 @@ def callback(rgb, id):
         condition["cb1 storing"] = 1
         cv2.imwrite(path + "rgb/"+str(img_number) + ".jpg", cv2_img)
         cv2.imwrite(all_rgb + str(img_number) + ".jpg", cv2_img)
-        print(img_number)
+        print("image storing;"+str(img_number))
 
         img_number += 2
 
@@ -136,7 +136,7 @@ def callback2(rgb, id):
         condition["cb2 storing"] = 1
         cv2.imwrite(path + "rgb/"+str(img_number2) + ".jpg", cv2_img)
         cv2.imwrite(all_rgb + str(img_number2) + ".jpg", cv2_img)
-        print(img_number2)
+        print("image storing;"+str(img_number2))
 
         img_number2 += 2
     # 中止
@@ -152,6 +152,7 @@ def loop_CB(loop):
         already_loop = 1
     else:
         # 中止
+        print(loop.data)
         already_loop = 0
 
 
