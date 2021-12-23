@@ -1,4 +1,5 @@
+import os
 test={}
 test["r"]=1
-if test["o"]==0:
-	print("yes")
+if (os.path.exists("/home/ayumi/")):
+	print("exists")

@@ -22,7 +22,8 @@ private:
     std::vector<int> detection_list;
 
     int robot_number;
-
+    int confirm_num{0};
+    int nextIndex{1};
 
     // NOTE 二秒ごとにimageをチェックする。
     ros::Rate loop_rate{0.5};
@@ -44,9 +45,6 @@ private:
 
     ros::Subscriber confirm;
 
-    int confirm_num{0};
-    int nextIndex{1};
-
 public:
     std::string template_path{"/home/ayumi/Documents/tohoku_uni/CLOVERs/images/rgb/"};
 
@@ -66,7 +64,6 @@ public:
         val_pub = n.advertise<std_msgs::Int32MultiArray>("val_array", 10);
 
         confirm = n.subscribe("stop_storing", 1000, &Loop_Closure::confirmCB, this);
-
 
         std::map<std::string, std::vector<int>> R1_info;
         std::map<std::string, std::vector<int>> R2_info;
@@ -127,6 +124,7 @@ public:
     // NOTE 大量のforを回すことで解決？
     void detection(void)
     {
+
         std_msgs::Int32 msg;
 
         msg.data = 1;
@@ -141,7 +139,7 @@ public:
             ROS_ERROR("Camera init failed!");
             exit(1);
         }
-
+        ROS_ERROR("CHECK!!!");
         std::string jpg{".jpg"};
         std::string io_num{std::to_string(nextIndex) + jpg};
 
@@ -251,17 +249,18 @@ int main(int argc, char **argv)
 {
 
     ros::init(argc, argv, "detection_checker");
+    // NOTE let image node delete dir
+    sleep(10);
 
     Loop_Closure detector;
     size_t thr{10};
     std::string img_name{".jpg"};
 
-
     while (ros::ok())
     {
-    // NOTEまず最初にある程度写真を溜めさせるべき
-        if (UFile::exists(detector.template_path+std::to_string(thr)+img_name)){
-            std::cout << "check" << std::endl;
+        // NOTEまず最初にある程度写真を溜めさせるべき
+        if (UFile::exists(detector.template_path + std::to_string(thr) + img_name))
+        {
             detector.detection();
         }
     }

@@ -25,8 +25,8 @@ all_rgb = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/all_rgb/"
 
 img_number = 1
 img_number2 = 2
-
 already_loop = 1
+
 #NOTE callback1's condition,2's condition
 condition = {"cb1 storing":1,
             "cb1 stocking":0}
@@ -116,7 +116,9 @@ def callback(rgb, id):
             msg.data=1
 
             # NOTE detectの対象ファイルをまとめる [start:int,end:int]
+            print("confirm is publishing...")
             confirm.publish(msg)
+
             start2end["start"] = start2end["end"]+1
             if img_number > img_number2:
                 start2end["end"] = img_number
@@ -149,7 +151,7 @@ def callback2(rgb, id):
 
 
 def loop_CB(loop):
-    global already_loop, stock
+    global already_loop
     if already_loop == 0:
         # 再開
         already_loop = 1
@@ -158,15 +160,24 @@ def loop_CB(loop):
         already_loop = 0
 
 
-if __name__ == '__main__':
-
+def setup():
     shutil.rmtree(path)
+    dir_info=Int32()
+    dir_info.data=1
+
+# NOTE Inform loop node that dir is deleted
 
     os.mkdir(path)
     os.mkdir(all_rgb)
     os.mkdir(path+"/rgb/")
 
+
+if __name__ == '__main__':
+
+
     rospy.init_node('image_listener', anonymous=True)
+
+    setup()
 
     rgb_topic = "/robot1/camera/rgb/image_raw"
     rgb_topic2 = "/robot2/camera/rgb/image_raw"
@@ -185,6 +196,7 @@ if __name__ == '__main__':
     myid_sub2 = message_filters.Subscriber(ID_topic2, Info)
 
     button = rospy.Subscriber("loop", Int32, loop_CB)
+    # NOTE listen that loop node's setup is done
     confirm=rospy.Publisher("stop_storing",Int32,queue_size=1)
 
     # ts = message_filters.TimeSynchronizer([rgb_sub, myid_sub], 10)
