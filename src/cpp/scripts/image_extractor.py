@@ -98,11 +98,14 @@ def callback(rgb, id):
             
             # TODO 連続していないものをtemp_stockに避難させておく.
             l=[img_number,img_number2]
-            l_no=max(l)
+            l_no=max(l)-2
+            # NOTE lはこれかあ作る予定の画像のindex
+            print("Max image num is "+str(l_no))
             while True:
                 if (os.path.exists(path+"rgb/"+str(l_no-1)+".jpg")):
                     break
                 temp_stock[l_no]=cv2.imread(path+"rgb/"+str(l_no)+".jpg")
+                # NOTE FileNotFoundError
                 os.remove(path+"rgb/"+str(l_no)+".jpg")
                 l_no-=2
             # NOTE これで連番になった
@@ -152,7 +155,6 @@ def loop_CB(loop):
         already_loop = 1
     else:
         # 中止
-        print(loop.data)
         already_loop = 0
 
 

@@ -12,8 +12,6 @@
 #include <vector>
 #include <unistd.h>
 
-#define DATABASEPATH "/home/ayumi/Documents/RTAB-Map/rtabmap.db"
-
 //detector, dir_changer,rest_commander
 
 class Loop_Closure
@@ -25,12 +23,11 @@ private:
 
     int robot_number;
 
-    std::string template_path{"/home/ayumi/Documents/tohoku_uni/CLOVERs/images/rgb/"};
 
     // NOTE 二秒ごとにimageをチェックする。
     ros::Rate loop_rate{0.5};
 
-    std::string database_path{DATABASEPATH};
+    std::string database_path{"/home/ayumi/Documents/RTAB-Map/rtabmap.db"};
 
     std::map<int, std::map<std::string, std::vector<int>>> who_detect;
     // NOTE {int robotID;{"index":std::vector<int>,"LoopID":std::vector<int>}} このindexには連続するものしか入らない
@@ -51,14 +48,18 @@ private:
     int nextIndex{1};
 
 public:
-    Loop_Closure(int num) : robot_number(num)
+    std::string template_path{"/home/ayumi/Documents/tohoku_uni/CLOVERs/images/rgb/"};
+
+    Loop_Closure() : robot_number(2)
     {
         rtabmap.setTimeThreshold(700.0f); // Time threshold : 700 ms, 0 ms means no limit
 
         parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRtabmapLoopThr(), "0.2"));
         parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRGBDEnabled(), "false"));
 
-        rtabmap.init(parameters, DATABASEPATH);
+        // UFile::erase(database_path);
+        // NOTE 何故か強制シャットダウンする。.ros/rtabmap.dbを消すと治った？？
+        rtabmap.init(parameters, database_path);
 
         img_switch = n.advertise<std_msgs::Int32>("loop", 10);
         index_pub = n.advertise<std_msgs::Int32MultiArray>("index_array", 10);
@@ -66,7 +67,6 @@ public:
 
         confirm = n.subscribe("stop_storing", 1000, &Loop_Closure::confirmCB, this);
 
-        UFile::erase(database_path);
 
         std::map<std::string, std::vector<int>> R1_info;
         std::map<std::string, std::vector<int>> R2_info;
@@ -124,7 +124,6 @@ public:
         all_loop[1]["LoopID"].clear();
         all_loop[2]["LoopID"].clear();
     }
-    // FIXME whileの中にwhileがあるから動かない？？
     // NOTE 大量のforを回すことで解決？
     void detection(void)
     {
@@ -136,18 +135,21 @@ public:
         // NOTE Loop Detect開始(msgの内容はどうでもいい)
 
         rtabmap::CameraImages camera(template_path);
-
-        camera.init();
+        // NOTE ディレクトリができるのを待つ必要がある.
+        if (!camera.init())
+        {
+            ROS_ERROR("Camera init failed!");
+            exit(1);
+        }
 
         std::string jpg{".jpg"};
         std::string io_num{std::to_string(nextIndex) + jpg};
 
         data = camera.takeImage();
         // NOTE この時点で、imgの保存が止まっている必要がある
-        // FIXME そもそも1ループもしていない
-        for (int wait{0}; wait < 10 ^ 10; ++wait)
+        for (int wait{0}; wait < std::pow(10, 9); ++wait)
         {
-            if (wait == 10 ^ 10 - 1)
+            if (wait == std::pow(10, 9) - 1)
             {
                 ROS_ERROR("Can't wait anymore!!");
                 exit(1);
@@ -160,7 +162,8 @@ public:
         //     if (confirm_num == 1)
         //         break;
         // }
-        for (int wait{0};wait<10^10;++wait){
+        for (int wait{0}; wait < std::pow(10, 9); ++wait)
+        {
 
             if (UFile::exists(template_path + io_num))
             {
@@ -249,16 +252,18 @@ int main(int argc, char **argv)
 
     ros::init(argc, argv, "detection_checker");
 
-    ros::NodeHandle pnh("~");
-    int number;
-    pnh.getParam("robot_num", number);
+    Loop_Closure detector;
+    size_t thr{10};
+    std::string img_name{".jpg"};
 
-    Loop_Closure detector(number);
 
     while (ros::ok())
     {
-        std::cout << "check" << std::endl;
-        detector.detection();
+    // NOTEまず最初にある程度写真を溜めさせるべき
+        if (UFile::exists(detector.template_path+std::to_string(thr)+img_name)){
+            std::cout << "check" << std::endl;
+            detector.detection();
+        }
     }
 
     return 0;
