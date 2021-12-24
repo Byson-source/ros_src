@@ -50,6 +50,9 @@ private:
 public:
     Loop_Closure() : robot_number(2)
     {
+        // REVIEW ここのデータベースを消さずにrtabmapのインスタンスを作ると、前回のdetectionの記憶を引き継ぐことができる。
+        UFile::erase(database_path);
+
         rtabmap.setTimeThreshold(700.0f); // Time threshold : 700 ms, 0 ms means no limit
 
         parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRtabmapLoopThr(), "0.2"));
@@ -123,7 +126,6 @@ public:
         all_loop[1]["LoopID"].clear();
         all_loop[2]["LoopID"].clear();
     }
-    // FIXME main関数内でwhileループを使うな
     void detection(const std_msgs::Int32::ConstPtr &turn_on)
     {
 
@@ -254,7 +256,6 @@ public:
         ros::spinOnce();
         loop_rate.sleep();
     }
-    // FIXME
 
     void confirm_CB(const std_msgs::Int32::ConstPtr &msg)
     {
@@ -269,6 +270,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "detection_checker");
     Loop_Closure detector;
 
+    // WARNING classを使う場合、publishするのにmain関数内でwhileループを使うな.
     ros::spin();
 
     return 0;
