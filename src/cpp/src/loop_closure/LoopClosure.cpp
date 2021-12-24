@@ -28,6 +28,7 @@ private:
     // NOTE 二秒ごとにimageをチェックする。
     ros::Rate loop_rate{0.5};
 
+    std::string template_path{"/home/ayumi/Documents/tohoku_uni/CLOVERs/images/rgb/"};
     std::string database_path{"/home/ayumi/Documents/RTAB-Map/rtabmap.db"};
 
     std::map<int, std::map<std::string, std::vector<int>>> who_detect;
@@ -43,11 +44,10 @@ private:
     ros::Publisher val_pub;
     ros::Publisher img_switch;
 
+    ros::Subscriber switch_sub;
     ros::Subscriber confirm;
 
 public:
-    std::string template_path{"/home/ayumi/Documents/tohoku_uni/CLOVERs/images/rgb/"};
-
     Loop_Closure() : robot_number(2)
     {
         rtabmap.setTimeThreshold(700.0f); // Time threshold : 700 ms, 0 ms means no limit
@@ -59,10 +59,11 @@ public:
         // NOTE 何故か強制シャットダウンする。.ros/rtabmap.dbを消すと治った？？
         rtabmap.init(parameters, database_path);
 
-        img_switch = n.advertise<std_msgs::Int32>("loop", 10);
         index_pub = n.advertise<std_msgs::Int32MultiArray>("index_array", 10);
         val_pub = n.advertise<std_msgs::Int32MultiArray>("val_array", 10);
+        img_switch = n.advertise<std_msgs::Int32>("loop", 10);
 
+        switch_sub = n.subscribe("command", 1000, &Loop_Closure::detection, this);
         confirm = n.subscribe("stop_storing", 1000, &Loop_Closure::confirmCB, this);
 
         std::map<std::string, std::vector<int>> R1_info;
@@ -121,16 +122,16 @@ public:
         all_loop[1]["LoopID"].clear();
         all_loop[2]["LoopID"].clear();
     }
-    // NOTE 大量のforを回すことで解決？
-    void detection(void)
+    // FIXME main関数内でwhileループを使うな
+    void detection(const std_msgs::Int32::ConstPtr &turn_on)
     {
 
         std_msgs::Int32 msg;
 
         msg.data = 1;
 
-        img_switch.publish(msg);
         // NOTE Loop Detect開始(msgの内容はどうでもいい)
+        img_switch.publish(msg);
 
         rtabmap::CameraImages camera(template_path);
         // NOTE ディレクトリができるのを待つ必要がある.
@@ -139,7 +140,7 @@ public:
             ROS_ERROR("Camera init failed!");
             exit(1);
         }
-        
+
         ROS_ERROR("CHECK!!!");
         std::string jpg{".jpg"};
         std::string io_num{std::to_string(nextIndex) + jpg};
@@ -156,7 +157,7 @@ public:
                 break;
         }
         data = camera.takeImage();
-        
+
         for (int wait{0}; wait < std::pow(10, 9); ++wait)
         {
 
@@ -246,22 +247,9 @@ int main(int argc, char **argv)
 {
 
     ros::init(argc, argv, "detection_checker");
-    // NOTE let image node delete dir
-    sleep(10);
 
     Loop_Closure detector;
-    size_t thr{10};
-    std::string img_name{".jpg"};
-
-    while (ros::ok())
-    {
-        // NOTEまず最初にある程度写真を溜めさせるべき
-        if (UFile::exists(detector.template_path + std::to_string(thr) + img_name))
-        {
-            detector.detection();
-        }
-    }
-
+    
     ros::spin();
 
     return 0;

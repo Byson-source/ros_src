@@ -146,10 +146,10 @@ def loop_CB(loop):
     else:
         # 中止
         already_loop = 0
-        rospy.loginfo("loop")
 
 
 def setup():
+    global condition
     shutil.rmtree(path)
 
     os.mkdir(path)
@@ -161,9 +161,6 @@ if __name__ == '__main__':
 
 
     rospy.init_node('image_listener', anonymous=True)
-
-
-    setup()
 
     rgb_topic = "/robot1/camera/rgb/image_raw"
     rgb_topic2 = "/robot2/camera/rgb/image_raw"
@@ -195,4 +192,14 @@ if __name__ == '__main__':
         [rgb_sub2, myid_sub2], 10, 0.1, allow_headerless=False)
     ts2.registerCallback(callback2)
     # rospy.Subscriber(image_topic, Image, rgb_callback)
+    switch=rospy.Publisher("command",Int32,queue_size=10)
+    setup()
+
+    while not rospy.is_shutdown():
+        if(img_number>10):
+            turn_on=Int32()
+            turn_on.data=1
+            switch.publish(turn_on)
+
+
     rospy.spin()
