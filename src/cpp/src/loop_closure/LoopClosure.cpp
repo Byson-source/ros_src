@@ -26,7 +26,6 @@ private:
     int nextIndex{1};
 
     // NOTE 二秒ごとにimageをチェックする。
-    ros::Rate loop_rate{0.5};
 
     std::string template_path{"/home/ayumi/Documents/tohoku_uni/CLOVERs/images/rgb/"};
     std::string database_path{"/home/ayumi/Documents/RTAB-Map/rtabmap.db"};
@@ -253,8 +252,6 @@ public:
             // {
         }
         img_switch.publish(msg);
-        ros::spinOnce();
-        loop_rate.sleep();
     }
 
     void confirm_CB(const std_msgs::Int32::ConstPtr &msg)

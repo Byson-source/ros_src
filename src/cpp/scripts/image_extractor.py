@@ -156,6 +156,11 @@ def setup():
     os.mkdir(all_rgb)
     os.mkdir(path+"/rgb/")
 
+def timerCB(event):
+    turn_on=Int32()
+    turn_on.data=1
+    switch.publish(turn_on)
+
 
 if __name__ == '__main__':
 
@@ -195,11 +200,11 @@ if __name__ == '__main__':
     switch=rospy.Publisher("command",Int32,queue_size=10)
     setup()
 
-    while not rospy.is_shutdown():
-        if(img_number>10):
-            turn_on=Int32()
-            turn_on.data=1
-            switch.publish(turn_on)
+    # NOTE 5秒に一度detection nodeを呼び込む
+    while img_number<10:
+        pass
+    rospy.Timer(rospy.Duration(5),timerCB)
 
 
+    # REVIEW rospy spinが出ている時点でrate.sleepを用いて定時でpublishすることは不可能になる.
     rospy.spin()
