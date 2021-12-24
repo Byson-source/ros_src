@@ -24,6 +24,7 @@ private:
     int robot_number;
     int confirm_num{0};
     int nextIndex{1};
+    int iter{0};
 
     // NOTE 二秒ごとにimageをチェックする。
     ros::Rate loop_rate{0.5};
@@ -40,9 +41,9 @@ private:
     rtabmap::ParametersMap parameters;
     rtabmap::SensorData data;
 
-    ros::Publisher index_pub;
-    ros::Publisher val_pub;
     ros::Publisher img_switch;
+    ros::Publisher val_pub;
+    ros::Publisher index_pub;
 
     ros::Subscriber switch_sub;
     ros::Subscriber confirm;
@@ -59,9 +60,9 @@ public:
         // REVIEW 何故か強制シャットダウンする。.ros/rtabmap.dbを消すと治った？？
         rtabmap.init(parameters, database_path);
 
+        img_switch = n.advertise<std_msgs::Int32>("loop", 10);
         index_pub = n.advertise<std_msgs::Int32MultiArray>("index_array", 10);
         val_pub = n.advertise<std_msgs::Int32MultiArray>("val_array", 10);
-        img_switch = n.advertise<std_msgs::Int32>("loop", 10);
 
         // FIXME
         confirm = n.subscribe("stop_storing", 1000, &Loop_Closure::confirm_CB, this);
@@ -123,16 +124,21 @@ public:
         all_loop[1]["LoopID"].clear();
         all_loop[2]["LoopID"].clear();
     }
-    // FIXME main関数内でwhileループを使うな
+
     void detection(const std_msgs::Int32::ConstPtr &turn_on)
     {
+        iter += 1;
 
         std_msgs::Int32 msg;
 
         msg.data = 1;
 
         // NOTE Loop Detect開始(msgの内容はどうでもいい)
-        img_switch.publish(msg);
+        if (iter == 1)
+        {
+
+            img_switch.publish(msg);
+        }
 
         rtabmap::CameraImages camera(template_path);
         // NOTE ディレクトリができるのを待つ必要がある.
@@ -142,107 +148,26 @@ public:
             exit(1);
         }
 
-        ROS_ERROR("CHECK!!!");
         std::string jpg{".jpg"};
         std::string io_num{std::to_string(nextIndex) + jpg};
-
-        // NOTE この時点で、imgの保存が止まっている必要がある
+        int iter{0};
         // REVIEW ここをwhileにすると、confirmCBが動かなくなる.→confirm_numを参照できなくなる？？
         // REVIEW sleepは全ての機能を一時停止にする
         // WARNING CBにwhileを書いてはいけない.forなら耐える
-        for (int iteration{0};iteration<200;++iteration){
-            if(confirm_num==1)
-                break;
-        }
-        ROS_INFO("Confirmed");
-        
-        data = camera.takeImage();
-
-        if(data.imageRaw().empty()){
-            ROS_ERROR("Images are not stored");
-            exit(1);
-        }
-
-        for(int iteration{0};iteration<std::pow(10,3);++iteration)
+        for (int i{0};i<100;++i)
         {
-
-            if (UFile::exists(template_path + io_num))
-            {
-                rtabmap.process(data.imageRaw(), nextIndex);
-
-                if (rtabmap.getLoopClosureId())
-                {
-                    printf("time(%fs) STM(%d) WM(%d) hyp(%d) value(%.2f) *LOOP %d->%d*\n",
-                           rtabmap.getLastProcessTime(),
-                           (int)rtabmap.getSTM().size(), // short-term memory
-                           (int)rtabmap.getWM().size(),  // working memory
-                           rtabmap.getLoopClosureId(),
-                           rtabmap.getLoopClosureValue(),
-                           nextIndex,
-                           rtabmap.getLoopClosureId());
-                    ++nextIndex;
-                    io_num = std::to_string(nextIndex) + jpg;
-                    if ((nextIndex - rtabmap.getLoopClosureId()) % 2 == 1)
-                    {
-                        if (nextIndex % 2 == 1)
-                        {
-                            // NOTE R1が検知
-                            // NOTE loopが連続しているか否か
-                            if ((all_loop[1]["index"].size() > 0) && (all_loop[1]["index"].back() == nextIndex - 1))
-                            {
-                                who_detect[1]["index"].push_back(nextIndex);
-                                who_detect[1]["LoopID"].push_back(rtabmap.getLoopClosureId());
-                            }
-                        }
-
-                        else
-                        // NOTE R2が検知
-                        {
-                            if ((all_loop[2]["index"].size() > 0) && (all_loop[2]["index"].back() == nextIndex - 1))
-                            {
-                                who_detect[2]["index"].push_back(nextIndex);
-                                who_detect[2]["LoopID"].push_back(rtabmap.getLoopClosureId());
-                            }
-
-                            all_loop[2]["index"].push_back(nextIndex);
-                            all_loop[2]["LoopID"].push_back(rtabmap.getLoopClosureId());
-                        }
-
-                        ROS_ERROR("!!!!!!!!!!!!!!!!!!!!!!!!!");
-
-                        send_command(5);
-                    }
-                    else
-                    // NOTE loopが検出されなくなった瞬間
-                    {
-                        ++nextIndex;
-
-                        clear_dir();
-
-                        io_num = std::to_string(nextIndex) + jpg;
-
-                        send_command();
-                    }
-
-                    data = camera.takeImage();
-                }
-                // NOTE loop detect終了
-                img_switch.publish(msg);
-            }
-            // while (!data.imageRaw().empty())
-            // {
-            ros::spinOnce();
-            loop_rate.sleep();
+            if (confirm_num == 1)
+                break;
+            ROS_ERROR("HEY");
         }
 
+        // NOTE この時点で、imgの保存が止まっている必要がある
     }
-// FIXME
-
-
-    void confirm_CB(const std_msgs::Int32::ConstPtr &msg)
+    // FIXME
+    void confirm_CB(const std_msgs::String::ConstPtr &msg)
     {
-        ROS_INFO("Hi");
-        confirm_num = msg->data;
+        ROS_ERROR("Hi");
+        confirm_num = 1;
     }
 };
 

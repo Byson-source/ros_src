@@ -48,6 +48,7 @@ def callback(rgb, id):
     cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
 
     # REVIEW 再開
+    # FIXME already_loopが再更新？？
     if already_loop == 1:
         condition["cb1 stocking"]=0
         # NOTE 初回を除く
@@ -149,7 +150,6 @@ def loop_CB(loop):
 
 
 def setup():
-    global condition
     shutil.rmtree(path)
 
     os.mkdir(path)
