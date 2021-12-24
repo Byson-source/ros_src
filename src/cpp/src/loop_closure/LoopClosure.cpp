@@ -142,7 +142,6 @@ public:
             exit(1);
         }
 
-        ROS_ERROR("CHECK!!!");
         std::string jpg{".jpg"};
         std::string io_num{std::to_string(nextIndex) + jpg};
 
@@ -150,37 +149,42 @@ public:
         // REVIEW ここをwhileにすると、confirmCBが動かなくなる.→confirm_numを参照できなくなる？？
         // REVIEW sleepは全ての機能を一時停止にする
         // WARNING CBにwhileを書いてはいけない.forなら耐える
-        for (int iteration{0};iteration<200;++iteration){
-            if(confirm_num==1)
+        for (int iteration{0}; iteration < 200; ++iteration)
+        {
+            if (confirm_num == 1)
                 break;
         }
-        ROS_INFO("Confirmed");
-        
-        data = camera.takeImage();
 
-        if(data.imageRaw().empty()){
+        ROS_INFO("Confirmed");
+
+        data = camera.takeImage();
+        int i = 0;
+
+        if (data.imageRaw().empty())
+        {
             ROS_ERROR("Images are not stored");
             exit(1);
         }
 
-        for(int iteration{0};iteration<std::pow(10,3);++iteration)
+        for (int iteration{0}; iteration < std::pow(10, 3); ++iteration)
         {
+            i += 1;
 
-            if (UFile::exists(template_path + io_num))
+            if (!data.imageRaw().empty())
             {
                 rtabmap.process(data.imageRaw(), nextIndex);
 
                 if (rtabmap.getLoopClosureId())
                 {
-                    printf("time(%fs) STM(%d) WM(%d) hyp(%d) value(%.2f) *LOOP %d->%d*\n",
+                    printf(" #%d ptime(%fs) STM(%d) WM(%d) hyp(%d) value(%.2f) *LOOP %d->%d*\n",
+                           i,
                            rtabmap.getLastProcessTime(),
                            (int)rtabmap.getSTM().size(), // short-term memory
                            (int)rtabmap.getWM().size(),  // working memory
-                           rtabmap.getLoopClosureId(),
-                           rtabmap.getLoopClosureValue(),
+                           (int)rtabmap.getLoopClosureId(),
+                           (float)rtabmap.getLoopClosureValue(),
                            nextIndex,
-                           rtabmap.getLoopClosureId());
-                    ++nextIndex;
+                           (int)rtabmap.getLoopClosureId());
                     io_num = std::to_string(nextIndex) + jpg;
                     if ((nextIndex - rtabmap.getLoopClosureId()) % 2 == 1)
                     {
@@ -215,7 +219,6 @@ public:
                     else
                     // NOTE loopが検出されなくなった瞬間
                     {
-                        ++nextIndex;
 
                         clear_dir();
 
@@ -223,21 +226,35 @@ public:
 
                         send_command();
                     }
+                }
+                else
+                {
 
-                    data = camera.takeImage();
+                    printf(" #%d ptime(%fs) STM(%d) WM(%d) hyp(%d) value(%.2f)\n",
+                           i,
+                           rtabmap.getLastProcessTime(),
+                           (int)rtabmap.getSTM().size(),     // short-term memory
+                           (int)rtabmap.getWM().size(),      // working memory
+                           rtabmap.getHighestHypothesisId(), // highest loop closure hypothesis
+                           rtabmap.getLoopClosureValue());
                 }
                 // NOTE loop detect終了
-                img_switch.publish(msg);
+
+                ++nextIndex;
+                data = camera.takeImage();
+            }
+            else
+            {
+                break;
             }
             // while (!data.imageRaw().empty())
             // {
-            ros::spinOnce();
-            loop_rate.sleep();
         }
-
+        img_switch.publish(msg);
+        ros::spinOnce();
+        loop_rate.sleep();
     }
-// FIXME
-
+    // FIXME
 
     void confirm_CB(const std_msgs::Int32::ConstPtr &msg)
     {
