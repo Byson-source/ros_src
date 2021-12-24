@@ -47,7 +47,7 @@ def callback(rgb, id):
 # FIXME Maybe should change to (640,480)
     cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
 
-    # 再開
+    # REVIEW 再開
     if already_loop == 1:
         condition["cb1 stocking"]=0
         # NOTE 初回を除く
@@ -82,7 +82,7 @@ def callback(rgb, id):
 
         stock.clear()
 
-    # 中止
+    # REVIEW 中止
     else:
         condition["cb1 storing"] = 0
 
