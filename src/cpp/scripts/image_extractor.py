@@ -48,14 +48,56 @@ def callback(rgb, id):
     cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
 
     # REVIEW 再開
-    # FIXME already_loopが再更新？？
+    # FIXME このままだとalready_loopがパブリッシュされた瞬間に以下の処理を実行できない
     if already_loop == 1:
+        condition["cb1 storing"] = 1
+        cv2.imwrite(path + "rgb/"+str(img_number) + ".jpg", cv2_img)
+        cv2.imwrite(all_rgb + str(img_number) + ".jpg", cv2_img)
+        print("image storing;"+str(img_number))
+
+        img_number += 2
+
+        condition["cb1 storing"] = 0
+
+        stock.clear()
+
+    # REVIEW 中止
+    else:
+        stock[str(img_number)] = cv2_img
+
+
+
+def callback2(rgb, id):
+    global img_number2, stock, condition
+
+    cv2_img = bridge.imgmsg_to_cv2(rgb, "bgr8")
+# FIXME Maybe should change to (640,480)
+    cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
+    # 再開
+    if already_loop == 1:
+        condition["cb2 storing"] = 1
+        cv2.imwrite(path + "rgb/"+str(img_number2) + ".jpg", cv2_img)
+        cv2.imwrite(all_rgb + str(img_number2) + ".jpg", cv2_img)
+        print("image storing;"+str(img_number2))
+
+        img_number2 += 2
+        condition["cb2 storing"] = 0
+    # 中止
+    else:
+        stock[str(img_number2)] = cv2_img
+
+
+def loop_CB(loop):
+    global already_loop
+    if already_loop == 0:
+        # 再開
+        already_loop = 1
         condition["cb1 stocking"]=0
         # NOTE 初回を除く
         if condition["cb1 storing"] == 0:
-
+    
             # NOTE Erase detected images
-
+            # FIXME can't remove
             for file_num in range(start2end["start"], start2end["end"]):
                 os.remove(path + "rgb/"+str(file_num) + ".jpg")
 
@@ -72,19 +114,10 @@ def callback(rgb, id):
                 for index,img in temp_stock:
                     cv2.imwrite(path + "rgb/"+str(index) + ".jpg", img)
 
-
-        # NOTE ↓normal
-        condition["cb1 storing"] = 1
-        cv2.imwrite(path + "rgb/"+str(img_number) + ".jpg", cv2_img)
-        cv2.imwrite(all_rgb + str(img_number) + ".jpg", cv2_img)
-        print("image storing;"+str(img_number))
-
-        img_number += 2
-
-        stock.clear()
-
-    # REVIEW 中止
     else:
+        # 中止
+        already_loop = 0
+
         condition["cb1 storing"] = 0
 
         # NOTE callback2が画像を保存するのをやめるまで待つ
@@ -116,37 +149,6 @@ def callback(rgb, id):
 
         
         condition["cb1 stocking"]=1
-        stock[str(img_number)] = cv2_img
-
-
-def callback2(rgb, id):
-    global img_number2, stock, condition
-
-    cv2_img = bridge.imgmsg_to_cv2(rgb, "bgr8")
-# FIXME Maybe should change to (640,480)
-    cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
-    # 再開
-    if already_loop == 1:
-        condition["cb2 storing"] = 1
-        cv2.imwrite(path + "rgb/"+str(img_number2) + ".jpg", cv2_img)
-        cv2.imwrite(all_rgb + str(img_number2) + ".jpg", cv2_img)
-        print("image storing;"+str(img_number2))
-
-        img_number2 += 2
-    # 中止
-    else:
-        condition["cb2 storing"] = 0
-        stock[str(img_number2)] = cv2_img
-
-
-def loop_CB(loop):
-    global already_loop
-    if already_loop == 0:
-        # 再開
-        already_loop = 1
-    else:
-        # 中止
-        already_loop = 0
 
 
 def setup():
