@@ -1,5 +1,4 @@
 # FIXME This works only for few robots. If you want, convert this into C++.
-# TODO 連番が崩れるときがあるので、loop nodeに許可を与えるときに工夫する
 #! /usr/bin/python
 import rospy
 
@@ -28,6 +27,7 @@ img_number2 = 2
 already_loop = 1
 
 #NOTE callback1's condition,2's condition
+# cb1 storing, cb1 stocking, cb2 storing 
 condition = {"cb1 storing":1,
             "cb1 stocking":0}
 
@@ -41,7 +41,7 @@ bridge = CvBridge()
 
 
 def callback(rgb, id):
-    global img_number, img_number2, already_loop, stock, start2end, condition
+    global img_number, stock, start2end, condition
 
     cv2_img = bridge.imgmsg_to_cv2(rgb, "bgr8")
 # FIXME Maybe should change to (640,480)
@@ -49,21 +49,17 @@ def callback(rgb, id):
 
     # 再開
     if already_loop == 1:
-
+        condition["cb1 stocking"]=0
+        # NOTE 初回を除く
         if condition["cb1 storing"] == 0:
 
-            condition["cb1 erasing"] = 1
             # NOTE Erase detected images
-            # NOTE start2endが正しければ問題ないはず。。。
 
             for file_num in range(start2end["start"], start2end["end"]):
                 os.remove(path + "rgb/"+str(file_num) + ".jpg")
 
-            condition["cb1 erasing"] = 0
+            # NOTE Now store the images which were stored during loop closure detection
 
-        # NOTE Now store the images which were stored during loop closure detection
-
-            condition["cb1 recovering"] = 1
             if ("start" in start2end):
                 # NOTE wait until cb2 begins its work and now stock is fully stored
                 while (condition["cb2 storing"] == 0):
@@ -75,7 +71,6 @@ def callback(rgb, id):
                 for index,img in temp_stock:
                     cv2.imwrite(path + "rgb/"+str(index) + ".jpg", img)
 
-            condition["cb1 recovering"] = 0
 
         # NOTE ↓normal
         condition["cb1 storing"] = 1
@@ -91,39 +86,32 @@ def callback(rgb, id):
     else:
         condition["cb1 storing"] = 0
 
-        if(condition["cb1 stocking"] == 0):
-            # NOTE callback2が画像を保存するのをやめるまで待つ
-            while(condition["cb2 storing"] == 1):
-                pass
-            
-            # TODO 連続していないものをtemp_stockに避難させておく.
-            l=[img_number,img_number2]
-            l_no=max(l)-2
-            # NOTE lはこれかあ作る予定の画像のindex
-            print("Max image num is "+str(l_no))
-            while True:
-                if (os.path.exists(path+"rgb/"+str(l_no-1)+".jpg")):
-                    break
-                temp_stock[l_no]=cv2.imread(path+"rgb/"+str(l_no)+".jpg")
-                # NOTE FileNotFoundError
-                os.remove(path+"rgb/"+str(l_no)+".jpg")
-                l_no-=2
-            # NOTE これで連番になった
-            # condition["seq_end"]=l_no
+        # NOTE callback2が画像を保存するのをやめるまで待つ
+        while(condition["cb2 storing"] == 1):
+            pass
+        
+        # NOTE 連続していないものをtemp_stockに避難させておく.
+        l=[img_number,img_number2]
+        l_no=max(l)-2
+        # NOTE lはこれから作る予定の画像index
+        print("Max image num is "+str(l_no))
+        while True:
+            if (os.path.exists(path+"rgb/"+str(l_no-1)+".jpg")):
+                break
+            temp_stock[l_no]=cv2.imread(path+"rgb/"+str(l_no)+".jpg")
+            os.remove(path+"rgb/"+str(l_no)+".jpg")
+            l_no-=2
 
-                # NOTE loop closure nodeに画像が保存し終わったことを伝える
-            msg=Int32()
-            msg.data=1
+        # NOTE loop closure nodeに画像が保存し終わったことを伝える
+        msg.data=1
+        confirm.publish(msg)
 
-            # NOTE detectの対象ファイルをまとめる [start:int,end:int]
-            print("confirm is publishing...")
-            confirm.publish(msg)
-
-            start2end["start"] = start2end["end"]+1
-            if img_number > img_number2:
-                start2end["end"] = img_number
-            else:
-                start2end["end"] = img_number2
+        # NOTE detectの対象ファイルをまとめる [start:int,end:int]
+        start2end["start"] = start2end["end"]+1
+        if img_number > img_number2:
+            start2end["end"] = img_number
+        else:
+            start2end["end"] = img_number2
 
         
         condition["cb1 stocking"]=1
@@ -131,7 +119,7 @@ def callback(rgb, id):
 
 
 def callback2(rgb, id):
-    global img_number2, already_loop, stock, condition
+    global img_number2, stock, condition
 
     cv2_img = bridge.imgmsg_to_cv2(rgb, "bgr8")
 # FIXME Maybe should change to (640,480)
@@ -158,14 +146,11 @@ def loop_CB(loop):
     else:
         # 中止
         already_loop = 0
+        rospy.loginfo("loop")
 
 
 def setup():
     shutil.rmtree(path)
-    dir_info=Int32()
-    dir_info.data=1
-
-# NOTE Inform loop node that dir is deleted
 
     os.mkdir(path)
     os.mkdir(all_rgb)
@@ -177,13 +162,13 @@ if __name__ == '__main__':
 
     rospy.init_node('image_listener', anonymous=True)
 
+
     setup()
 
     rgb_topic = "/robot1/camera/rgb/image_raw"
     rgb_topic2 = "/robot2/camera/rgb/image_raw"
 
     ID_topic = "/robot1/rtabmap/info"
-    # FIXME Fix to make it more easy to use for any-number usage
     ID_topic2 = "/robot2/rtabmap/info"
     # # To store the images from camera
 
@@ -196,8 +181,10 @@ if __name__ == '__main__':
     myid_sub2 = message_filters.Subscriber(ID_topic2, Info)
 
     button = rospy.Subscriber("loop", Int32, loop_CB)
-    # NOTE listen that loop node's setup is done
+
+    msg=Int32()
     confirm=rospy.Publisher("stop_storing",Int32,queue_size=1)
+    #NOTE  loop nodeが起動する頃には画像の保存が終了している必要がある
 
     # ts = message_filters.TimeSynchronizer([rgb_sub, myid_sub], 10)
     ts = message_filters.ApproximateTimeSynchronizer(

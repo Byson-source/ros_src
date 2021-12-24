@@ -139,11 +139,11 @@ public:
             ROS_ERROR("Camera init failed!");
             exit(1);
         }
+        
         ROS_ERROR("CHECK!!!");
         std::string jpg{".jpg"};
         std::string io_num{std::to_string(nextIndex) + jpg};
 
-        data = camera.takeImage();
         // NOTE この時点で、imgの保存が止まっている必要がある
         for (int wait{0}; wait < std::pow(10, 9); ++wait)
         {
@@ -155,11 +155,8 @@ public:
             else if (confirm_num == 1)
                 break;
         }
-        // while (confirm_num != 1)
-        // {
-        //     if (confirm_num == 1)
-        //         break;
-        // }
+        data = camera.takeImage();
+        
         for (int wait{0}; wait < std::pow(10, 9); ++wait)
         {
 
@@ -264,6 +261,8 @@ int main(int argc, char **argv)
             detector.detection();
         }
     }
+
+    ros::spin();
 
     return 0;
 }
