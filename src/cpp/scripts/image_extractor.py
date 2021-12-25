@@ -132,10 +132,7 @@ def loop_CB(loop):
         for num in range(10**4):
             if (os.path.exists(path+"rgb/"+str(l_no-1)+".jpg")):
                 break
-            # FIXME 読み込めない
-            rospy.loginfo("!!!!!!!!!!!!!!!!!!!!!!!!!")
-            print(os.path.exists(path+"rgb/"+str(l_no)+".jpg"))
-            rospy.loginfo("!!!!!!!!!!!!!!!!!!!!!!!!!")
+            # NOTE なんかエラーが出るけど、うまく読み込めてはいるっぽい
             temp_stock[l_no]=cv2.imread(path+"rgb/"+str(l_no)+".jpg")
             os.remove(path+"rgb/"+str(l_no)+".jpg")
             l_no-=2
