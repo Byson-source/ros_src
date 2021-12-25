@@ -1,5 +1,5 @@
 import os
 test={}
-test["r"]=1
-if (os.path.exists("/home/ayumi/")):
-	print("exists")
+test["15"]=1
+for (index,val) in enumerate(test):
+	print(index)

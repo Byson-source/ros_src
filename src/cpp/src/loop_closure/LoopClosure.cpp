@@ -156,8 +156,6 @@ public:
                 break;
         }
 
-        ROS_INFO("Confirmed");
-
         data = camera.takeImage();
         int i = 0;
 
@@ -256,7 +254,6 @@ public:
 
     void confirm_CB(const std_msgs::Int32::ConstPtr &msg)
     {
-        ROS_INFO("Hi");
         confirm_num = msg->data;
     }
 };
