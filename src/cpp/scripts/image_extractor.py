@@ -61,6 +61,7 @@ def callback(rgb, id):
     # REVIEW 中止
     else:
         rospy.loginfo("CB1 stocking img "+str(img_number))
+        cv2.imwrite(all_rgb + str(img_number) + ".jpg", cv2_img)
         stock[str(img_number)] = cv2_img
 
     img_number += 2
@@ -83,6 +84,7 @@ def callback2(rgb, id):
     # 中止
     else:
         rospy.loginfo("CB2 stocking img "+str(img_number2))
+        cv2.imwrite(all_rgb + str(img_number2) + ".jpg", cv2_img)
         stock[str(img_number2)] = cv2_img
 
     img_number2 += 2
