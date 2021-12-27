@@ -206,7 +206,7 @@ if __name__ == '__main__':
     # NOTE 5秒に一度detection nodeを呼び込む
     while img_number<10:
         pass
-    rospy.Timer(rospy.Duration(5),timerCB)
+    rospy.Timer(rospy.Duration(7),timerCB)
 
 
     # REVIEW rospy spinが出ている時点でrate.sleepを用いて定時でpublishすることは不可能になる.

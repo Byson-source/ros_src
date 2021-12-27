@@ -1,7 +1,5 @@
-// FIXME loopが連続すると"つられ"現象が起こる。True positiveが異なるロボット間で起きた→つられ現象によりFPになった場合、半数作業が必要？
-// FIXME 観察するディレクトリは1と2ロボットから同じ数だけあるはず。それぞれのロボットが連続するようにソートしてから読み込む
+// FIXME loopが連続すると"つられ"現象が起こる。True positiveが異なるロボット間で起きた→つられ現象によりFPになった場合、反芻作業が必要？
 // FIXME TPとFPのふるいわけ
-// TODO STMを40にする
 #include "rtabmap/core/Rtabmap.h"
 #include "rtabmap/core/CameraRGB.h"
 #include <opencv2/core/core.hpp>
@@ -31,8 +29,8 @@ private:
     int robot_number;
     int confirm_num{0};
     int nextIndex{1};
-
-    // NOTE 二秒ごとにimageをチェックする。
+    int criteria{0};
+    // hypothesis criteria
 
     std::string template_path{"/home/ayumi/Documents/tohoku_uni/CLOVERs/images/rgb/"};
     std::string database_path{"/home/ayumi/Documents/RTAB-Map/rtabmap.db"};
@@ -42,7 +40,6 @@ private:
     std::map<int, std::map<std::string, std::vector<int>>> all_loop;
     // NOTE {int robotID;{"index":std::vector<int>,"LoopID":std::vector<int>}} このindexにはロボット間の検知だったら全て格納する
     std::map<int, int> sorted_original;
-    std::map<int, int> original_sorted;
 
     rtabmap::Rtabmap rtabmap;
     rtabmap::ParametersMap parameters;
@@ -147,35 +144,44 @@ public:
         return file_number;
     }
 
-
-    void rename(std::map<std::string, std::vector<int>> file_dir,int file_num,std::string jpg)
+    std::map<std::string, int> rename(int file_num, std::string jpg)
     {
-        for (int iteration=0 ; iteration < file_num + 1; ++iteration)
+        std::map<std::string, std::vector<int>> file_dir;
+        for (int iteration = 0; iteration < file_num + 1; ++iteration)
         {
             if ((nextIndex + iteration) % 2 == 1)
-                file_dir["R1"].push_back(nextIndex + iteration );
+                file_dir["R1"].push_back(nextIndex + iteration);
             else
-                file_dir["R2"].push_back(nextIndex + iteration );
+                file_dir["R2"].push_back(nextIndex + iteration);
             std::string old_name{template_path + std::to_string(nextIndex + iteration) + jpg};
             std::string new_name{template_path + std::to_string(nextIndex + iteration + 50) + jpg};
             std::rename(old_name.c_str(), new_name.c_str());
         }
         // NOTE まず、R1を先にソートする
-        for (int iteration=0 ; iteration < file_dir["R1"].size() ; ++iteration)
+        for (int iteration = 0; iteration < file_dir["R1"].size(); ++iteration)
         {
-            std::string old_name{template_path + std::to_string(file_dir["R1"][iteration]+50) + jpg};
+            std::string old_name{template_path + std::to_string(file_dir["R1"][iteration] + 50) + jpg};
             std::string new_name{template_path + std::to_string(nextIndex + iteration) + jpg};
-            sorted_original[nextIndex + iteration]=file_dir["R1"][iteration];
+
+            sorted_original[nextIndex + iteration] = file_dir["R1"][iteration];
             std::rename(old_name.c_str(), new_name.c_str());
         }
         // R2
-        for (int iteration=0 ; iteration < file_dir["R2"].size() ; ++iteration)
+        for (int iteration = 0; iteration < file_dir["R2"].size(); ++iteration)
         {
-            std::string old_name{template_path + std::to_string(file_dir["R2"][iteration]+50) + jpg};
+            std::string old_name{template_path + std::to_string(file_dir["R2"][iteration] + 50) + jpg};
             std::string new_name{template_path + std::to_string(nextIndex + iteration + file_dir["R1"].size()) + jpg};
-            sorted_original[nextIndex + iteration + file_dir["R1"].size()]=file_dir["R2"][iteration];
+            sorted_original[nextIndex + iteration + file_dir["R1"].size()] = file_dir["R2"][iteration];
             std::rename(old_name.c_str(), new_name.c_str());
         }
+
+        std::map<std::string, int> ans;
+        ans["R1start"] = nextIndex;
+        ans["R1end"] = nextIndex + file_dir["R1"].size() - 1;
+        ans["R2start"] = nextIndex + file_dir["R1"].size();
+        ans["R2end"] = nextIndex + file_num - 1;
+
+        return ans;
     }
 
     void clear_dir(void)
@@ -191,6 +197,38 @@ public:
         all_loop[2]["LoopID"].clear();
     }
 
+    // FIXME 要修正？
+    int judge(int hypothesis, std::map<std::string, int> detect_info)
+    {
+        std::string belong;
+        // NOTE 塊の始まりの検知
+        if (nextIndex - std::max(all_loop[1]["index"].back(), all_loop[2]["index"].back()) > 3)
+        {
+            if (detect_info["R1start"] <= nextIndex && nextIndex <= detect_info["R1end"])
+                belong = "R1";
+            else
+                belong = "R2";
+            return 1;
+        }
+        // NOTE連続しているもので、かつ対象のロボットが変わった場合
+        // else if ((nextIndex - max(all_loop[1]["index"].back(), all_loop[2]["index"].back()) <= 3) &&
+        //          (nextIndex == detect_info["R1start"] || nextIndex == detect_info["R2start"]))
+        else if ((nextIndex - std::max(all_loop[1]["index"].back(), all_loop[2]["index"].back()) <= 3) &&
+                 (nextIndex == detect_info["R2start"]))
+        {
+            if (((belong == "R1") && ((criteria - 5 <= hypothesis) && (criteria + 5 >= hypothesis))) ||
+                ((belong == "R2") && ((criteria - 5 <= hypothesis) && (criteria + 5 >= hypothesis))))
+                return 0;
+            else
+                return 1;
+        }
+    }
+
+    void confirm_CB(const std_msgs::Int32::ConstPtr &msg)
+    {
+        confirm_num = msg->data;
+    }
+
     void detection(const std_msgs::Int32::ConstPtr &turn_on)
     {
 
@@ -198,11 +236,11 @@ public:
 
         msg.data = 1;
 
-        // NOTE Loop Detect開始(msgの内容はどうでもいい)
+        // Loop Detect開始(msgの内容はどうでもいい)
         img_switch.publish(msg);
 
         rtabmap::CameraImages camera(template_path);
-        // NOTE ディレクトリができるのを待つ必要がある.
+        // ディレクトリができるのを待つ必要がある.
         if (!camera.init())
         {
             ROS_ERROR("Camera init failed!");
@@ -212,12 +250,8 @@ public:
         std::string jpg{".jpg"};
         std::string io_num{std::to_string(nextIndex) + jpg};
 
-        // NOTE この時点で、imgの保存が止まっている必要がある
         // REVIEW ここをwhileにすると、confirmCBが動かなくなる.→confirm_numを参照できなくなる？？
         // REVIEW sleepは全ての機能を一時停止にする
-        // NOTE false positiveの特徴；
-        //  True positiveのloop closure valueと連続値であること
-        //  そもそも連続しない
 
         // WARNING CBにwhileを書いてはいけない.forなら耐える
         for (int iteration{0}; iteration < 200; ++iteration)
@@ -226,18 +260,9 @@ public:
                 break;
         }
 
-        // NOTE Rename the files
-        int file_num = count_files();
-        std::map<std::string, std::vector<int>> file_dir;
-        rename(file_dir,file_num,jpg);
-
-        for (int iteration{0} ; iteration < file_num + 1; ++iteration)
-        {
-            std::string old_name{template_path + std::to_string(nextIndex + iteration + 50) + jpg};
-            // std::string new_name{template_path + std::to_string(nextIndex + iteration + 50) + jpg};
-            if ((nextIndex + iteration) % 2 == 1)
-                std::string new_name { template_path + std::to_string(nextIndex + iteration) + jpg };
-        }
+        // Rename the files
+        std::map<std::string, int> ans{rename(count_files(), jpg)};
+        // NOTE "R1start","R1end","R2start","R2end"
 
         data = camera.takeImage();
         int i = 0;
@@ -256,8 +281,9 @@ public:
             {
                 rtabmap.process(data.imageRaw(), nextIndex);
 
-                if (rtabmap.getLoopClosureId())
+                if (rtabmap.getLoopClosureId() && judge(rtabmap.getLoopClosureId(), ans))
                 {
+
                     printf(" #%d ptime(%fs) STM(%d) WM(%d) hyp(%d) value(%.2f) *LOOP %d->%d*\n",
                            i,
                            rtabmap.getLastProcessTime(),
@@ -269,17 +295,19 @@ public:
                            (int)rtabmap.getLoopClosureId());
                     io_num = std::to_string(nextIndex) + jpg;
                     // ロボット間の検知
+
                     if ((nextIndex - rtabmap.getLoopClosureId()) % 2 == 1)
-                    {
-                        if (nextIndex % 2 == 1)
+                        if (ans["R1start"] <= nextIndex && ans["R1end"] >= nextIndex)
                         {
                             // R1が検知
                             // loopが連続しているか否か
                             if ((all_loop[1]["index"].size() > 0) && (all_loop[1]["index"].back() == nextIndex - 2))
                             {
-                                who_detect[1]["index"].push_back(nextIndex);
-                                who_detect[1]["LoopID"].push_back(rtabmap.getLoopClosureId());
+                                // original arrangement was appended
+                                who_detect[1]["index"].push_back(sorted_original[nextIndex]);
+                                who_detect[1]["LoopID"].push_back(sorted_original[rtabmap.getLoopClosureId()]);
                             }
+                            // sorted appended
                             all_loop[1]["index"].push_back(nextIndex);
                             all_loop[1]["LoopID"].push_back(rtabmap.getLoopClosureId());
                         }
@@ -289,44 +317,40 @@ public:
                         {
                             if ((all_loop[2]["index"].size() > 0) && (all_loop[2]["index"].back() == nextIndex - 2))
                             {
-                                who_detect[2]["index"].push_back(nextIndex);
-                                who_detect[2]["LoopID"].push_back(rtabmap.getLoopClosureId());
+                                who_detect[2]["index"].push_back(sorted_original[nextIndex]);
+                                who_detect[2]["LoopID"].push_back(sorted_original[rtabmap.getLoopClosureId()]);
                             }
 
                             all_loop[2]["index"].push_back(nextIndex);
                             all_loop[2]["LoopID"].push_back(rtabmap.getLoopClosureId());
                         }
 
-                        ROS_ERROR("!!!!!!!!!!!!!!!!!!!!!!!!!");
+                    ROS_ERROR("!!!!!!!!!!!!!!!!!!!!!!!!!");
 
-                        send_command(5);
-                    }
-                    // 同ロボット間の検知
-                    else
-                    // NOTE loopが検出されなくなった瞬間
-                    {
-                        printf(" #%d ptime(%fs) STM(%d) WM(%d) hyp(%d) value(%.2f) *LOOP %d->%d*\n",
-                               i,
-                               rtabmap.getLastProcessTime(),
-                               (int)rtabmap.getSTM().size(), // short-term memory
-                               (int)rtabmap.getWM().size(),  // working memory
-                               (int)rtabmap.getLoopClosureId(),
-                               (float)rtabmap.getLoopClosureValue(),
-                               nextIndex,
-                               (int)rtabmap.getLoopClosureId());
-
-                        clear_dir();
-
-                        io_num = std::to_string(nextIndex) + jpg;
-
-                        send_command();
-                    }
+                    send_command(5);
                 }
+                // 同ロボット間の検知
                 else
+                // loopが検出されなくなった瞬間
                 {
-                    printf("No loop was detected");
+                    printf(" #%d ptime(%fs) STM(%d) WM(%d) hyp(%d) value(%.2f) *LOOP %d->%d*\n",
+                           i,
+                           rtabmap.getLastProcessTime(),
+                           (int)rtabmap.getSTM().size(), // short-term memory
+                           (int)rtabmap.getWM().size(),  // working memory
+                           (int)rtabmap.getLoopClosureId(),
+                           (float)rtabmap.getLoopClosureValue(),
+                           nextIndex,
+                           (int)rtabmap.getLoopClosureId());
+
+                    clear_dir();
+
+                    io_num = std::to_string(nextIndex) + jpg;
+
+                    send_command();
                 }
-                // NOTE loop detect終了
+            
+                // loop detect終了
 
                 ++nextIndex;
                 data = camera.takeImage();
@@ -343,13 +367,8 @@ public:
             }
             // while (!data.imageRaw().empty())
             // {
+            img_switch.publish(msg);
         }
-        img_switch.publish(msg);
-    }
-
-    void confirm_CB(const std_msgs::Int32::ConstPtr &msg)
-    {
-        confirm_num = msg->data;
     }
 };
 
