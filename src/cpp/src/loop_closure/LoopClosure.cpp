@@ -143,13 +143,13 @@ public:
             exit(1);
         }
         // NOTE なぜ引く必要があるかはわからない
-        return file_number-2;
+        return file_number - 2;
     }
 
     std::map<std::string, int> rename(int file_num, std::string jpg)
     {
         std::map<std::string, std::vector<int>> file_dir;
-        for (int iteration = 0; iteration < file_num ; ++iteration)
+        for (int iteration = 0; iteration < file_num; ++iteration)
         {
             if ((nextIndex + iteration) % 2 == 1)
                 file_dir["R1"].push_back(nextIndex + iteration);
@@ -169,7 +169,7 @@ public:
             sorted_original[nextIndex + iteration] = file_dir["R1"][iteration];
             std::rename(old_name.c_str(), new_name.c_str());
 
-            std::cout<<"For R1, old name; "<<old_name2<<" to new name; "<<new_name<<std::endl;
+            std::cout << "For R1, old name; " << old_name2 << " to new name; " << new_name << std::endl;
         }
         // R2
         for (int iteration = 0; iteration < file_dir["R2"].size(); ++iteration)
@@ -179,7 +179,7 @@ public:
             std::string new_name{template_path + std::to_string(nextIndex + iteration + file_dir["R1"].size()) + jpg};
             sorted_original[nextIndex + iteration + file_dir["R1"].size()] = file_dir["R2"][iteration];
             std::rename(old_name.c_str(), new_name.c_str());
-            std::cout<<"For R2, old name; "<<old_name2<<" to new name; "<<new_name<<std::endl;
+            std::cout << "For R2, old name; " << old_name2 << " to new name; " << new_name << std::endl;
         }
 
         std::map<std::string, int> ans;
@@ -197,11 +197,6 @@ public:
         who_detect[2]["index"].clear();
         who_detect[1]["LoopID"].clear();
         who_detect[2]["LoopID"].clear();
-
-        all_loop[1]["index"].clear();
-        all_loop[2]["index"].clear();
-        all_loop[1]["LoopID"].clear();
-        all_loop[2]["LoopID"].clear();
     }
 
     // FIXME 要修正？
@@ -261,14 +256,9 @@ public:
         // REVIEW sleepは全ての機能を一時停止にする
 
         // WARNING CBにwhileを書いてはいけない.forなら耐える
-        for (int iteration{0}; iteration < 200; ++iteration)
-        {
-            if (confirm_num == 1)
-                break;
-        }
 
         // Rename the files
-        std::cout<<"files are "<<count_files()<<std::endl;
+        std::cout << "files are " << count_files() << std::endl;
         std::map<std::string, int> ans{rename(count_files(), jpg)};
         // for (auto item : ans)
         // {
@@ -294,58 +284,9 @@ public:
             {
                 rtabmap.process(data.imageRaw(), nextIndex);
 
-                if (rtabmap.getLoopClosureId() && judge(rtabmap.getLoopClosureId(), ans))
+                if (rtabmap.getLoopClosureId())
                 {
-
-                    printf(" #%d ptime(%fs) STM(%d) WM(%d) hyp(%d) value(%.2f) *LOOP %d->%d*\n",
-                           i,
-                           rtabmap.getLastProcessTime(),
-                           (int)rtabmap.getSTM().size(), // short-term memory
-                           (int)rtabmap.getWM().size(),  // working memory
-                           (int)rtabmap.getLoopClosureId(),
-                           (float)rtabmap.getLoopClosureValue(),
-                           nextIndex,
-                           (int)rtabmap.getLoopClosureId());
-                    io_num = std::to_string(nextIndex) + jpg;
-                    // ロボット間の検知
-
-                    if ((nextIndex - rtabmap.getLoopClosureId()) % 2 == 1)
-                    {
-
-                        if (ans["R1start"] <= nextIndex && ans["R1end"] >= nextIndex)
-                        {
-                            // R1が検知
-                            // loopが連続しているか否か
-                            if ((all_loop[1]["index"].size() > 0) && (all_loop[1]["index"].back() == nextIndex - 2))
-                            {
-                                // original arrangement was appended
-                                who_detect[1]["index"].push_back(sorted_original[nextIndex]);
-                                who_detect[1]["LoopID"].push_back(sorted_original[rtabmap.getLoopClosureId()]);
-                            }
-                            // sorted appended
-                            all_loop[1]["index"].push_back(nextIndex);
-                            all_loop[1]["LoopID"].push_back(rtabmap.getLoopClosureId());
-                        }
-
-                        else
-                        // R2が検知
-                        {
-                            if ((all_loop[2]["index"].size() > 0) && (all_loop[2]["index"].back() == nextIndex - 2))
-                            {
-                                who_detect[2]["index"].push_back(sorted_original[nextIndex]);
-                                who_detect[2]["LoopID"].push_back(sorted_original[rtabmap.getLoopClosureId()]);
-                            }
-
-                            all_loop[2]["index"].push_back(nextIndex);
-                            all_loop[2]["LoopID"].push_back(rtabmap.getLoopClosureId());
-                        }
-
-                        ROS_ERROR("!!!!!!!!!!!!!!!!!!!!!!!!!");
-
-                        send_command(5);
-                    }
-                    else
-                    // loopが検出されなくなった瞬間
+                    if (judge(rtabmap.getLoopClosureId(), ans))
                     {
                         printf(" #%d ptime(%fs) STM(%d) WM(%d) hyp(%d) value(%.2f) *LOOP %d->%d*\n",
                                i,
@@ -356,35 +297,46 @@ public:
                                (float)rtabmap.getLoopClosureValue(),
                                nextIndex,
                                (int)rtabmap.getLoopClosureId());
-
-                        clear_dir();
-
                         io_num = std::to_string(nextIndex) + jpg;
-
-                        send_command();
+                        // ロボット間の検知
+                        // R1の検知
+                        if (ans["R1start"] <= nextIndex && ans["R1end"] >= nextIndex)
+                        {
+                            if ((sorted_original[nextIndex] - sorted_original[rtabmap.getLoopClosureId()]) % 2 == 1)
+                            {
+                                ROS_INFO("This is the loop between Robots");
+                                who_detect[1]["index"].push_back(sorted_original[nextIndex]);
+                                who_detect[1]["LoopID"].push_back(sorted_original[rtabmap.getLoopClosureId()]);
+                            }
+                            all_loop[1]["index"].push_back(nextIndex);
+                            all_loop[1]["LoopID"].push_back(rtabmap.getLoopClosureId());
+                        }
+                        else
+                        {
+                            if ((sorted_original[nextIndex] - sorted_original[rtabmap.getLoopClosureId()]) % 2 == 1)
+                            {
+                                ROS_INFO("This is the loop between Robots");
+                                who_detect[2]["index"].push_back(sorted_original[nextIndex]);
+                                who_detect[2]["LoopID"].push_back(sorted_original[rtabmap.getLoopClosureId()]);
+                            }
+                            all_loop[2]["index"].push_back(nextIndex);
+                            all_loop[2]["LoopID"].push_back(rtabmap.getLoopClosureId());
+                        }
                     }
+                    else
+                        printf("False positive was detected");
                 }
-                // 同ロボット間の検知
-
-                // loop detect終了
 
                 ++nextIndex;
                 data = camera.takeImage();
-                // std::cout<<"loop list for R1 is..."<<std::endl;
-                // FIXME
-                // for (auto item : who_detect[1]["index"]){
-                //     ROS_ERROR("Hey!!!");
-                //     std::cout<<item<<" ";
-                // }
             }
             else
-            {
                 break;
-            }
-            // while (!data.imageRaw().empty())
-            // {
         }
-        confirm_num=0;
+        // TODO send_commandの実装
+        // send_command
+        clear_dir();
+        confirm_num = 0;
         img_switch.publish(msg);
     }
 };
