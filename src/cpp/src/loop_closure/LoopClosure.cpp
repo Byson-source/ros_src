@@ -138,16 +138,18 @@ public:
             (void)closedir(dp);
         }
         else
+        {
             perror("Couldn't open the directory");
-        exit(1);
-
-        return file_number;
+            exit(1);
+        }
+        // NOTE なぜ引く必要があるかはわからない
+        return file_number-2;
     }
 
     std::map<std::string, int> rename(int file_num, std::string jpg)
     {
         std::map<std::string, std::vector<int>> file_dir;
-        for (int iteration = 0; iteration < file_num + 1; ++iteration)
+        for (int iteration = 0; iteration < file_num ; ++iteration)
         {
             if ((nextIndex + iteration) % 2 == 1)
                 file_dir["R1"].push_back(nextIndex + iteration);
@@ -161,18 +163,23 @@ public:
         for (int iteration = 0; iteration < file_dir["R1"].size(); ++iteration)
         {
             std::string old_name{template_path + std::to_string(file_dir["R1"][iteration] + 50) + jpg};
+            std::string old_name2{template_path + std::to_string(file_dir["R1"][iteration]) + jpg};
             std::string new_name{template_path + std::to_string(nextIndex + iteration) + jpg};
 
             sorted_original[nextIndex + iteration] = file_dir["R1"][iteration];
             std::rename(old_name.c_str(), new_name.c_str());
+
+            std::cout<<"For R1, old name; "<<old_name2<<" to new name; "<<new_name<<std::endl;
         }
         // R2
         for (int iteration = 0; iteration < file_dir["R2"].size(); ++iteration)
         {
             std::string old_name{template_path + std::to_string(file_dir["R2"][iteration] + 50) + jpg};
+            std::string old_name2{template_path + std::to_string(file_dir["R2"][iteration]) + jpg};
             std::string new_name{template_path + std::to_string(nextIndex + iteration + file_dir["R1"].size()) + jpg};
             sorted_original[nextIndex + iteration + file_dir["R1"].size()] = file_dir["R2"][iteration];
             std::rename(old_name.c_str(), new_name.c_str());
+            std::cout<<"For R2, old name; "<<old_name2<<" to new name; "<<new_name<<std::endl;
         }
 
         std::map<std::string, int> ans;
@@ -261,7 +268,13 @@ public:
         }
 
         // Rename the files
+        std::cout<<"files are "<<count_files()<<std::endl;
         std::map<std::string, int> ans{rename(count_files(), jpg)};
+        // for (auto item : ans)
+        // {
+        //     std::cout << item.first << std::endl;
+        //     std::cout << item.second << std::endl;
+        // }
         // NOTE "R1start","R1end","R2start","R2end"
 
         data = camera.takeImage();
@@ -297,6 +310,8 @@ public:
                     // ロボット間の検知
 
                     if ((nextIndex - rtabmap.getLoopClosureId()) % 2 == 1)
+                    {
+
                         if (ans["R1start"] <= nextIndex && ans["R1end"] >= nextIndex)
                         {
                             // R1が検知
@@ -325,31 +340,32 @@ public:
                             all_loop[2]["LoopID"].push_back(rtabmap.getLoopClosureId());
                         }
 
-                    ROS_ERROR("!!!!!!!!!!!!!!!!!!!!!!!!!");
+                        ROS_ERROR("!!!!!!!!!!!!!!!!!!!!!!!!!");
 
-                    send_command(5);
+                        send_command(5);
+                    }
+                    else
+                    // loopが検出されなくなった瞬間
+                    {
+                        printf(" #%d ptime(%fs) STM(%d) WM(%d) hyp(%d) value(%.2f) *LOOP %d->%d*\n",
+                               i,
+                               rtabmap.getLastProcessTime(),
+                               (int)rtabmap.getSTM().size(), // short-term memory
+                               (int)rtabmap.getWM().size(),  // working memory
+                               (int)rtabmap.getLoopClosureId(),
+                               (float)rtabmap.getLoopClosureValue(),
+                               nextIndex,
+                               (int)rtabmap.getLoopClosureId());
+
+                        clear_dir();
+
+                        io_num = std::to_string(nextIndex) + jpg;
+
+                        send_command();
+                    }
                 }
                 // 同ロボット間の検知
-                else
-                // loopが検出されなくなった瞬間
-                {
-                    printf(" #%d ptime(%fs) STM(%d) WM(%d) hyp(%d) value(%.2f) *LOOP %d->%d*\n",
-                           i,
-                           rtabmap.getLastProcessTime(),
-                           (int)rtabmap.getSTM().size(), // short-term memory
-                           (int)rtabmap.getWM().size(),  // working memory
-                           (int)rtabmap.getLoopClosureId(),
-                           (float)rtabmap.getLoopClosureValue(),
-                           nextIndex,
-                           (int)rtabmap.getLoopClosureId());
 
-                    clear_dir();
-
-                    io_num = std::to_string(nextIndex) + jpg;
-
-                    send_command();
-                }
-            
                 // loop detect終了
 
                 ++nextIndex;
@@ -367,8 +383,9 @@ public:
             }
             // while (!data.imageRaw().empty())
             // {
-            img_switch.publish(msg);
         }
+        confirm_num=0;
+        img_switch.publish(msg);
     }
 };
 

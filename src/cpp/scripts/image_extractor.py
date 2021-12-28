@@ -142,6 +142,7 @@ def loop_CB(loop):
         # NOTE loop closure nodeに画像が保存し終わったことを伝える
         msg.data=1
         confirm.publish(msg)
+        # FIXME CB2がためている？？
 
         # NOTE detectの対象ファイルをまとめる [start:int,end:int]
         start2end["start"] = start2end["end"]+1
