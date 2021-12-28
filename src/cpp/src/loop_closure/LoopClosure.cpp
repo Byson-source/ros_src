@@ -19,15 +19,14 @@
 
 //detector, dir_changer,rest_commander
 
+int confirm_num{0};
+
 class Loop_Closure
 {
 private:
-    ros::NodeHandle n;
-
     std::vector<int> detection_list;
 
     int robot_number;
-    int confirm_num{0};
     int nextIndex{1};
     int criteria{0};
     // hypothesis criteria
@@ -50,10 +49,9 @@ private:
     ros::Publisher img_switch;
 
     ros::Subscriber switch_sub;
-    ros::Subscriber confirm;
 
 public:
-    Loop_Closure() : robot_number(2)
+    Loop_Closure(ros::NodeHandle n) : robot_number(2)
     {
         // REVIEW ここのデータベースを消さずにrtabmapのインスタンスを作ると、前回のdetectionの記憶を引き継ぐことができる。
         UFile::erase(database_path);
@@ -75,7 +73,6 @@ public:
         img_switch = n.advertise<std_msgs::Int32>("loop", 10);
 
         // FIXME
-        confirm = n.subscribe("stop_storing", 1000, &Loop_Closure::confirm_CB, this);
         switch_sub = n.subscribe("command", 1000, &Loop_Closure::detection, this);
 
         std::map<std::string, std::vector<int>> R1_info;
@@ -226,10 +223,7 @@ public:
         }
     }
 
-    void confirm_CB(const std_msgs::Int32::ConstPtr &msg)
-    {
-        confirm_num = msg->data;
-    }
+    // REVIEW クラス内では複数のsubscriberは同時には機能しない?
 
     void detection(const std_msgs::Int32::ConstPtr &turn_on)
     {
@@ -240,6 +234,12 @@ public:
 
         // Loop Detect開始(msgの内容はどうでもいい)
         img_switch.publish(msg);
+        // REVIEW ループを回している間は他の関数が動けない？？
+        for (int iteration{0}; iteration < std::pow(10, 6); ++iteration)
+            if (confirm_num == 1)
+            {
+                break;
+            }
 
         rtabmap::CameraImages camera(template_path);
         // ディレクトリができるのを待つ必要がある.
@@ -260,11 +260,6 @@ public:
         // Rename the files
         std::cout << "files are " << count_files() << std::endl;
         std::map<std::string, int> ans{rename(count_files(), jpg)};
-        // for (auto item : ans)
-        // {
-        //     std::cout << item.first << std::endl;
-        //     std::cout << item.second << std::endl;
-        // }
         // NOTE "R1start","R1end","R2start","R2end"
 
         data = camera.takeImage();
@@ -341,11 +336,20 @@ public:
     }
 };
 
+void confirm_CB(const std_msgs::Int32::ConstPtr &msg)
+{
+    ROS_INFO("Confirmed!!");
+    confirm_num = msg->data;
+}
+
 int main(int argc, char **argv)
 {
 
     ros::init(argc, argv, "detection_checker");
-    Loop_Closure detector;
+    ros::NodeHandle n;
+    ros::Subscriber confirm = n.subscribe("stop_storing", 1000, confirm_CB);
+
+    Loop_Closure detector(n);
 
     // WARNING classを使う場合、publishするのにmain関数内でwhileループを使うな.
     ros::spin();
