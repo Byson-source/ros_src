@@ -35,9 +35,12 @@ start2end = {"end": 0}
 # index:img
 bridge = CvBridge()
 
+condition = {"cb1 storing":1,
+            "cb2 storing":1}
+
 
 def callback(rgb, id):
-    global img_number, stock, start2end
+    global img_number, stock, start2end,condition
 
     cv2_img = bridge.imgmsg_to_cv2(rgb, "bgr8")
 # FIXME Maybe should change to (640,480)
@@ -45,6 +48,7 @@ def callback(rgb, id):
 
     # REVIEW 再開
     if already_loop == 1:
+        condition["cb1 storing"]=1
         cv2.imwrite(path + "rgb/"+str(img_number) + ".jpg", cv2_img)
         cv2.imwrite(all_rgb + str(img_number) + ".jpg", cv2_img)
         print("image storing;"+str(img_number))
@@ -53,6 +57,7 @@ def callback(rgb, id):
 
     # REVIEW 中止
     else:
+        condition["cb1 storing"]=0
         rospy.loginfo("CB1 stocking img "+str(img_number))
         cv2.imwrite(all_rgb + str(img_number) + ".jpg", cv2_img)
         stock[str(img_number)] = cv2_img
@@ -61,18 +66,20 @@ def callback(rgb, id):
 
 
 def callback2(rgb, id):
-    global img_number2, stock
+    global img_number2, stock,condition
 
     cv2_img = bridge.imgmsg_to_cv2(rgb, "bgr8")
 # FIXME Maybe should change to (640,480)
     cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
     # 再開
     if already_loop == 1:
+        condition["cb2 storing"]=1
         cv2.imwrite(path + "rgb/"+str(img_number2) + ".jpg", cv2_img)
         cv2.imwrite(all_rgb + str(img_number2) + ".jpg", cv2_img)
         print("image storing;"+str(img_number2))
     # 中止
     else:
+        condition["cb2 storing"]=0
         rospy.loginfo("CB2 stocking img "+str(img_number2))
         cv2.imwrite(all_rgb + str(img_number2) + ".jpg", cv2_img)
         stock[str(img_number2)] = cv2_img
@@ -91,7 +98,10 @@ def switch_CB(loop):
     # NOTE Now store the images which were stored during loop closure detection
 
     if ("start" in start2end):
-        # NOTE wait until cb2 begins its work and now stock is fully stored
+        # NOTE wait until both cb begins its work and now stock is fully stored
+        for i in range(10**7):
+            if condition["cb1 storing"]==1 and condition["cb2 storing"]==1:
+                break
         # REVIEW 辞書のforループの回し方
         for index, img in stock.items():
             cv2.imwrite(path + "rgb/"+str(index) + ".jpg", img)
@@ -128,6 +138,9 @@ def commandCB(event):
         l_no-=2
 
     # NOTE loop closure nodeに画像が保存し終わったことを伝える
+    for i in range(10**7):
+        if condition["cb1 storing"]==0 and condition["cb2 storing"]==0:
+            break
     msg.data=1
     # NOTE ここで、loop nodeを起動
     files=glob.glob(path+"rgb/*")

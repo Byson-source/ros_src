@@ -332,6 +332,18 @@ add_dependencies(
   ${cpp_EXPORTED_TARGETS}
 )
 
+add_executable(spin_study src/loop_closure/multi_thread.cpp)
+
+target_link_libraries(
+  spin_study
+  ${catkin_LIBRARIES}
+)
+
+add_dependencies(
+  spin_study
+  ${cpp_EXPORTED_TARGETS}
+)
+
 add_executable(test_fibonacci src/CPP_demo/actionlib_client.cpp)
 
 target_link_libraries(
