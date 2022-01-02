@@ -1,5 +1,6 @@
 // FIXME loopが連続すると"つられ"現象が起こる。True positiveが異なるロボット間で起きた→つられ現象によりFPになった場合、反芻作業が必要？
 // FIXME TPとFPのふるいわけ
+// TODO multithreadを試す
 #include "rtabmap/core/Rtabmap.h"
 #include "rtabmap/core/CameraRGB.h"
 #include <opencv2/core/core.hpp>
@@ -19,11 +20,11 @@
 
 //detector, dir_changer,rest_commander
 
-int confirm_num{0};
-
 class Loop_Closure
 {
 private:
+    ros::NodeHandle n;
+
     std::vector<int> detection_list;
 
     int robot_number;
@@ -48,10 +49,10 @@ private:
     ros::Publisher val_pub;
     ros::Publisher img_switch;
 
-    ros::Subscriber switch_sub;
+    ros::Subscriber confirm;
 
 public:
-    Loop_Closure(ros::NodeHandle n) : robot_number(2)
+    Loop_Closure() : robot_number(2)
     {
         // REVIEW ここのデータベースを消さずにrtabmapのインスタンスを作ると、前回のdetectionの記憶を引き継ぐことができる。
         UFile::erase(database_path);
@@ -70,10 +71,11 @@ public:
 
         index_pub = n.advertise<std_msgs::Int32MultiArray>("index_array", 10);
         val_pub = n.advertise<std_msgs::Int32MultiArray>("val_array", 10);
+        // image node turn ON
         img_switch = n.advertise<std_msgs::Int32>("loop", 10);
 
-        // FIXME
-        switch_sub = n.subscribe("command", 1000, &Loop_Closure::detection, this);
+        // loop起動
+        confirm = n.subscribe("stop_storing", 1000, &Loop_Closure::confirm_CB, this);
 
         std::map<std::string, std::vector<int>> R1_info;
         std::map<std::string, std::vector<int>> R2_info;
@@ -222,24 +224,15 @@ public:
                 return 1;
         }
     }
-
-    // REVIEW クラス内では複数のsubscriberは同時には機能しない?
-
-    void detection(const std_msgs::Int32::ConstPtr &turn_on)
+    
+// FIXME Multi thread!!
+    void confirm_CB(const std_msgs::Int32::ConstPtr &turn_on)
     {
 
         std_msgs::Int32 msg;
 
         msg.data = 1;
 
-        // Loop Detect開始(msgの内容はどうでもいい)
-        img_switch.publish(msg);
-        // REVIEW ループを回している間は他の関数が動けない？？
-        for (int iteration{0}; iteration < std::pow(10, 6); ++iteration)
-            if (confirm_num == 1)
-            {
-                break;
-            }
 
         rtabmap::CameraImages camera(template_path);
         // ディレクトリができるのを待つ必要がある.
@@ -252,7 +245,6 @@ public:
         std::string jpg{".jpg"};
         std::string io_num{std::to_string(nextIndex) + jpg};
 
-        // REVIEW ここをwhileにすると、confirmCBが動かなくなる.→confirm_numを参照できなくなる？？
         // REVIEW sleepは全ての機能を一時停止にする
 
         // WARNING CBにwhileを書いてはいけない.forなら耐える
@@ -331,25 +323,15 @@ public:
         // TODO send_commandの実装
         // send_command
         clear_dir();
-        confirm_num = 0;
         img_switch.publish(msg);
     }
 };
-
-void confirm_CB(const std_msgs::Int32::ConstPtr &msg)
-{
-    ROS_INFO("Confirmed!!");
-    confirm_num = msg->data;
-}
 
 int main(int argc, char **argv)
 {
 
     ros::init(argc, argv, "detection_checker");
-    ros::NodeHandle n;
-    ros::Subscriber confirm = n.subscribe("stop_storing", 1000, confirm_CB);
-
-    Loop_Closure detector(n);
+    Loop_Closure detector;
 
     // WARNING classを使う場合、publishするのにmain関数内でwhileループを使うな.
     ros::spin();
