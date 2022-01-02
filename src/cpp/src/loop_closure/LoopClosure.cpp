@@ -34,6 +34,7 @@ private:
 
     std::string template_path{"/home/ayumi/Documents/tohoku_uni/CLOVERs/images/rgb/"};
     std::string database_path{"/home/ayumi/Documents/RTAB-Map/rtabmap.db"};
+    std::string belong;
 
     std::map<int, std::map<std::string, std::vector<int>>> who_detect;
     // NOTE {int robotID;{"index":std::vector<int>,"LoopID":std::vector<int>}} このindexには連続するものしか入らない
@@ -75,7 +76,7 @@ public:
         img_switch = n.advertise<std_msgs::Int32>("loop", 10);
 
         // loop起動
-        confirm = n.subscribe("stop_storing", 1000, &Loop_Closure::confirm_CB, this);
+        confirm = n.subscribe("loop_start", 1000, &Loop_Closure::confirm_CB, this);
 
         std::map<std::string, std::vector<int>> R1_info;
         std::map<std::string, std::vector<int>> R2_info;
@@ -201,15 +202,21 @@ public:
     // FIXME 要修正？
     int judge(int hypothesis, std::map<std::string, int> detect_info)
     {
-        std::string belong;
+        ROS_INFO("Now judging...");
+        int return_val;
+        std::string index_belong;
+        if (detect_info["R1start"] <= nextIndex && nextIndex <= detect_info["R1end"])
+            index_belong = "R1";
+        else
+            index_belong = "R2";
         // NOTE 塊の始まりの検知
         if (nextIndex - std::max(all_loop[1]["index"].back(), all_loop[2]["index"].back()) > 3)
         {
-            if (detect_info["R1start"] <= nextIndex && nextIndex <= detect_info["R1end"])
+            if (index_belong == "R1")
                 belong = "R1";
             else
                 belong = "R2";
-            return 1;
+            return_val = 1;
         }
         // NOTE連続しているもので、かつ対象のロボットが変わった場合
         // else if ((nextIndex - max(all_loop[1]["index"].back(), all_loop[2]["index"].back()) <= 3) &&
@@ -217,22 +224,22 @@ public:
         else if ((nextIndex - std::max(all_loop[1]["index"].back(), all_loop[2]["index"].back()) <= 3) &&
                  (nextIndex == detect_info["R2start"]))
         {
-            if (((belong == "R1") && ((criteria - 5 <= hypothesis) && (criteria + 5 >= hypothesis))) ||
-                ((belong == "R2") && ((criteria - 5 <= hypothesis) && (criteria + 5 >= hypothesis))))
-                return 0;
+            if (((belong == "R1") && (index_belong == "R2") && ((criteria - 5 <= hypothesis) && (criteria + 5 >= hypothesis))) ||
+                ((belong == "R2") && (index_belong == "R2") && ((criteria - 5 <= hypothesis) && (criteria + 5 >= hypothesis))))
+                return_val = 0;
             else
-                return 1;
+                return_val = 1;
         }
+        return return_val;
     }
-    
-// FIXME Multi thread!!
+
+    // FIXME Multi thread!!
     void confirm_CB(const std_msgs::Int32::ConstPtr &turn_on)
     {
-
+        ROS_INFO("Loop node was actuated");
         std_msgs::Int32 msg;
 
         msg.data = 1;
-
 
         rtabmap::CameraImages camera(template_path);
         // ディレクトリができるのを待つ必要がある.
@@ -250,7 +257,6 @@ public:
         // WARNING CBにwhileを書いてはいけない.forなら耐える
 
         // Rename the files
-        std::cout << "files are " << count_files() << std::endl;
         std::map<std::string, int> ans{rename(count_files(), jpg)};
         // NOTE "R1start","R1end","R2start","R2end"
 
@@ -273,6 +279,8 @@ public:
 
                 if (rtabmap.getLoopClosureId())
                 {
+                    ROS_INFO("Loop was detected,now judging...");
+                    
                     if (judge(rtabmap.getLoopClosureId(), ans))
                     {
                         printf(" #%d ptime(%fs) STM(%d) WM(%d) hyp(%d) value(%.2f) *LOOP %d->%d*\n",

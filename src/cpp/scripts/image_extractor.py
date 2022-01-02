@@ -1,4 +1,5 @@
 # FIXME This works only for few robots. If you want, convert this into C++.
+# REVIEW rosのcallbackは同時には行えない。他ノードの終了を確認してからcallback起動させたいなら、multithreadか、もしくはactionlibの仕様が前提
 #! /usr/bin/python
 import rospy
 import os
@@ -10,6 +11,7 @@ from cv_bridge import CvBridge
 # OpenCV2 for saving an image
 from rtabmap_ros.msg import Info
 from std_msgs.msg import Int32
+import glob
 
 
 import message_filters
@@ -112,7 +114,6 @@ def commandCB(event):
 
     # loop検知開始
     global already_loop 
-    already_loop=0
     
     # NOTE 連続していないものをtemp_stockに避難させておく.
     l=[img_number,img_number2]
@@ -128,14 +129,22 @@ def commandCB(event):
 
     # NOTE loop closure nodeに画像が保存し終わったことを伝える
     msg.data=1
-    rospy.loginfo("Loop node was acuated")
     # NOTE ここで、loop nodeを起動
+    files=glob.glob(path+"rgb/*")
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    for file in files:
+        rospy.loginfo(file)
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+
     command.publish(msg)
     # loop nodeから検知終了の合図を待つ
+
+
 
     # NOTE detectの対象ファイルをまとめる [start:int,end:int]
     start2end["start"] = start2end["end"]+1
     start2end["end"]=l_no
+    already_loop=0
 
 if __name__ == '__main__':
     
