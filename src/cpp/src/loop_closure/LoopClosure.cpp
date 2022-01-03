@@ -173,7 +173,7 @@ public:
 
             cv::Mat srcImage{cv::imread(new_name)};
             std::string folder_name{"sorted_rgb/"};
-            cv::imwrite(sorted_path+std::to_string(nextIndex + iteration) + jpg,srcImage);
+            cv::imwrite(sorted_path + std::to_string(nextIndex + iteration) + jpg, srcImage);
 
             std::cout << "For R1, old name; " << std::to_string(file_dir["R1"][iteration]) << " to new name; " << std::to_string(nextIndex + iteration) << std::endl;
         }
@@ -188,7 +188,7 @@ public:
 
             cv::Mat srcImage{cv::imread(new_name)};
             std::string folder_name{"sorted_rgb/"};
-            cv::imwrite(sorted_path+std::to_string(nextIndex + iteration+file_dir["R1"].size()) + jpg,srcImage);
+            cv::imwrite(sorted_path + std::to_string(nextIndex + iteration + file_dir["R1"].size()) + jpg, srcImage);
 
             std::cout << "For R2, old name; " << std::to_string(file_dir["R2"][iteration]) << " to new name; " << std::to_string(nextIndex + iteration + file_dir["R1"].size()) << std::endl;
         }
@@ -245,10 +245,9 @@ public:
         // NOTE連続しているもので、かつ対象のロボットが変わった場合
         // else if ((nextIndex - max(all_loop[1]["index"].back(), all_loop[2]["index"].back()) <= 3) &&
         //          (nextIndex == detect_info["R1start"] || nextIndex == detect_info["R2start"]))
-        else if ((nextIndex - std::max(all_loop[1]["index"].back(), all_loop[2]["index"].back()) <= 3) &&
-                 (nextIndex == detect_info["R2start"]))
+        else if (nextIndex - std::max(all_loop[1]["index"].back(), all_loop[2]["index"].back()) <= 3)
         {
-            std::cout<<"criteria is "<<std::to_string(criteria)<<std::endl;
+            std::cout << "criteria is " << std::to_string(criteria) << std::endl;
             if (((belong == "R1") && (index_belong == "R2") && ((criteria - 5 <= hypothesis) && (criteria + 5 >= hypothesis))) ||
                 ((belong == "R2") && (index_belong == "R1") && ((criteria - 5 <= hypothesis) && (criteria + 5 >= hypothesis))))
                 return_val = 0;
@@ -345,7 +344,7 @@ public:
                         }
                     }
                     else
-                        printf("False positive was detected");
+                        ROS_INFO("False positive was detected");
                 }
 
                 ++nextIndex;
