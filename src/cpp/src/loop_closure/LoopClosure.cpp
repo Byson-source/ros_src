@@ -35,7 +35,6 @@ private:
     std::string template_path{"/home/ayumi/Documents/tohoku_uni/CLOVERs/images/rgb/"};
     std::string database_path{"/home/ayumi/Documents/RTAB-Map/rtabmap.db"};
     std::string sorted_path{"/home/ayumi/Documents/tohoku_uni/CLOVERs/images/sorted_rgb/"};
-    std::string belong;
 
     std::map<int, std::map<std::string, std::vector<int>>> who_detect;
     // NOTE {int robotID;{"index":std::vector<int>,"LoopID":std::vector<int>}} このindexには連続するものしか入らない
@@ -227,7 +226,6 @@ public:
     // FIXME 要修正？
     int judge(int hypothesis, std::map<std::string, int> detect_info)
     {
-        int return_val;
         std::string index_belong;
 
         if (detect_info["R1start"] <= nextIndex && nextIndex <= detect_info["R1end"])
@@ -235,45 +233,37 @@ public:
         else
             index_belong = "R2";
         // NOTE 塊の始まりの検知
+        // 初回
 
         if ((all_loop[1]["index"].size() == 1) && (all_loop[2]["index"].size() == 1))
         {
             if (index_belong == "R1")
-                belong = "R1";
-                criteria_R1=hypothesis;
+                criteria_R1 = hypothesis;
             else
-                belong = "R2";
-                criteria_R2=hypothesis;
-            return_val = 1;
+                criteria_R2 = hypothesis;
         }
-
+        // 別の塊
         else if ((nextIndex - std::max(all_loop[1]["index"].back(), all_loop[2]["index"].back()) > 3))
         {
             // ROS_INFO("Now judging...");
             if (index_belong == "R1")
-                belong = "R1";
-                criteria_R1=hypothesis;
+                criteria_R1 = hypothesis;
             else
-                belong = "R2";
-                criteria_R2=hypothesis;
-            return_val = 1;
+                criteria_R2 = hypothesis;
         }
         // criteriaは真値のhypothesisと期待できるもの
+        // loopが連続している時
         else if (nextIndex - std::max(all_loop[1]["index"].back(), all_loop[2]["index"].back()) <= 3)
         {
-            if ((((belong == "R1") && (index_belong == "R2")) && ((criteria_R1 - 5 <= hypothesis) && (criteria_R1 + 5 >= hypothesis))) ||
-                (((belong == "R2") && (index_belong == "R1")) && ((criteria_R2 - 5 <= hypothesis) && (criteria + 5 >= hypothesis))))
-                return_val = 0;
-            else if (((belong == "R1") && (index_belong == "R1")) ||
-                     ((belong == "R2") && (index_belong == "R2")))
-            {
-                criteria = hypothesis;
-                return_val = 1;
-            }
-            else
-                return_val = 1;
+            if ((((index_belong == "R2")) && ((criteria_R1 - 5 <= hypothesis) && (criteria_R1 + 5 >= hypothesis))) ||
+                (((index_belong == "R1")) && ((criteria_R2 - 5 <= hypothesis) && (criteria_R2 + 5 >= hypothesis))))
+                return 0;
+            else if (index_belong == "R1")
+                criteria_R1 = hypothesis;
+            else if (index_belong == "R2")
+                criteria_R2 = hypothesis;
         }
-        return return_val;
+        return 1;
     }
 
     // FIXME Multi thread!!
