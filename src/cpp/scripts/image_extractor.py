@@ -1,5 +1,5 @@
 # FIXME This works only for few robots. If you want, convert this into C++.
-# REVIEW rosのcallbackは同時には行えない。他ノードの終了を確認してからcallback起動させたいなら、multithreadか、もしくはactionlibの仕様が前提
+# REVIEW rosのcallbackはpythonの場合、並列して行える!C＋＋は無理？？
 #! /usr/bin/python
 import rospy
 import os
@@ -57,10 +57,10 @@ def callback(rgb, id):
 
     # REVIEW 中止
     else:
-        condition["cb1 storing"]=0
         rospy.loginfo("CB1 stocking img "+str(img_number))
         cv2.imwrite(all_rgb + str(img_number) + ".jpg", cv2_img)
         stock[str(img_number)] = cv2_img
+        condition["cb1 storing"]=0
 
     img_number += 2
 
@@ -79,10 +79,10 @@ def callback2(rgb, id):
         print("image storing;"+str(img_number2))
     # 中止
     else:
-        condition["cb2 storing"]=0
         rospy.loginfo("CB2 stocking img "+str(img_number2))
         cv2.imwrite(all_rgb + str(img_number2) + ".jpg", cv2_img)
         stock[str(img_number2)] = cv2_img
+        condition["cb2 storing"]=0
 
     img_number2 += 2
 
@@ -101,9 +101,8 @@ def switch_CB(loop):
 
     if ("start" in start2end):
         # NOTE wait until both cb begins its work and now stock is fully stored
-        for i in range(10**7):
-            if condition["cb1 storing"]==1 and condition["cb2 storing"]==1:
-                break
+        while (condition["cb1 storing"]==0 or condition["cb2 storing"]==0):
+            pass
         # REVIEW 辞書のforループの回し方
         for index, img in stock.items():
             cv2.imwrite(path + "rgb/"+str(index) + ".jpg", img)
@@ -126,14 +125,15 @@ def commandCB(event):
 
     # loop検知開始
     global already_loop,start2end
+    l=[img_number,img_number2]
+    l_no=max(l)-2
+    already_loop=0
     
     # NOTE 連続していないものをtemp_stockに避難させておく.
 
-    for i in range(10**7):
-        if condition["cb1 storing"]==0 and condition["cb2 storing"]==0:
-            break
-    l=[img_number,img_number2]
-    l_no=max(l)-2
+
+    while (condition["cb1 storing"]==1 or condition["cb2 storing"]==1):
+            pass
     # NOTE lはこれから作る予定の画像index
     for num in range(10**4):
         if (os.path.exists(path+"rgb/"+str(l_no-1)+".jpg")):
@@ -141,13 +141,14 @@ def commandCB(event):
         # NOTE なんかエラーが出るけど、うまく読み込めてはいるっぽい
         temp_stock[l_no]=cv2.imread(path+"rgb/"+str(l_no)+".jpg")
         rospy.loginfo("removing "+str(l_no))
-        print(os.remove(path+"rgb/"+str(l_no)+".jpg"))
+        os.remove(path+"rgb/"+str(l_no)+".jpg")
         l_no-=2
 
     # NOTE loop closure nodeに画像が保存し終わったことを伝える
     msg.data=1
     # NOTE ここで、loop nodeを起動
     files=glob.glob(path+"rgb/*")
+
     print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     for file in files:
         rospy.loginfo(file)
@@ -161,7 +162,7 @@ def commandCB(event):
     # NOTE detectの対象ファイルをまとめる [start:int,end:int]
     start2end["start"] = start2end["end"]+1
     start2end["end"]=l_no
-    already_loop=0
+    
 
 if __name__ == '__main__':
     
