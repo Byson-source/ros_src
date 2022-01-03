@@ -40,7 +40,7 @@ condition = {"cb1 storing":1,
 
 
 def callback(rgb, id):
-    global img_number, stock, start2end,condition
+    global img_number, stock, condition
 
     cv2_img = bridge.imgmsg_to_cv2(rgb, "bgr8")
 # FIXME Maybe should change to (640,480)
@@ -92,6 +92,8 @@ def switch_CB(loop):
     already_loop=1
     
     # NOTE Erase detected images
+    rospy.loginfo("file start is "+str(start2end["start"]))
+    rospy.loginfo("file end is "+str(start2end["end"]))
     for file_num in range(start2end["start"], start2end["end"]+1):
         os.remove(path + "rgb/"+str(file_num) + ".jpg")
 
@@ -123,9 +125,13 @@ def setup():
 def commandCB(event):
 
     # loop検知開始
-    global already_loop 
+    global already_loop,start2end
     
     # NOTE 連続していないものをtemp_stockに避難させておく.
+
+    for i in range(10**7):
+        if condition["cb1 storing"]==0 and condition["cb2 storing"]==0:
+            break
     l=[img_number,img_number2]
     l_no=max(l)-2
     # NOTE lはこれから作る予定の画像index
@@ -134,13 +140,11 @@ def commandCB(event):
             break
         # NOTE なんかエラーが出るけど、うまく読み込めてはいるっぽい
         temp_stock[l_no]=cv2.imread(path+"rgb/"+str(l_no)+".jpg")
-        os.remove(path+"rgb/"+str(l_no)+".jpg")
+        rospy.loginfo("removing "+str(l_no))
+        print(os.remove(path+"rgb/"+str(l_no)+".jpg"))
         l_no-=2
 
     # NOTE loop closure nodeに画像が保存し終わったことを伝える
-    for i in range(10**7):
-        if condition["cb1 storing"]==0 and condition["cb2 storing"]==0:
-            break
     msg.data=1
     # NOTE ここで、loop nodeを起動
     files=glob.glob(path+"rgb/*")
