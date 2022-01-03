@@ -92,8 +92,8 @@ def switch_CB(loop):
     already_loop=1
     
     # NOTE Erase detected images
-    rospy.loginfo("file start is "+str(start2end["start"]))
-    rospy.loginfo("file end is "+str(start2end["end"]))
+    # rospy.loginfo("file start is "+str(start2end["start"]))
+    # rospy.loginfo("file end is "+str(start2end["end"]))
     for file_num in range(start2end["start"], start2end["end"]+1):
         os.remove(path + "rgb/"+str(file_num) + ".jpg")
 
@@ -119,6 +119,7 @@ def setup():
     os.mkdir(path)
     os.mkdir(all_rgb)
     os.mkdir(path+"/rgb/")
+    os.mkdir(path+"/sorted_rgb/")
 
 
 def commandCB(event):

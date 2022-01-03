@@ -33,6 +33,7 @@ private:
 
     std::string template_path{"/home/ayumi/Documents/tohoku_uni/CLOVERs/images/rgb/"};
     std::string database_path{"/home/ayumi/Documents/RTAB-Map/rtabmap.db"};
+    std::string sorted_path{"/home/ayumi/Documents/tohoku_uni/CLOVERs/images/sorted_rgb/"};
     std::string belong;
 
     std::map<int, std::map<std::string, std::vector<int>>> who_detect;
@@ -87,7 +88,9 @@ public:
         std::map<std::string, std::vector<int>> R2_loop;
 
         all_loop[1] = R1_loop;
+        all_loop[1]["index"].push_back(-1);
         all_loop[2] = R2_loop;
+        all_loop[2]["index"].push_back(-1);
     }
 
     void send_command(int threshold = 0)
@@ -168,7 +171,11 @@ public:
             sorted_original[nextIndex + iteration] = file_dir["R1"][iteration];
             std::rename(old_name.c_str(), new_name.c_str());
 
-            std::cout << "For R1, old name; " << old_name2 << " to new name; " << new_name << std::endl;
+            cv::Mat srcImage{cv::imread(new_name)};
+            std::string folder_name{"sorted_rgb/"};
+            cv::imwrite(sorted_path+std::to_string(nextIndex + iteration) + jpg,srcImage);
+
+            std::cout << "For R1, old name; " << std::to_string(file_dir["R1"][iteration]) << " to new name; " << std::to_string(nextIndex + iteration) << std::endl;
         }
         // R2
         for (int iteration = 0; iteration < file_dir["R2"].size(); ++iteration)
@@ -178,7 +185,12 @@ public:
             std::string new_name{template_path + std::to_string(nextIndex + iteration + file_dir["R1"].size()) + jpg};
             sorted_original[nextIndex + iteration + file_dir["R1"].size()] = file_dir["R2"][iteration];
             std::rename(old_name.c_str(), new_name.c_str());
-            std::cout << "For R2, old name; " << old_name2 << " to new name; " << new_name << std::endl;
+
+            cv::Mat srcImage{cv::imread(new_name)};
+            std::string folder_name{"sorted_rgb/"};
+            cv::imwrite(sorted_path+std::to_string(nextIndex + iteration+file_dir["R1"].size()) + jpg,srcImage);
+
+            std::cout << "For R2, old name; " << std::to_string(file_dir["R2"][iteration]) << " to new name; " << std::to_string(nextIndex + iteration + file_dir["R1"].size()) << std::endl;
         }
 
         std::map<std::string, int> ans;
@@ -209,21 +221,25 @@ public:
         else
             index_belong = "R2";
         // NOTE 塊の始まりの検知
-        if ((all_loop[1]["index"].size() == 0) && (all_loop[2]["index"].size() == 0)){
+
+        if ((all_loop[1]["index"].size() == 1) && (all_loop[2]["index"].size() == 1))
+        {
             if (index_belong == "R1")
                 belong = "R1";
             else
                 belong = "R2";
+            criteria = hypothesis;
             return_val = 1;
         }
 
         else if ((nextIndex - std::max(all_loop[1]["index"].back(), all_loop[2]["index"].back()) > 3))
         {
-            ROS_INFO("Now judging...");
+            // ROS_INFO("Now judging...");
             if (index_belong == "R1")
                 belong = "R1";
             else
                 belong = "R2";
+            criteria = hypothesis;
             return_val = 1;
         }
         // NOTE連続しているもので、かつ対象のロボットが変わった場合
@@ -232,8 +248,9 @@ public:
         else if ((nextIndex - std::max(all_loop[1]["index"].back(), all_loop[2]["index"].back()) <= 3) &&
                  (nextIndex == detect_info["R2start"]))
         {
+            std::cout<<"criteria is "<<std::to_string(criteria)<<std::endl;
             if (((belong == "R1") && (index_belong == "R2") && ((criteria - 5 <= hypothesis) && (criteria + 5 >= hypothesis))) ||
-                ((belong == "R2") && (index_belong == "R2") && ((criteria - 5 <= hypothesis) && (criteria + 5 >= hypothesis))))
+                ((belong == "R2") && (index_belong == "R1") && ((criteria - 5 <= hypothesis) && (criteria + 5 >= hypothesis))))
                 return_val = 0;
             else
                 return_val = 1;
@@ -300,6 +317,7 @@ public:
                                (float)rtabmap.getLoopClosureValue(),
                                nextIndex,
                                (int)rtabmap.getLoopClosureId());
+
                         io_num = std::to_string(nextIndex) + jpg;
                         // ロボット間の検知
                         // R1の検知
@@ -307,7 +325,7 @@ public:
                         {
                             if ((sorted_original[nextIndex] - sorted_original[rtabmap.getLoopClosureId()]) % 2 == 1)
                             {
-                                ROS_INFO("This is the loop between Robots");
+                                ROS_WARN("This is the loop between Robots");
                                 who_detect[1]["index"].push_back(sorted_original[nextIndex]);
                                 who_detect[1]["LoopID"].push_back(sorted_original[rtabmap.getLoopClosureId()]);
                             }
@@ -318,7 +336,7 @@ public:
                         {
                             if ((sorted_original[nextIndex] - sorted_original[rtabmap.getLoopClosureId()]) % 2 == 1)
                             {
-                                ROS_INFO("This is the loop between Robots");
+                                ROS_WARN("This is the loop between Robots");
                                 who_detect[2]["index"].push_back(sorted_original[nextIndex]);
                                 who_detect[2]["LoopID"].push_back(sorted_original[rtabmap.getLoopClosureId()]);
                             }
