@@ -1,6 +1,5 @@
 // FIXME loopが連続すると"つられ"現象が起こる。True positiveが異なるロボット間で起きた→つられ現象によりFPになった場合、反芻作業が必要？
 // FIXME TPとFPのふるいわけ
-// TODO multithreadを試す
 #include "rtabmap/core/Rtabmap.h"
 #include "rtabmap/core/CameraRGB.h"
 #include <opencv2/core/core.hpp>
@@ -202,7 +201,6 @@ public:
     // FIXME 要修正？
     int judge(int hypothesis, std::map<std::string, int> detect_info)
     {
-        ROS_INFO("Now judging...");
         int return_val;
         std::string index_belong;
         if (detect_info["R1start"] <= nextIndex && nextIndex <= detect_info["R1end"])
@@ -210,7 +208,13 @@ public:
         else
             index_belong = "R2";
         // NOTE 塊の始まりの検知
-        if (nextIndex - std::max(all_loop[1]["index"].back(), all_loop[2]["index"].back()) > 3)
+        ROS_INFO("Now judging...");
+        std::cout<<all_loop[1]["index"].size()<<std::endl;
+        std::cout<<all_loop[2]["index"].size()<<std::endl;
+
+        if ((nextIndex - std::max(all_loop[1]["index"].back(), all_loop[2]["index"].back()) > 3) || 
+        // 初回の時
+        ((all_loop[1]["index"].size()==0) && (all_loop[2]["index"].size()==0)))
         {
             if (index_belong == "R1")
                 belong = "R1";

@@ -149,10 +149,10 @@ def commandCB(event):
     # NOTE ここで、loop nodeを起動
     files=glob.glob(path+"rgb/*")
 
-    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-    for file in files:
-        rospy.loginfo(file)
-    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    # print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    # for file in files:
+    #     rospy.loginfo(file)
+    # print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
     command.publish(msg)
     # loop nodeから検知終了の合図を待つ
