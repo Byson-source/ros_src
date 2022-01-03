@@ -1,5 +1,3 @@
-// FIXME loopが連続すると"つられ"現象が起こる。True positiveが異なるロボット間で起きた→つられ現象によりFPになった場合、反芻作業が必要？
-// FIXME TPとFPのふるいわけ
 #include "rtabmap/core/Rtabmap.h"
 #include "rtabmap/core/CameraRGB.h"
 #include <opencv2/core/core.hpp>
@@ -93,34 +91,37 @@ public:
         all_loop[2]["index"].push_back(-1);
     }
 
-    void send_command(int threshold = 0)
+    void send_command(void)
     {
-        for (auto item : who_detect)
+        if ((who_detect[1]["index"].size() > 0) || (who_detect[2]["index"].size() > 0))
         {
-            std_msgs::Int32MultiArray index_array;
-            // NOTE　最初のインデックスに1とあったらR1のdetection、2とあったらR2のもの
-            std_msgs::Int32MultiArray val_array;
-            // NOTE　最初のインデックスに1とあったらR1のdetection、2とあったらR2のもの
 
-            index_array.data.resize(item.second["index"].size() + 1);
-            val_array.data.resize(item.second["index"].size() + 1);
-
-            for (int iter{0}; iter < item.second["index"].size() + 1; ++iter)
+            for (auto item : who_detect)
             {
-                if (iter == 0)
-                {
-                    index_array.data[iter] = item.first;
-                    val_array.data[iter] = item.first;
-                }
-                else
-                {
-                    index_array.data[iter] = item.second["index"][iter - 1];
-                    val_array.data[iter] = item.second["LoopID"][iter - 1];
-                }
-            }
+                std_msgs::Int32MultiArray index_array;
+                std_msgs::Int32MultiArray val_array;
 
-            index_pub.publish(index_array);
-            val_pub.publish(val_array);
+                index_array.data.resize(item.second["index"].size() + 1);
+                val_array.data.resize(item.second["index"].size() + 1);
+
+                for (int iter{0}; iter < item.second["index"].size() + 1; ++iter)
+                {
+                    if (iter == 0)
+                    {
+                        // NOTE 最初のインデックスに1とあったらR1のdetection、2とあったらR2のもの
+                        index_array.data[iter] = item.first;
+                        val_array.data[iter] = item.first;
+                    }
+                    else
+                    {
+                        index_array.data[iter] = item.second["index"][iter - 1];
+                        val_array.data[iter] = item.second["LoopID"][iter - 1];
+                    }
+                }
+
+                index_pub.publish(index_array);
+                val_pub.publish(val_array);
+            }
         }
     }
 
@@ -362,7 +363,7 @@ public:
                 break;
         }
         // TODO send_commandの実装
-        // send_command
+        send_command();
         clear_dir();
         img_switch.publish(msg);
     }
