@@ -203,19 +203,23 @@ public:
     {
         int return_val;
         std::string index_belong;
+
         if (detect_info["R1start"] <= nextIndex && nextIndex <= detect_info["R1end"])
             index_belong = "R1";
         else
             index_belong = "R2";
         // NOTE 塊の始まりの検知
-        ROS_INFO("Now judging...");
-        std::cout<<all_loop[1]["index"].size()<<std::endl;
-        std::cout<<all_loop[2]["index"].size()<<std::endl;
+        if ((all_loop[1]["index"].size() == 0) && (all_loop[2]["index"].size() == 0)){
+            if (index_belong == "R1")
+                belong = "R1";
+            else
+                belong = "R2";
+            return_val = 1;
+        }
 
-        if ((nextIndex - std::max(all_loop[1]["index"].back(), all_loop[2]["index"].back()) > 3) || 
-        // 初回の時
-        ((all_loop[1]["index"].size()==0) && (all_loop[2]["index"].size()==0)))
+        else if ((nextIndex - std::max(all_loop[1]["index"].back(), all_loop[2]["index"].back()) > 3))
         {
+            ROS_INFO("Now judging...");
             if (index_belong == "R1")
                 belong = "R1";
             else
@@ -284,7 +288,7 @@ public:
                 if (rtabmap.getLoopClosureId())
                 {
                     ROS_INFO("Loop was detected,now judging...");
-                    
+
                     if (judge(rtabmap.getLoopClosureId(), ans))
                     {
                         printf(" #%d ptime(%fs) STM(%d) WM(%d) hyp(%d) value(%.2f) *LOOP %d->%d*\n",
