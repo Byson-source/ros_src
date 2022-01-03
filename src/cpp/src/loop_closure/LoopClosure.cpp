@@ -28,7 +28,8 @@ private:
 
     int robot_number;
     int nextIndex{1};
-    int criteria{0};
+    int criteria_R1{0};
+    int criteria_R2{0};
     // hypothesis criteria
 
     std::string template_path{"/home/ayumi/Documents/tohoku_uni/CLOVERs/images/rgb/"};
@@ -173,7 +174,13 @@ public:
 
             cv::Mat srcImage{cv::imread(new_name)};
             std::string folder_name{"sorted_rgb/"};
-            cv::imwrite(sorted_path + std::to_string(nextIndex + iteration) + jpg, srcImage);
+            try
+            {
+                cv::imwrite(sorted_path + std::to_string(nextIndex + iteration) + jpg, srcImage);
+            }
+            catch (cv::Exception)
+            {
+            }
 
             std::cout << "For R1, old name; " << std::to_string(file_dir["R1"][iteration]) << " to new name; " << std::to_string(nextIndex + iteration) << std::endl;
         }
@@ -188,7 +195,14 @@ public:
 
             cv::Mat srcImage{cv::imread(new_name)};
             std::string folder_name{"sorted_rgb/"};
-            cv::imwrite(sorted_path + std::to_string(nextIndex + iteration + file_dir["R1"].size()) + jpg, srcImage);
+            try
+            {
+
+                cv::imwrite(sorted_path + std::to_string(nextIndex + iteration + file_dir["R1"].size()) + jpg, srcImage);
+            }
+            catch (cv::Exception)
+            {
+            }
 
             std::cout << "For R2, old name; " << std::to_string(file_dir["R2"][iteration]) << " to new name; " << std::to_string(nextIndex + iteration + file_dir["R1"].size()) << std::endl;
         }
@@ -226,9 +240,10 @@ public:
         {
             if (index_belong == "R1")
                 belong = "R1";
+                criteria_R1=hypothesis;
             else
                 belong = "R2";
-            criteria = hypothesis;
+                criteria_R2=hypothesis;
             return_val = 1;
         }
 
@@ -237,20 +252,24 @@ public:
             // ROS_INFO("Now judging...");
             if (index_belong == "R1")
                 belong = "R1";
+                criteria_R1=hypothesis;
             else
                 belong = "R2";
-            criteria = hypothesis;
+                criteria_R2=hypothesis;
             return_val = 1;
         }
-        // NOTE連続しているもので、かつ対象のロボットが変わった場合
-        // else if ((nextIndex - max(all_loop[1]["index"].back(), all_loop[2]["index"].back()) <= 3) &&
-        //          (nextIndex == detect_info["R1start"] || nextIndex == detect_info["R2start"]))
+        // criteriaは真値のhypothesisと期待できるもの
         else if (nextIndex - std::max(all_loop[1]["index"].back(), all_loop[2]["index"].back()) <= 3)
         {
-            std::cout << "criteria is " << std::to_string(criteria) << std::endl;
-            if (((belong == "R1") && (index_belong == "R2") && ((criteria - 5 <= hypothesis) && (criteria + 5 >= hypothesis))) ||
-                ((belong == "R2") && (index_belong == "R1") && ((criteria - 5 <= hypothesis) && (criteria + 5 >= hypothesis))))
+            if ((((belong == "R1") && (index_belong == "R2")) && ((criteria_R1 - 5 <= hypothesis) && (criteria_R1 + 5 >= hypothesis))) ||
+                (((belong == "R2") && (index_belong == "R1")) && ((criteria_R2 - 5 <= hypothesis) && (criteria + 5 >= hypothesis))))
                 return_val = 0;
+            else if (((belong == "R1") && (index_belong == "R1")) ||
+                     ((belong == "R2") && (index_belong == "R2")))
+            {
+                criteria = hypothesis;
+                return_val = 1;
+            }
             else
                 return_val = 1;
         }
@@ -260,7 +279,7 @@ public:
     // FIXME Multi thread!!
     void confirm_CB(const std_msgs::Int32::ConstPtr &turn_on)
     {
-        ROS_INFO("Loop node was actuated");
+        // ROS_INFO("Loop node was actuated");
         std_msgs::Int32 msg;
 
         msg.data = 1;
@@ -303,7 +322,6 @@ public:
 
                 if (rtabmap.getLoopClosureId())
                 {
-                    ROS_INFO("Loop was detected,now judging...");
 
                     if (judge(rtabmap.getLoopClosureId(), ans))
                     {
@@ -344,7 +362,7 @@ public:
                         }
                     }
                     else
-                        ROS_INFO("False positive was detected");
+                        ROS_ERROR("False positive was detected");
                 }
 
                 ++nextIndex;
