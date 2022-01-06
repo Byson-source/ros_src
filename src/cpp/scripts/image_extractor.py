@@ -120,6 +120,7 @@ def setup():
     os.mkdir(all_rgb)
     os.mkdir(path+"/rgb/")
     os.mkdir(path+"/sorted_rgb/")
+    os.mkdir(path+"/depth/")
 
 
 def commandCB(event):
@@ -150,11 +151,6 @@ def commandCB(event):
     # NOTE ここで、loop nodeを起動
     files=glob.glob(path+"rgb/*")
 
-    # print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-    # for file in files:
-    #     rospy.loginfo(file)
-    # print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-
     command.publish(msg)
     # loop nodeから検知終了の合図を待つ
 
@@ -166,8 +162,7 @@ def commandCB(event):
     
 
 if __name__ == '__main__':
-    
-
+    setup()
     rospy.init_node('image_listener', anonymous=True)
 
     rgb_topic = "/robot1/camera/rgb/image_raw"
@@ -197,7 +192,6 @@ if __name__ == '__main__':
         [rgb_sub2, myid_sub2], 10, 0.1, allow_headerless=False)
     ts2.registerCallback(callback2)
     # rospy.Subscriber(image_topic, Image, rgb_callback)
-    setup()
 
     # NOTE 5秒に一度detection nodeを呼び込む
     while img_number<10:

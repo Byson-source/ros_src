@@ -237,7 +237,7 @@ src/gui/include
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
   scripts/gen_numbers.py scripts/any_image_extractor.py scripts/image_extractor.py
-  scripts/talker.py scripts/listener.py
+  scripts/talker.py scripts/listener.py scripts/depth_container.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

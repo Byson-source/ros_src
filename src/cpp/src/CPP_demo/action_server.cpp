@@ -60,7 +60,8 @@ public:
       
       feedback_.sequence.push_back(feedback_.sequence[i] + feedback_.sequence[i - 1]);
       // publish the feedback
-      as_.publishFeedback(feedback_);
+      // as_.publishFeedback(feedback_);
+      std::cout<<"Hi!"<<std::endl;
       // this sleep is not necessary, the sequence is computed at 1 Hz for demonstration purposes
       r.sleep();
     }
