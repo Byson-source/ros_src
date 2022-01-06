@@ -8,7 +8,7 @@ import numpy as np
 import pyrealsense2 as rs2
 import os
 from rtabmap_ros.msg import Info
-from std.msg import Int32
+from std_msgs.msg import Int32
 
 import message_filters
 import cv2
@@ -18,6 +18,9 @@ import cv2
 depth_path = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/depth/"
 depth_img=1
 depth_img2=2
+container1=[]
+container2=[]
+bridge=CvBridge()
 
 def depthCB1(depth1, id):
     global depth_img
@@ -29,6 +32,7 @@ def depthCB1(depth1, id):
     cv2_img = cv2.applyColorMap(cv2.convertScaleAbs(cv2_img, alpha=0.03), cv2.COLORMAP_JET)
 
     # REVIEW 再開
+    container1.append(cv2_img)
     cv2.imwrite(depth_path + str(depth_img) + ".png", cv2_img)
 
     depth_img += 2
@@ -43,6 +47,7 @@ def depthCB2(depth2, id):
     
     img = cv2.applyColorMap(cv2.convertScaleAbs(img, alpha=0.03), cv2.COLORMAP_JET)
     cv2.imwrite(depth_path + str(depth_img2) + ".png", img)
+    container2.append(img)
 
     depth_img2 += 2
 
@@ -124,7 +129,7 @@ if __name__ == '__main__':
     rospy.init_node("depth_listener")
 
     depth_topic = "/robot1/camera/depth/image_raw"
-    depth_topic2 = "/robot1/camera/depth/image_raw"
+    depth_topic2 = "/robot2/camera/depth/image_raw"
 
     ID_topic = "/robot1/rtabmap/info"
     ID_topic2 = "/robot2/rtabmap/info"
