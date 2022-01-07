@@ -1,3 +1,8 @@
+# TODO loopノードからloop pair情報を受け取る
+# TODO feature matching+RANSAC
+# TODO 特徴点に該当する深度算出
+# TODO 特徴点の座標と深度をPublish
+
 import rospy
 from sensor_msgs.msg import Image as msg_Image
 from sensor_msgs.msg import CameraInfo
@@ -9,6 +14,7 @@ import pyrealsense2 as rs2
 import os
 from rtabmap_ros.msg import Info
 from std_msgs.msg import Int32
+from std_msgs.msg import Int32MultiArray
 
 import message_filters
 import cv2
@@ -21,12 +27,13 @@ depth_img2=2
 container1=[]
 container2=[]
 bridge=CvBridge()
+loop_dict={}
 
 def depthCB1(depth1, id):
     global depth_img
 
     cv2_img = bridge.imgmsg_to_cv2(depth1, "passthrough")
-# FIXME Maybe should change to (640,480)
+    # FIXME Maybe should change to (640,480)
     cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
 
     cv2_img = cv2.applyColorMap(cv2.convertScaleAbs(cv2_img, alpha=0.03), cv2.COLORMAP_JET)
@@ -42,7 +49,7 @@ def depthCB2(depth2, id):
     global depth_img2
 
     img = bridge.imgmsg_to_cv2(depth2, "passthrough")
-# FIXME Maybe should change to (640,480)
+    # FIXME Maybe should change to (640,480)
     img = cv2.resize(img, dsize=(512, 384))
     
     img = cv2.applyColorMap(cv2.convertScaleAbs(img, alpha=0.03), cv2.COLORMAP_JET)
@@ -50,6 +57,10 @@ def depthCB2(depth2, id):
     container2.append(img)
 
     depth_img2 += 2
+
+def indexCB(data):
+
+def valueCB(data)
 
 
 
@@ -127,7 +138,7 @@ def depthCB2(depth2, id):
 if __name__ == '__main__':
     # node_name = os.path.basename(sys.argv[0]).split('.')[0]
     rospy.init_node("depth_listener")
-
+    # /////////////////////////////////////////////////////////////////////////
     depth_topic = "/robot1/camera/depth/image_raw"
     depth_topic2 = "/robot2/camera/depth/image_raw"
 
@@ -147,6 +158,11 @@ if __name__ == '__main__':
     ts2 = message_filters.ApproximateTimeSynchronizer(
         [depth_sub2, myid_sub2], 10, 0.1, allow_headerless=False)
     ts2.registerCallback(depthCB2)
+    # /////////////////////////////////////////////////////////////////////////
+
+    # /////////////////////////////////////////////////////////////////////////
+    loop_index_sub=rospy.Subscriber("index_array",Int32MultiArray,indexCB);
+    loop_value_sub=rospy.Subscriber("val_array",Int32MultiArray,valueCB);
 
     # main()
 
