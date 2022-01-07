@@ -1,6 +1,5 @@
-# TODO loopノードからloop pair情報を受け取る
-# TODO feature matching+RANSAC
 # TODO 特徴点に該当する深度算出
+
 # TODO 特徴点の座標と深度をPublish
 
 import rospy
@@ -14,7 +13,10 @@ import pyrealsense2 as rs2
 import os
 from rtabmap_ros.msg import Info
 from std_msgs.msg import Int32
-from std_msgs.msg import Int32MultiArray
+from cpp.msg import MultiArray
+from cpp.msg import FeatureArray
+# NOTE 例えばr12の場合、r1がloopを検知した画像ペアのうち、r2が撮った写真上の特徴点の情報を格納している
+# NOTE [[x1,y1,depth1],[x2,y2,depth2]...]
 
 import message_filters
 import cv2
@@ -22,12 +24,12 @@ import cv2
 # if (not hasattr(rs2, 'intrinsics')):
 #     import pyrealsense2.pyrealsense2 as rs2
 depth_path = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/depth/"
+rgb_path="/home/ayumi/Documents/tohoku_uni/CLOVERs/images/all_rgb/"
 depth_img=1
 depth_img2=2
 container1=[]
 container2=[]
 bridge=CvBridge()
-loop_dict={}
 
 def depthCB1(depth1, id):
     global depth_img
@@ -58,11 +60,107 @@ def depthCB2(depth2, id):
 
     depth_img2 += 2
 
-def indexCB(data):
+# Return feature locations
+# TODO パラメーターの妥当性の確認
+def orbmatch(fileName1, fileName2):
+    img1 = cv2.imread(rgb_path+str(fileName1)+".jpg")
+    img2 = cv2.imread(rgb_path+str(fileName2)+".jpg")
+    if img1 is None:
+        print('img1 open err exit')
+        exit(1)
+    if img2 is None:
+        print('img2 open err exit')
+        exit(1)
 
-def valueCB(data)
+    # ORB検出器生成
+    orb = cv2.ORB_create(1000)
 
+    # ORB特徴の取得
+    kp1, des1 = orb.detectAndCompute(img1,None)
+    kp2, des2 = orb.detectAndCompute(img2,None)
+    
+    kp1_loc,kp2_loc=[],[]
 
+    FLANN_INDEX_LSH = 6
+    index_params= dict(algorithm = FLANN_INDEX_LSH,
+                       table_number = 6, # 12
+                       key_size = 14,     # 20
+                       multi_probe_level = 1) #2
+    search_params = dict(checks=50)
+
+    flann = cv2.FlannBasedMatcher(index_params,search_params)
+
+    # マッチング
+    knn_matches = flann.knnMatch(des1,des2,k=2)
+
+    # マッチング結果を描画
+    ratio_thresh = 0.7
+    good_matches = []
+    for mt in knn_matches:
+        
+        if len(mt) < 2:
+            continue
+        m,n = mt[0], mt[1]
+        
+        # print(type(x1))
+        if m.distance < ratio_thresh * n.distance:
+            good_matches.append(m)
+            img1_idx=m.queryIdx
+            img2_idx=m.trainIdx
+            
+            (x1,y1)=kp1[img1_idx].pt
+            (x2,y2)=kp2[img2_idx].pt
+            
+            kp1_loc.append((x1,y1))
+            kp2_loc.append((x2,y2))
+            
+    src_pts = np.float32([ kp1[m.queryIdx].pt for m in good_matches ]).reshape(-1,1,2)
+    dst_pts = np.float32([ kp2[m.trainIdx].pt for m in good_matches ]).reshape(-1,1,2)
+
+    M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,1)
+    mask = mask.ravel().tolist()
+    loc1,loc2=[],[]
+    
+    for index,element in enumerate(mask):
+        if element==1:
+            loc1.append(kp1_loc[index])
+            loc2.append(kp2_loc[index])   
+            
+    # loc1とloc2がRANSACでふるい分けられた特徴点の座標
+
+    return loc1,loc2
+
+def loop_CB(data):
+
+    loop_dict={"R1":{"index":[],"value":[],"FeaturePair":{}},
+               "R2":{"index":[],"value":[],"FeaturePair":{}}}
+
+    for val in data.r1_index:
+        loop_dict["R1"]["index"].append(val)
+    for val in data.r1_value:
+        loop_dict["R1"]["value"].append(val)
+    for val in data.r2_index:
+        loop_dict["R2"]["index"].append(val)
+    for val in data.r2_index:
+        loop_dict["R2"]["value"].append(val)
+
+    for index,element in enumerate(loop_dict):
+        if index=="R1":
+            for iter in range(len(element["index"])):
+                element["FeaturePair"]["R1"],element["FeaturePair"]["R2"]=orbmatch(element["index"][iter],
+                                                                                    element["value"][iter])
+        else:
+            for iter in range(len(element["index"])):
+                element["FeaturePair"]["R2"],element["FeaturePair"]["R1"]=orbmatch(element["index"][iter],
+                                                                                    element["value"][iter])
+
+    info=FeatureArray()
+    info.r11=loop_dict["R1"]["FeaturePair"]["R1"]
+    info.r12=loop_dict["R1"]["FeaturePair"]["R2"]
+    info.r21=loop_dict["R2"]["FeaturePair"]["R1"]
+    info.r22=loop_dict["R2"]["FeaturePair"]["R2"]
+
+    # depth算出
 
 # class ImageListener:
 #     def __init__(self, depth_image_topic, depth_info_topic):
@@ -161,8 +259,8 @@ if __name__ == '__main__':
     # /////////////////////////////////////////////////////////////////////////
 
     # /////////////////////////////////////////////////////////////////////////
-    loop_index_sub=rospy.Subscriber("index_array",Int32MultiArray,indexCB);
-    loop_value_sub=rospy.Subscriber("val_array",Int32MultiArray,valueCB);
+    loop_sub=rospy.Subscriber("result",MultiArray,loopCB);
+    feature_pub=rospy.Publisher("features",FeatureArray,queue_size=10)
 
     # main()
 
