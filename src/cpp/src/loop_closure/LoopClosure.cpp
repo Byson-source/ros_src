@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include "std_msgs/Int32.h"
 #include "std_msgs/String.h"
-#include "std_msgs/Int32MultiArray.h"
+#include "cpp/MultiArray.h"
 #include <ros/ros.h>
 #include <string>
 #include <vector>
@@ -44,8 +44,7 @@ private:
     rtabmap::ParametersMap parameters;
     rtabmap::SensorData data;
 
-    ros::Publisher index_pub;
-    ros::Publisher val_pub;
+    ros::Publisher loop_pub;
     ros::Publisher img_switch;
 
     ros::Subscriber confirm;
@@ -68,8 +67,7 @@ public:
         // REVIEW 何故か強制シャットダウンする。.ros/rtabmap.dbを消すと治った？？
         rtabmap.init(parameters, database_path);
 
-        index_pub = n.advertise<std_msgs::Int32MultiArray>("index_array", 10);
-        val_pub = n.advertise<std_msgs::Int32MultiArray>("val_array", 10);
+        loop_pub = n.advertise<cpp::MultiArray>("result", 10);
         // image node turn ON
         img_switch = n.advertise<std_msgs::Int32>("loop", 10);
 
@@ -95,33 +93,36 @@ public:
     {
         if ((who_detect[1]["index"].size() > 0) || (who_detect[2]["index"].size() > 0))
         {
+            cpp::MultiArray result;
+            std::vector<int> result_index;
+            std::vector<int> result_val;
 
             for (auto item : who_detect)
             {
-                std_msgs::Int32MultiArray index_array;
-                std_msgs::Int32MultiArray val_array;
 
-                index_array.data.resize(item.second["index"].size() + 1);
-                val_array.data.resize(item.second["index"].size() + 1);
+                // result_index.resize(item.second["index"].size());
+                // result_val.resize(item.second["index"].size());
 
-                for (int iter{0}; iter < item.second["index"].size() + 1; ++iter)
+                for (int iter{0}; iter < item.second["index"].size(); ++iter)
                 {
-                    if (iter == 0)
-                    {
-                        // NOTE 最初のインデックスに1とあったらR1のdetection、2とあったらR2のもの
-                        index_array.data[iter] = item.first;
-                        val_array.data[iter] = item.first;
-                    }
-                    else
-                    {
-                        index_array.data[iter] = item.second["index"][iter - 1];
-                        val_array.data[iter] = item.second["LoopID"][iter - 1];
-                    }
+                    // result_index[iter] = item.second["index"][iter];
+                    // result_val[iter] = item.second["LoopID"][iter];
+                    result_index.push_back(item.second["index"][iter]);
+                    result_val.push_back(item.second["LoopID"][iter]);
                 }
 
-                index_pub.publish(index_array);
-                val_pub.publish(val_array);
+                if (item.first == 1)
+                {
+                    result.r1_index = result_index;
+                    result.r1_value = result_val;
+                }
+                else
+                {
+                    result.r2_index=result_index ;
+                    result.r2_value=result_val;
+                }
             }
+            loop_pub.publish(result);
         }
     }
 
