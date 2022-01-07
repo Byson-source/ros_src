@@ -116,7 +116,7 @@ INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
 ##   * uncomment the add_*_files sections below as needed
 ##     and list every .msg/.srv/.action file to be processed
 ##   * uncomment the generate_messages entry below
-##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
+##   * add every package in MSG_DEP_SET toegenerate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
 add_message_files(
