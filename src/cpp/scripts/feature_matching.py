@@ -27,21 +27,20 @@ depth_path = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/depth/"
 rgb_path="/home/ayumi/Documents/tohoku_uni/CLOVERs/images/all_rgb/"
 depth_img=1
 depth_img2=2
-container1=[]
-container2=[]
+container={}
 bridge=CvBridge()
 
 def depthCB1(depth1, id):
     global depth_img
 
-    cv2_img = bridge.imgmsg_to_cv2(depth1, "passthrough")
+    cv2_img = bridge.imgmsg_to_cv2(depth1, depth1.encoding)
     # FIXME Maybe should change to (640,480)
     cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
 
     cv2_img = cv2.applyColorMap(cv2.convertScaleAbs(cv2_img, alpha=0.03), cv2.COLORMAP_JET)
 
     # REVIEW 再開
-    container1.append(cv2_img)
+    container[depth_img]=cv2_img
     cv2.imwrite(depth_path + str(depth_img) + ".png", cv2_img)
 
     depth_img += 2
@@ -50,13 +49,13 @@ def depthCB1(depth1, id):
 def depthCB2(depth2, id):
     global depth_img2
 
-    img = bridge.imgmsg_to_cv2(depth2, "passthrough")
+    img = bridge.imgmsg_to_cv2(depth2, depth2.encoding)
     # FIXME Maybe should change to (640,480)
     img = cv2.resize(img, dsize=(512, 384))
     
     img = cv2.applyColorMap(cv2.convertScaleAbs(img, alpha=0.03), cv2.COLORMAP_JET)
+    container[depth_img2]=img
     cv2.imwrite(depth_path + str(depth_img2) + ".png", img)
-    container2.append(img)
 
     depth_img2 += 2
 
@@ -134,7 +133,7 @@ def loop_CB(data):
 
     loop_dict={"R1":{"index":[],"value":[],"FeaturePair":{}},
                "R2":{"index":[],"value":[],"FeaturePair":{}}}
-
+    #NOTE about "FeaturePair"...{"R1":[1:[[x1,y1],[x2,y2],...],2:...] ,"R2":[1:[[x1,y1],[x2,y2],...],2:[]...],"R1Depth":{1:[d1,d2,d3,...],...},"R2depth":{1:[d1,d2,...],2:[]...]}
     for val in data.r1_index:
         loop_dict["R1"]["index"].append(val)
     for val in data.r1_value:
@@ -143,96 +142,47 @@ def loop_CB(data):
         loop_dict["R2"]["index"].append(val)
     for val in data.r2_index:
         loop_dict["R2"]["value"].append(val)
-
+    # R1とR2
     for index,element in enumerate(loop_dict):
-        if index=="R1":
-            for iter in range(len(element["index"])):
-                element["FeaturePair"]["R1"],element["FeaturePair"]["R2"]=orbmatch(element["index"][iter],
-                                                                                    element["value"][iter])
-        else:
-            for iter in range(len(element["index"])):
-                element["FeaturePair"]["R2"],element["FeaturePair"]["R1"]=orbmatch(element["index"][iter],
-                                                                                    element["value"][iter])
+        i=0
+            # detected pair of images
+        for iter in range(len(element["index"])):
+            i+=1
+            indice1,indice2="",""
+
+            if index=="R1":
+                r1_feature,r2_feature=orbmatch(element["index"][iter],element["value"][iter])
+                indice1,indice2="index","value"
+            else:
+                r2_feature,r1_feature=orbmatch(element["index"][iter],element["value"][iter])
+                indice1,indice2="value","index"
+
+            element["FeaturePair"]["R1Depth"][i]=[]
+            element["FeaturePair"]["R2Depth"][i]=[]
+            # feature iterations
+            for val in r1_feature:
+                element["FeaturePair"]["R1Depth"][i].append(container[element[indice1]][val[1],val[0]])
+                # TODO check if the order is (y,x) or (x,y)
+            for val in r2_feature:
+                element["FeaturePair"]["R2Depth"][i].append(container[element[indice2]][val[1],val[0]])
+            
+            element["FeaturePair"]["R1"][i]=r1_feature
+            element["FeaturePair"]["R2"][i]=r2_feature
 
     info=FeatureArray()
+
+
     info.r11=loop_dict["R1"]["FeaturePair"]["R1"]
     info.r12=loop_dict["R1"]["FeaturePair"]["R2"]
     info.r21=loop_dict["R2"]["FeaturePair"]["R1"]
     info.r22=loop_dict["R2"]["FeaturePair"]["R2"]
 
+    feature_pub.publish(info)
+
     # depth算出
 
-# class ImageListener:
-#     def __init__(self, depth_image_topic, depth_info_topic):
-#         self.bridge = CvBridge()
-#         self.sub = rospy.Subscriber(depth_image_topic, msg_Image, self.imageDepthCallback)
-#         self.sub_info = rospy.Subscriber(depth_info_topic, CameraInfo, self.imageDepthInfoCallback)
-#         confidence_topic = depth_image_topic.replace('depth', 'confidence')
-#         self.sub_conf = rospy.Subscriber(confidence_topic, msg_Image, self.confidenceCallback)
-#         self.intrinsics = None
-#         self.pix = None
-#         self.pix_grade = None
-
-#     def imageDepthCallback(self, data):
-#         try:
-#             cv_image = self.bridge.imgmsg_to_cv2(data, data.encoding)
-#             # pick one pixel among all the pixels with the closest range:
-#             indices = np.array(np.where(cv_image == cv_image[cv_image > 0].min()))[:,0]
-#             pix = (indices[1], indices[0])
-#             self.pix = pix
-#             line = '\rDepth at pixel(%3d, %3d): %7.1f(mm).' % (pix[0], pix[1], cv_image[pix[1], pix[0]])
-
-#             if self.intrinsics:
-#                 depth = cv_image[pix[1], pix[0]]
-#                 result = rs2.rs2_deproject_pixel_to_point(self.intrinsics, [pix[0], pix[1]], depth)
-#                 line += '  Coordinate: %8.2f %8.2f %8.2f.' % (result[0], result[1], result[2])
-#             if (not self.pix_grade is None):
-#                 line += ' Grade: %2d' % self.pix_grade
-#             line += '\r'
-#             sys.stdout.write(line)
-#             sys.stdout.flush()
-
-#         except CvBridgeError as e:
-#             print(e)
-#             return
-#         except ValueError as e:
-#             return
-
-#     def confidenceCallback(self, data):
-#         try:
-#             cv_image = self.bridge.imgmsg_to_cv2(data, data.encoding)
-#             grades = np.bitwise_and(cv_image >> 4, 0x0f)
-#             if (self.pix):
-#                 self.pix_grade = grades[self.pix[1], self.pix[0]]
-#         except CvBridgeError as e:
-#             print(e)
-#             return
 
 
-#     def imageDepthInfoCallback(self, cameraInfo):
-#         try:
-#             if self.intrinsics:
-#                 return
-#             self.intrinsics = rs2.intrinsics()
-#             self.intrinsics.width = cameraInfo.width
-#             self.intrinsics.height = cameraInfo.height
-#             self.intrinsics.ppx = cameraInfo.K[2]
-#             self.intrinsics.ppy = cameraInfo.K[5]
-#             self.intrinsics.fx = cameraInfo.K[0]
-#             self.intrinsics.fy = cameraInfo.K[4]
-#             if cameraInfo.distortion_model == 'plumb_bob':
-#                 self.intrinsics.model = rs2.distortion.brown_conrady
-#             elif cameraInfo.distortion_model == 'equidistant':
-#                 self.intrinsics.model = rs2.distortion.kannala_brandt4
-#             self.intrinsics.coeffs = [i for i in cameraInfo.D]
-#         except CvBridgeError as e:
-#             print(e)
-#             return
-# def main():
-#     depth_image_topic = '/camera/depth/image_rect_raw'
-#     depth_info_topic = '/camera/depth/camera_info'
-#     listener = ImageListener(depth_image_topic, depth_info_topic)
-#     rospy.spin()
 if __name__ == '__main__':
     # node_name = os.path.basename(sys.argv[0]).split('.')[0]
     rospy.init_node("depth_listener")

@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/ayumi/catkin_ws/src/realsense-ros/realsense2_camera/build/devel/setup.sh

@@ -1,5 +1,5 @@
 import os
 test={}
-test["15"]=1
-for (index,val) in enumerate(test):
-	print(index)
+test["15"]=[]
+test["15"].append(3)
+print(test["15"])
