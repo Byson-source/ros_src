@@ -1,8 +1,7 @@
 std_msgs/MultiArrayLayout layout
-float32[] r11
+float32[] r1
 
-float32[] r12
+float32[] r2
 
-float32[] r21
-
-float32[] r22
+int32 who_detect
+int32 signal

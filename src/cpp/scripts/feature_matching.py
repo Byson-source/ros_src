@@ -16,7 +16,8 @@ from std_msgs.msg import Int32
 from cpp.msg import MultiArray
 from cpp.msg import FeatureArray
 # NOTE 例えばr12の場合、r1がloopを検知した画像ペアのうち、r2が撮った写真上の特徴点の情報を格納している
-# NOTE [[x1,y1,depth1],[x2,y2,depth2]...]
+# NOTE 写真一枚ごと
+# NOTE [x1,y1,depth1,x2,y2,depth2...]
 
 import message_filters
 import cv2
@@ -133,7 +134,7 @@ def loop_CB(data):
 
     loop_dict={"R1":{"index":[],"value":[],"FeaturePair":{}},
                "R2":{"index":[],"value":[],"FeaturePair":{}}}
-    #NOTE about "FeaturePair"...{"R1":[1:[[x1,y1],[x2,y2],...],2:...] ,"R2":[1:[[x1,y1],[x2,y2],...],2:[]...],"R1Depth":{1:[d1,d2,d3,...],...},"R2depth":{1:[d1,d2,...],2:[]...]}
+    #NOTE about "FeaturePair"...{"R1":{1:[x1,y1,d1,x2,y2,d2,...],2:...} ,"R2":{1:[x1,y1,d1,x2,y2,d2,...],2:[]...}}
     for val in data.r1_index:
         loop_dict["R1"]["index"].append(val)
     for val in data.r1_value:
@@ -142,11 +143,15 @@ def loop_CB(data):
         loop_dict["R2"]["index"].append(val)
     for val in data.r2_index:
         loop_dict["R2"]["value"].append(val)
-    # R1とR2
+    #NOTE R1とR2
     for index,element in enumerate(loop_dict):
         i=0
-            # detected pair of images
+        # 辞書を作る
+
+        element["FeaturePair"]["R1"],element["FeaturePair"]["R2"]={},{}
+        #NOTE detected pair of images
         for iter in range(len(element["index"])):
+            element["FeaturePair"]["R1"][iter+1],element["FeaturePair"]["R2"][iter+1]=[],[]
             i+=1
             indice1,indice2="",""
 
@@ -157,27 +162,36 @@ def loop_CB(data):
                 r2_feature,r1_feature=orbmatch(element["index"][iter],element["value"][iter])
                 indice1,indice2="value","index"
 
-            element["FeaturePair"]["R1Depth"][i]=[]
-            element["FeaturePair"]["R2Depth"][i]=[]
-            # feature iterations
+            #NOTE feature iterations
             for val in r1_feature:
-                element["FeaturePair"]["R1Depth"][i].append(container[element[indice1]][val[1],val[0]])
+                # x
+                element["FeaturePair"]["R1"][iter+1].append(val[0])
+                # y
+                element["FeaturePair"]["R1"][iter+1].append(val[1])
+                # depth
+                element["FeaturePair"]["R1"][iter+1].append(container[element[indice1]][val[1],val[0]])
                 # TODO check if the order is (y,x) or (x,y)
             for val in r2_feature:
-                element["FeaturePair"]["R2Depth"][i].append(container[element[indice2]][val[1],val[0]])
-            
-            element["FeaturePair"]["R1"][i]=r1_feature
-            element["FeaturePair"]["R2"][i]=r2_feature
+                # x
+                element["FeaturePair"]["R2"][iter+1].append(val[0])
+                # y
+                element["FeaturePair"]["R2"][iter+1].append(val[1])
+                # depth
+                element["FeaturePair"]["R2"][iter+1].append(container[element[indice2]][val[1],val[0]])
+                # element["FeaturePair"]["R2Depth"][i].append(container[element[indice2]][val[1],val[0]])
 
-    info=FeatureArray()
+            info=FeatureArray()
+            if index=="R2":
+                info.who_detect=2
+                if iter==len(element["index"]-1):
+                    info.signal=1
+                for index in range(element["FeaturePair"]["R1Depth"][iter]):
+                    info.r1.append(element["FeaturePair"]["R1"])
 
+                    # info.r1=element["FeaturePair"]["R1"]
+                    # info.r2=element["FeaturePair"]["R2"]
 
-    info.r11=loop_dict["R1"]["FeaturePair"]["R1"]
-    info.r12=loop_dict["R1"]["FeaturePair"]["R2"]
-    info.r21=loop_dict["R2"]["FeaturePair"]["R1"]
-    info.r22=loop_dict["R2"]["FeaturePair"]["R2"]
-
-    feature_pub.publish(info)
+            feature_pub.publish(info)
 
     # depth算出
 
@@ -209,7 +223,7 @@ if __name__ == '__main__':
     # /////////////////////////////////////////////////////////////////////////
 
     # /////////////////////////////////////////////////////////////////////////
-    loop_sub=rospy.Subscriber("result",MultiArray,loopCB);
+    loop_sub=rospy.Subscriber("result",MultiArray,loop_CB);
     feature_pub=rospy.Publisher("features",FeatureArray,queue_size=10)
 
     # main()
