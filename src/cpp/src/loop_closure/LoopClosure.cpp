@@ -216,7 +216,6 @@ public:
         who_detect[2]["LoopID"].clear();
     }
 
-    // FIXME 要修正？
     int judge(int hypothesis, std::map<std::string, int> detect_info)
     {
         std::string index_belong;
@@ -236,7 +235,7 @@ public:
                 criteria_R2 = hypothesis;
         }
         // 別の塊
-        else if ((nextIndex - std::max(all_loop[1]["index"].back(), all_loop[2]["index"].back()) > 3))
+        else if ((nextIndex - std::max(all_loop[1]["index"].back(), all_loop[2]["index"].back()) > 5))
         {
             // ROS_INFO("Now judging...");
             if (index_belong == "R1")
