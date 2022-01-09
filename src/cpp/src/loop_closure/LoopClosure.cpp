@@ -136,7 +136,7 @@ public:
         for (const auto &entry : fs::directory_iterator(template_path))
         {
             file_number+=1;
-            std::cout << entry.path() << std::endl;
+            // std::cout << entry.path() << std::endl;
         }
         return file_number;
     }

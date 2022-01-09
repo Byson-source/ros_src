@@ -125,7 +125,6 @@ def setup():
     os.mkdir(all_rgb)
     os.mkdir(path+"/rgb/")
     os.mkdir(path+"/sorted_rgb/")
-    os.mkdir(path+"/depth/")
 
 
 def commandCB(event):

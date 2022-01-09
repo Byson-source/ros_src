@@ -79,44 +79,48 @@ def orbmatch(fileName1, fileName2):
     flann = cv2.FlannBasedMatcher(index_params,search_params)
 
     # マッチング
-    knn_matches = flann.knnMatch(des1,des2,k=2)
+    try:
+        knn_matches = flann.knnMatch(des1,des2,k=2)
+    except cv2.error: 
+        pass
+    else:
+        # マッチング結果を描画
+        ratio_thresh = 0.7
+        good_matches = []
+        for mt in knn_matches:
+            
+            if len(mt) < 2:
+                continue
+            m,n = mt[0], mt[1]
+            
+            # print(type(x1))
+            if m.distance < ratio_thresh * n.distance:
+                good_matches.append(m)
+                img1_idx=m.queryIdx
+                img2_idx=m.trainIdx
+                
+                (x1,y1)=kp1[img1_idx].pt
+                (x2,y2)=kp2[img2_idx].pt
+                
+                kp1_loc.append((x1,y1))
+                kp2_loc.append((x2,y2))
+                
+        src_pts = np.float32([ kp1[m.queryIdx].pt for m in good_matches ]).reshape(-1,1,2)
+        dst_pts = np.float32([ kp2[m.trainIdx].pt for m in good_matches ]).reshape(-1,1,2)
 
-    # マッチング結果を描画
-    ratio_thresh = 0.7
-    good_matches = []
-    for mt in knn_matches:
+        M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,1)
+        mask = mask.ravel().tolist()
+        loc1,loc2=[],[]
         
-        if len(mt) < 2:
-            continue
-        m,n = mt[0], mt[1]
-        
-        # print(type(x1))
-        if m.distance < ratio_thresh * n.distance:
-            good_matches.append(m)
-            img1_idx=m.queryIdx
-            img2_idx=m.trainIdx
-            
-            (x1,y1)=kp1[img1_idx].pt
-            (x2,y2)=kp2[img2_idx].pt
-            
-            kp1_loc.append((x1,y1))
-            kp2_loc.append((x2,y2))
-            
-    src_pts = np.float32([ kp1[m.queryIdx].pt for m in good_matches ]).reshape(-1,1,2)
-    dst_pts = np.float32([ kp2[m.trainIdx].pt for m in good_matches ]).reshape(-1,1,2)
+        for index,element in enumerate(mask):
+            if element==1:
+                loc1.append(kp1_loc[index])
+                loc2.append(kp2_loc[index])   
+                
+        # loc1とloc2がRANSACでふるい分けられた特徴点の座標
 
-    M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,1)
-    mask = mask.ravel().tolist()
-    loc1,loc2=[],[]
-    
-    for index,element in enumerate(mask):
-        if element==1:
-            loc1.append(kp1_loc[index])
-            loc2.append(kp2_loc[index])   
-            
-    # loc1とloc2がRANSACでふるい分けられた特徴点の座標
-
-    return loc1,loc2
+        return loc1,loc2,1
+    return [],[],0
 
 def loop_CB(data):
 
@@ -129,11 +133,9 @@ def loop_CB(data):
 
         # 各検知の写真の枚数
         if index=="R1":
-            print(type(data.r1_index))
 
             element["num"]=len(data.r1_index)
         else:
-            print(type(data.r2_index))
             element["num"]=len(data.r2_index)
 
 
@@ -141,47 +143,51 @@ def loop_CB(data):
         for iter in range(element["num"]):
             element["R1"][iter+1],element["R2"][iter+1]=[],[]
             i+=1
-            indice1,indice2=0,0
+            indice1,indice2,good=0,0,0
+            r1_feature,r2_feature=[],[]
 
             if index=="R1":
-                r1_feature,r2_feature=orbmatch(data.r1_index[iter],data.r1_value[iter])
+                # filter
+                r1_feature,r2_feature,good=orbmatch(data.r1_index[iter],data.r1_value[iter])
                 indice1,indice2=data.r1_index[iter],data.r1_value[iter]
             else:
-                r2_feature,r1_feature=orbmatch(data.r2_index[iter],data.r2_value[iter])
+                r2_feature,r1_feature,good=orbmatch(data.r2_index[iter],data.r2_value[iter])
                 # indice1,indice2="value","index"
                 indice2,indice1=data.r2_index[iter],data.r2_value[iter]
 
             #NOTE feature iterations
-            for val in r1_feature:
-                # x
-                element["R1"][iter+1].append(val[0])
-                # y
-                element["R1"][iter+1].append(val[1])
-                # depth
-                element["R1"][iter+1].append(container[indice1][val[1],val[0]])
-                # TODO check if the order is (y,x) or (x,y)
-            for val in r2_feature:
-                # x
-                element["R2"][iter+1].append(val[0])
-                # y
-                element["R2"][iter+1].append(val[1])
-                # depth
-                element["R2"][iter+1].append(container[indice2][val[1],val[0]])
-                # element["FeaturePair"]["R2Depth"][i].append(container[element[indice2]][val[1],val[0]])
+            if(good):
+                for val in r1_feature:
+                    # x
+                    element["R1"][iter+1].append(val[0])
+                    # y
+                    element["R1"][iter+1].append(val[1])
+                    # depth
+                    element["R1"][iter+1].append(container[indice1][int(val[1]),int(val[0])])
+                    # TODO check if the order is (y,x) or (x,y)
+                for val in r2_feature:
+                    # x
+                    element["R2"][iter+1].append(val[0])
+                    # y
+                    element["R2"][iter+1].append(val[1])
+                    # depth
+                    element["R2"][iter+1].append(container[indice2][int(val[1]),int(val[0])])
+                    # element["FeaturePair"]["R2Depth"][i].append(container[element[indice2]][val[1],val[0]])
 
-            info=FeatureArray()
-            info.signal=0
-            info.r1=element["R1"][iter+1]
-            info.r2=element["R2"][iter+1]
-            if index=="R2":
-                info.who_detect=2
+                info=FeatureArray()
+                info.signal=0
+                info.r1=element["R1"][iter+1]
+                info.r2=element["R2"][iter+1]
+                
+                if index=="R2":
+                    info.who_detect=2
 
-                if iter==len(element["index"]-1):
-                    info.signal=1
-            else:
-                info.who_detect=1
+                    if iter==len(element["index"]-1):
+                        info.signal=1
+                else:
+                    info.who_detect=1
 
-            feature_pub.publish(info)
+                feature_pub.publish(info)
 
     # depth算出
 
