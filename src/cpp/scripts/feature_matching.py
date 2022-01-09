@@ -124,12 +124,12 @@ def loop_CB(data):
                "R2":{"R1":{},"R2":{}}}
     #NOTE {"R1":{1:[x1,y1,d1,x2,y2,d2,...],2:...} ,"R2":{1:[x1,y1,d1,x2,y2,d2,...],2:[]...}}
     #NOTE R1とR2
-    for index,element in enumerate(loop_dict):
+    for index,element in loop_dict.items():
         i=0
 
         # 各検知の写真の枚数
         if index=="R1":
-            print(type(element["num"]))
+            print(type(data.r1_index))
 
             element["num"]=len(data.r1_index)
         else:

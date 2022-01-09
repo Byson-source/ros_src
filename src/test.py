@@ -1,6 +1,5 @@
-import os
-test={}
-test["15"]=[]
-test["15"].append(3)
-test["3"]={}
-print(test["15"])
+loop_dict={"R1":{"R1":{},"R2":{}},"R2":{"R1":{},"R2":{}}}
+
+for key,value in loop_dict.items():
+    print(key,value)
+	

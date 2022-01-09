@@ -135,6 +135,7 @@ def commandCB(event):
 
     wait_until(1)
     already_loop=0
+    wait_until(1)
     l=[img_number,img_number2]
     l_no=max(l)-2
     

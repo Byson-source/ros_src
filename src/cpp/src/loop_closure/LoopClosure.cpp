@@ -131,31 +131,14 @@ public:
 
     int count_files(void)
     {
-        // REVIEW ディレクトリの中のファイルの数え方
-        DIR *dp;
+        // REVIEW ディレクトリの中のファイルの数え方,列挙の仕方
         int file_number = 0;
-        struct dirent *ep;
-        dp = opendir(template_path.c_str());
-        std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;
         for (const auto &entry : fs::directory_iterator(template_path))
         {
+            file_number+=1;
             std::cout << entry.path() << std::endl;
         }
-
-        if (dp != NULL)
-        {
-            while (ep = readdir(dp))
-                file_number++;
-
-            (void)closedir(dp);
-        }
-        else
-        {
-            perror("Couldn't open the directory");
-            exit(1);
-        }
-        // NOTE なぜ引く必要があるかはわからない
-        return file_number - 2;
+        return file_number;
     }
 
     std::map<std::string, int> rename(int file_num, std::string jpg)
