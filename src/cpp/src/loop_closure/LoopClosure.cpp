@@ -14,6 +14,9 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <cstdio>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 //detector, dir_changer,rest_commander
 
@@ -57,11 +60,11 @@ public:
 
         rtabmap.setTimeThreshold(700.0f); // Time threshold : 700 ms, 0 ms means no limit
 
-        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRtabmapLoopThr(), "0.2"));
+        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRtabmapLoopThr(), "0.12"));
         parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRGBDEnabled(), "false"));
 
         // REVIEW rtabmapのstmの決め方
-        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kMemSTMSize(), "40"));
+        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kMemSTMSize(), "30"));
 
         // UFile::erase(database_path);
         // REVIEW 何故か強制シャットダウンする。.ros/rtabmap.dbを消すと治った？？
@@ -118,8 +121,8 @@ public:
                 }
                 else
                 {
-                    result.r2_index=result_index ;
-                    result.r2_value=result_val;
+                    result.r2_index = result_index;
+                    result.r2_value = result_val;
                 }
             }
             loop_pub.publish(result);
@@ -133,6 +136,11 @@ public:
         int file_number = 0;
         struct dirent *ep;
         dp = opendir(template_path.c_str());
+        std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;
+        for (const auto &entry : fs::directory_iterator(template_path))
+        {
+            std::cout << entry.path() << std::endl;
+        }
 
         if (dp != NULL)
         {

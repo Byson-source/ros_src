@@ -38,11 +38,8 @@ def depthCB1(depth1, id):
     # FIXME Maybe should change to (640,480)
     cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
 
-    cv2_img = cv2.applyColorMap(cv2.convertScaleAbs(cv2_img, alpha=0.03), cv2.COLORMAP_JET)
-
     # REVIEW 再開
     container[depth_img]=cv2_img
-    cv2.imwrite(depth_path + str(depth_img) + ".png", cv2_img)
 
     depth_img += 2
 
@@ -53,10 +50,8 @@ def depthCB2(depth2, id):
     img = bridge.imgmsg_to_cv2(depth2, depth2.encoding)
     # FIXME Maybe should change to (640,480)
     img = cv2.resize(img, dsize=(512, 384))
-    
-    img = cv2.applyColorMap(cv2.convertScaleAbs(img, alpha=0.03), cv2.COLORMAP_JET)
+
     container[depth_img2]=img
-    cv2.imwrite(depth_path + str(depth_img2) + ".png", img)
 
     depth_img2 += 2
 
@@ -65,17 +60,10 @@ def depthCB2(depth2, id):
 def orbmatch(fileName1, fileName2):
     img1 = cv2.imread(rgb_path+str(fileName1)+".jpg")
     img2 = cv2.imread(rgb_path+str(fileName2)+".jpg")
-    if img1 is None:
-        print('img1 open err exit')
-        exit(1)
-    if img2 is None:
-        print('img2 open err exit')
-        exit(1)
 
     # ORB検出器生成
     orb = cv2.ORB_create(1000)
 
-    # ORB特徴の取得
     kp1, des1 = orb.detectAndCompute(img1,None)
     kp2, des2 = orb.detectAndCompute(img2,None)
     
@@ -132,64 +120,66 @@ def orbmatch(fileName1, fileName2):
 
 def loop_CB(data):
 
-    loop_dict={"R1":{"index":[],"value":[],"FeaturePair":{}},
-               "R2":{"index":[],"value":[],"FeaturePair":{}}}
-    #NOTE about "FeaturePair"...{"R1":{1:[x1,y1,d1,x2,y2,d2,...],2:...} ,"R2":{1:[x1,y1,d1,x2,y2,d2,...],2:[]...}}
-    for val in data.r1_index:
-        loop_dict["R1"]["index"].append(val)
-    for val in data.r1_value:
-        loop_dict["R1"]["value"].append(val)
-    for val in data.r2_index:
-        loop_dict["R2"]["index"].append(val)
-    for val in data.r2_index:
-        loop_dict["R2"]["value"].append(val)
+    loop_dict={"R1":{"R1":{},"R2":{}},
+               "R2":{"R1":{},"R2":{}}}
+    #NOTE {"R1":{1:[x1,y1,d1,x2,y2,d2,...],2:...} ,"R2":{1:[x1,y1,d1,x2,y2,d2,...],2:[]...}}
     #NOTE R1とR2
     for index,element in enumerate(loop_dict):
         i=0
-        # 辞書を作る
 
-        element["FeaturePair"]["R1"],element["FeaturePair"]["R2"]={},{}
+        # 各検知の写真の枚数
+        if index=="R1":
+            print(type(element["num"]))
+
+            element["num"]=len(data.r1_index)
+        else:
+            print(type(data.r2_index))
+            element["num"]=len(data.r2_index)
+
+
         #NOTE detected pair of images
-        for iter in range(len(element["index"])):
-            element["FeaturePair"]["R1"][iter+1],element["FeaturePair"]["R2"][iter+1]=[],[]
+        for iter in range(element["num"]):
+            element["R1"][iter+1],element["R2"][iter+1]=[],[]
             i+=1
-            indice1,indice2="",""
+            indice1,indice2=0,0
 
             if index=="R1":
-                r1_feature,r2_feature=orbmatch(element["index"][iter],element["value"][iter])
-                indice1,indice2="index","value"
+                r1_feature,r2_feature=orbmatch(data.r1_index[iter],data.r1_value[iter])
+                indice1,indice2=data.r1_index[iter],data.r1_value[iter]
             else:
-                r2_feature,r1_feature=orbmatch(element["index"][iter],element["value"][iter])
-                indice1,indice2="value","index"
+                r2_feature,r1_feature=orbmatch(data.r2_index[iter],data.r2_value[iter])
+                # indice1,indice2="value","index"
+                indice2,indice1=data.r2_index[iter],data.r2_value[iter]
 
             #NOTE feature iterations
             for val in r1_feature:
                 # x
-                element["FeaturePair"]["R1"][iter+1].append(val[0])
+                element["R1"][iter+1].append(val[0])
                 # y
-                element["FeaturePair"]["R1"][iter+1].append(val[1])
+                element["R1"][iter+1].append(val[1])
                 # depth
-                element["FeaturePair"]["R1"][iter+1].append(container[element[indice1]][val[1],val[0]])
+                element["R1"][iter+1].append(container[indice1][val[1],val[0]])
                 # TODO check if the order is (y,x) or (x,y)
             for val in r2_feature:
                 # x
-                element["FeaturePair"]["R2"][iter+1].append(val[0])
+                element["R2"][iter+1].append(val[0])
                 # y
-                element["FeaturePair"]["R2"][iter+1].append(val[1])
+                element["R2"][iter+1].append(val[1])
                 # depth
-                element["FeaturePair"]["R2"][iter+1].append(container[element[indice2]][val[1],val[0]])
+                element["R2"][iter+1].append(container[indice2][val[1],val[0]])
                 # element["FeaturePair"]["R2Depth"][i].append(container[element[indice2]][val[1],val[0]])
 
             info=FeatureArray()
+            info.signal=0
+            info.r1=element["R1"][iter+1]
+            info.r2=element["R2"][iter+1]
             if index=="R2":
                 info.who_detect=2
+
                 if iter==len(element["index"]-1):
                     info.signal=1
-                for index in range(element["FeaturePair"]["R1Depth"][iter]):
-                    info.r1.append(element["FeaturePair"]["R1"])
-
-                    # info.r1=element["FeaturePair"]["R1"]
-                    # info.r2=element["FeaturePair"]["R2"]
+            else:
+                info.who_detect=1
 
             feature_pub.publish(info)
 
@@ -225,7 +215,5 @@ if __name__ == '__main__':
     # /////////////////////////////////////////////////////////////////////////
     loop_sub=rospy.Subscriber("result",MultiArray,loop_CB);
     feature_pub=rospy.Publisher("features",FeatureArray,queue_size=10)
-
-    # main()
 
     rospy.spin()

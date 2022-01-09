@@ -52,17 +52,17 @@ def callback(rgb, id):
         cv2.imwrite(path + "rgb/"+str(img_number) + ".jpg", cv2_img)
         cv2.imwrite(all_rgb + str(img_number) + ".jpg", cv2_img)
         print("image storing;"+str(img_number))
-
-
+        img_number += 2
+        condition["cb1 storing"]=0
 
     # REVIEW 中止
     else:
+        condition["cb1 storing"]=-1
         rospy.loginfo("CB1 stocking img "+str(img_number))
         cv2.imwrite(all_rgb + str(img_number) + ".jpg", cv2_img)
         stock[str(img_number)] = cv2_img
-        condition["cb1 storing"]=0
 
-    img_number += 2
+        img_number += 2
 
 
 def callback2(rgb, id):
@@ -77,14 +77,20 @@ def callback2(rgb, id):
         cv2.imwrite(path + "rgb/"+str(img_number2) + ".jpg", cv2_img)
         cv2.imwrite(all_rgb + str(img_number2) + ".jpg", cv2_img)
         print("image storing;"+str(img_number2))
+        img_number2 += 2
+        condition["cb2 storing"]=0
     # 中止
     else:
+        condition["cb2 storing"]=-1
         rospy.loginfo("CB2 stocking img "+str(img_number2))
         cv2.imwrite(all_rgb + str(img_number2) + ".jpg", cv2_img)
         stock[str(img_number2)] = cv2_img
-        condition["cb2 storing"]=0
 
-    img_number2 += 2
+        img_number2 += 2
+
+def wait_until(condition_):
+    while (condition["cb1 storing"]==condition_ or condition["cb2 storing"]==condition_):
+        pass
 
 def switch_CB(loop):
     # loop終了
@@ -101,8 +107,7 @@ def switch_CB(loop):
 
     if ("start" in start2end):
         # NOTE wait until both cb begins its work and now stock is fully stored
-        while (condition["cb1 storing"]==0 or condition["cb2 storing"]==0):
-            pass
+        wait_until(-1)
         # REVIEW 辞書のforループの回し方
         for index, img in stock.items():
             cv2.imwrite(path + "rgb/"+str(index) + ".jpg", img)
@@ -127,15 +132,16 @@ def commandCB(event):
 
     # loop検知開始
     global already_loop,start2end
+
+    wait_until(1)
+    already_loop=0
     l=[img_number,img_number2]
     l_no=max(l)-2
-    already_loop=0
     
     # NOTE 連続していないものをtemp_stockに避難させておく.
 
 
-    while (condition["cb1 storing"]==1 or condition["cb2 storing"]==1):
-            pass
+    # wait_until(1)
     # NOTE lはこれから作る予定の画像index
     for num in range(10**4):
         if (os.path.exists(path+"rgb/"+str(l_no-1)+".jpg")):
@@ -194,7 +200,7 @@ if __name__ == '__main__':
     # rospy.Subscriber(image_topic, Image, rgb_callback)
 
     # NOTE 5秒に一度detection nodeを呼び込む
-    while img_number<10:
+    while img_number<7:
         pass
     rospy.Timer(rospy.Duration(7),commandCB)
 
