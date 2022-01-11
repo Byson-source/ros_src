@@ -46,10 +46,12 @@ public:
             0.0, 0.0, 1.0;
         inv_intrinstic = intrinstic_parameter.inverse();
     }
-    std::vector<Eigen::Vector3d> img2cam(std::vector<cv::Point2f>　kp1_loc, 
+    
+    std::vector<Eigen::Vector3d> img2cam(std::vector<cv::Point2f> kp1_loc, 
     std::vector<cv::Point2f> kp2_loc,
     std::vector<double> depth_1, std::vector<double> depth_2)
     {
+        std::vector<Eigen::Vector3d> X1_s, X2_s;
         pixels_1.clear();pixels_2.clear();X1_s.clear();X2_s.clear();
         for (int i{0}; i < kp1_loc.size(); ++i)
         {
@@ -64,15 +66,8 @@ public:
             pixel_2[1] = pix2[1];
             pixel_1[2], pixel_2[2] = depth_1[i], depth_2[i];
             // Homogeneous coordinate
-            pixels_1.push_back(pixel_1);
-            pixels_2.push_back(pixel_2);
-        }
-
-        std::vector<Eigen::Vector3d> X1_s, X2_s;
-        for (int index{0}; index < pixels_1.size(); ++index)
-        {
-            Eigen::Vector3d X1, X2;
-            X1, X2 = inv_intrinstic.dot(pixels_1[index]), inv_intrinstic.dot(pixels_2[index]);
+            Eigen::Vector3d X1.X2;
+            X1,X2 = inv_intrinstic.dot(pixel_1), inv_intrinstic.dot(pixel_2);
             X1_s.push_back(X1);
             X2_s.push_back(X2);
         }

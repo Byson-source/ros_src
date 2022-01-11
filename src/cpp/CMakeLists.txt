@@ -122,8 +122,9 @@ INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
 add_message_files(
   FILES
   StringArray.msg
-  # MultiArray.msg
+  MultiArray.msg
   FeatureArray.msg
+  RO_Array.msg
   # IoTSensor.msg
 )
 ## Generate services in the 'srv' folder
