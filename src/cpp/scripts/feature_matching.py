@@ -82,7 +82,7 @@ def orbmatch(fileName1, fileName2):
     try:
         knn_matches = flann.knnMatch(des1,des2,k=2)
     except cv2.error: 
-        pass
+        rospy.loginfo("Can't detect enough features...")
     else:
         # マッチング結果を描画
         ratio_thresh = 0.7
@@ -108,18 +108,23 @@ def orbmatch(fileName1, fileName2):
         src_pts = np.float32([ kp1[m.queryIdx].pt for m in good_matches ]).reshape(-1,1,2)
         dst_pts = np.float32([ kp2[m.trainIdx].pt for m in good_matches ]).reshape(-1,1,2)
 
-        M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,1)
-        mask = mask.ravel().tolist()
-        loc1,loc2=[],[]
-        
-        for index,element in enumerate(mask):
-            if element==1:
-                loc1.append(kp1_loc[index])
-                loc2.append(kp2_loc[index])   
-                
-        # loc1とloc2がRANSACでふるい分けられた特徴点の座標
+        try:
+            M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,1)
+        except cv2.error:
+            rospy.loginfo("Not enough features...")
+        else:
+            mask = mask.ravel().tolist()
+            loc1,loc2=[],[]
+            
+            for index,element in enumerate(mask):
+                if element==1:
+                    loc1.append(kp1_loc[index])
+                    loc2.append(kp2_loc[index])   
+                    
+            # loc1とloc2がRANSACでふるい分けられた特徴点の座標
 
-        return loc1,loc2,1
+            return loc1,loc2,1
+
     return [],[],0
 
 def loop_CB(data):
@@ -182,7 +187,8 @@ def loop_CB(data):
                 if index=="R2":
                     info.who_detect=2
 
-                    if iter==len(element["index"]-1):
+                    # if iter==len(element["index"]-1):
+                    if iter==element["num"]-1:
                         info.signal=1
                 else:
                     info.who_detect=1
