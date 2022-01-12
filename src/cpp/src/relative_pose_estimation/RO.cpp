@@ -25,6 +25,12 @@ private:
     tf::TransformListener listener1;
     tf::TransformListener listener2;
 
+    std::vector<Eigen::Matrix<float, 4, 4>> 1_poses;
+    std::vector<Eigen::Matrix<float, 4, 4>> 2_poses;
+
+    // points location
+    std::map<int,Eigen::Vector3d>
+
 public:
     RO_Estimator()
     {
@@ -66,13 +72,40 @@ public:
             -sin(pitch2), cos(pitch2) * sin(yaw2), cos(pitch2) * cos(yaw2), z2,
             0, 0, 0, 1;
 
+        int who_detect = data.who_detect;
+        int signal = data.signal;
+
+        if (signal == 0)
+        {
+            1_poses.push_back(pose1);
+            2_poses.push_back(pose2);
+            // NOTE mlpnp
+
+
+        }
+        else
+        {
+            // NOTE BA
+        }
+    }
+
+    opengv::transformation_t mlpnp(int numberOfPoints)
+    {
         // bearing vectors
         Eigen::MatrixXd cov_xx;
         Eigen::MatrixXd cov_ldld;
+
         points_t points;
         // FIXME pointsの座標はcalibration.hで求める
-        Eigen::MatrixXd gt(3, $numberofPoints);
-        // FIXME number of points,店の三次元座標
+        Eigen::MatrixXd gt(3, numberOfPoints);
+        // FIXME number of points,原点から見た点の三次元座標
+        for(int i{0};i<numberOfPoints;++i){
+            Eigen::Vector3d gt_;
+            gt_
+            gt.col(i)=
+
+        }
+
 
         opengv::bearingVectors_t bearingVectors;
         size_t numberCams{1};
