@@ -55,30 +55,25 @@ public:
             0.0, 0.0, 1.0;
         inv_intrinstic = intrinstic_parameter.inverse();
 
-        image_cov = Eigen::Identity();
-        observe_cam_cov = inv_intrinstic.dot(image_cov).dot(inv_intrinstic.transpose())
+        image_cov = Eigen::Matrix3d::Identity();
+        observe_cam_cov = inv_intrinstic * image_cov * inv_intrinstic.transpose();
     }
 
-    opengv::points_t img2cam(std::vector<cv::Point2f> kp_loc,
-                             std::vector<double> depth)
+    opengv::points_t img2cam(std::vector<cv::Point3f> kp_loc,
+                             std::vector<cv::Point3f> kp_loc_other)
     {
         X_s.clear();
         pixels.clear();
         for (int i{0}; i < kp_loc.size(); ++i)
         {
-            Eigen::Vector2d pix;
-            Eigen::Vector3d pixel;
+            Eigen::Vector3d pix;
             cv::cv2eigen(kp_loc[i], pix);
-
-            pixel[0] = pix[0];
-            pixel[1] = pix[1];
-            pixel[2] = depth[i];
             // Homogeneous coordinate
             Eigen::Vector3d X;
-            X = inv_intrinstic.dot(pixel);
+            X = inv_intrinstic * pix;
             X_s.push_back(X);
-            pixels.push_back(pixel)
         }
+        pixels = kp_loc_other;
         return X_s;
     }
 
@@ -104,8 +99,8 @@ public:
         covs.clear();
         for (int i{0}; i < pixels.size(); ++i)
         {
-            Eigen::Matrix3d jacobian = 1 / pixels[i].norm() * (Eigen::Matrix3d::Identity() - v_s[i].dot(v_s[i].transpose()));
-            opengv::cov3_mat_t vcov = jacobian.dot(observe_cam_cov).dot(jacobian.transpose());
+            Eigen::Matrix3d jacobian = 1 / pixels[i].norm() * (Eigen::Matrix3d::Identity() - v_s[i] * v_s[i].transpose());
+            opengv::cov3_mat_t vcov = jacobian * observe_cam_cov * jacobian.transpose();
             // ↑論文参照！
             vcovs.push_back(vcov);
         }

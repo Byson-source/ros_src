@@ -194,7 +194,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  src/relative_pose/include/
+  src/relative_pose_estimation/include/
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -307,7 +307,26 @@ target_link_libraries(turnTurtle ${catkin_LIBRARIES})
 add_executable(frame_a_to_frame_b_broadcaster src/CPP_demo/tf_broadcaster.cpp)
 target_link_libraries(frame_a_to_frame_b_broadcaster ${catkin_LIBRARIES})
 
+add_executable(detection_checker src/loop_closure/LoopClosure.cpp)
 
+target_link_libraries(
+  detection_checker
+  ${catkin_LIBRARIES}
+  ${LIBRARIES}
+)
+
+add_dependencies(
+  detection_checker
+  ${cpp_EXPORTED_TARGETS}
+)
+add_executable(RO_estimator 
+              src/relative_pose_estimation/RO.cpp
+              src/relative_pose_estimation/include/calibration.h)
+
+target_link_libraries(
+  RO_estimator
+  ${catkin_LIBRARIES}
+  )
 # add_executable(detection_checker loop_closure/detection_checker/LoopClosureDetection.cpp)
 # target_link_libraries(detection_checker ${catkin_LIBRARIES})
 # target_link_libraries(detection_checker ${LIBRARIES})
@@ -323,175 +342,77 @@ target_link_libraries(frame_a_to_frame_b_broadcaster ${catkin_LIBRARIES})
 # target_link_libraries(GUI_node ${catkin_LIBRARIES})
 # target_link_libraries(GUI_node ${LIBRARIES})
 
-add_executable(fibonacci_server src/CPP_demo/action_server.cpp)
-
-target_link_libraries(
-  fibonacci_server
-  ${catkin_LIBRARIES}
-)
-
-add_dependencies(
-  fibonacci_server
-  ${cpp_EXPORTED_TARGETS}
-)
-
-add_executable(spin_study src/loop_closure/multi_thread.cpp)
-
-target_link_libraries(
-  spin_study
-  ${catkin_LIBRARIES}
-)
-
-add_dependencies(
-  spin_study
-  ${cpp_EXPORTED_TARGETS}
-)
-
-add_executable(test_fibonacci src/CPP_demo/actionlib_client.cpp)
-
-target_link_libraries(
-  test_fibonacci
-  ${catkin_LIBRARIES}
-)
-
-add_dependencies(
-  test_fibonacci
-  ${cpp_EXPORTED_TARGETS}
-)
-
-add_executable(averaging src/CPP_demo/averaging_server.cpp)
-
-target_link_libraries(
-  averaging
-  ${catkin_LIBRARIES}
-)
-
-add_dependencies(
-  averaging
-  ${cpp_EXPORTED_TARGETS}
-)
-
-add_executable(test_averaging src/CPP_demo/averaging_client.cpp)
-
-target_link_libraries(
-  test_averaging
-  ${catkin_LIBRARIES}
-)
-
-add_dependencies(
-  test_averaging
-  ${cpp_EXPORTED_TARGETS}
-)
-
-add_executable(test_fibonacci_callback src/CPP_demo/fibonacci_callback_client.cpp)
-
-target_link_libraries(
-  test_fibonacci_callback
-  ${catkin_LIBRARIES}
-)
-
-add_dependencies(
-  test_fibonacci_callback
-  ${cpp_EXPORTED_TARGETS}
-)
-
-
-# add_executable(LoadDatabase_client src/load_database/client.cpp)
+# add_executable(fibonacci_server src/CPP_demo/action_server.cpp)
 
 # target_link_libraries(
-#   LoadDatabase_client 
+#   fibonacci_server
 #   ${catkin_LIBRARIES}
 # )
 
 # add_dependencies(
-#   LoadDatabase_client
+#   fibonacci_server
 #   ${cpp_EXPORTED_TARGETS}
 # )
 
-# add_executable(LoadDatabase_client2 src/load_database/client2.cpp)
+# add_executable(spin_study src/loop_closure/multi_thread.cpp)
 
 # target_link_libraries(
-#   LoadDatabase_client2 
+#   spin_study
 #   ${catkin_LIBRARIES}
 # )
 
 # add_dependencies(
-#   LoadDatabase_client2
+#   spin_study
 #   ${cpp_EXPORTED_TARGETS}
 # )
 
-# add_executable(loop_closure_client src/loop_closure/LoopClosure_client.cpp)
+# add_executable(test_fibonacci src/CPP_demo/actionlib_client.cpp)
 
 # target_link_libraries(
-#   loop_closure_client
+#   test_fibonacci
 #   ${catkin_LIBRARIES}
 # )
 
 # add_dependencies(
-#   loop_closure_client
+#   test_fibonacci
 #   ${cpp_EXPORTED_TARGETS}
 # )
 
-add_executable(detection_checker src/loop_closure/LoopClosure.cpp)
-
-target_link_libraries(
-  detection_checker
-  ${catkin_LIBRARIES}
-  ${LIBRARIES}
-)
-
-add_dependencies(
-  detection_checker
-  ${cpp_EXPORTED_TARGETS}
-)
-
-# add_executable(reprocess_client_node src/rtabmap-reprocess/client.cpp)
+# add_executable(averaging src/CPP_demo/averaging_server.cpp)
 
 # target_link_libraries(
-#   reprocess_client_node
+#   averaging
 #   ${catkin_LIBRARIES}
-#   ${LIBRARIES}
 # )
 
 # add_dependencies(
-#   reprocess_client_node
+#   averaging
 #   ${cpp_EXPORTED_TARGETS}
 # )
 
-
-# add_executable(reprocess_server_node src/rtabmap-reprocess/server.cpp)
+# add_executable(test_averaging src/CPP_demo/averaging_client.cpp)
 
 # target_link_libraries(
-#   reprocess_server_node
+#   test_averaging
 #   ${catkin_LIBRARIES}
-#   ${LIBRARIES}
 # )
 
 # add_dependencies(
-#   reprocess_server_node
+#   test_averaging
 #   ${cpp_EXPORTED_TARGETS}
 # )
 
-# INSTALL(TARGETS reprocess_server_node
-#     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT runtime
-#     BUNDLE DESTINATION "${CMAKE_BUNDLE_LOCATION}" COMPONENT runtime)
-
-# add_executable(GUI_node 
-# src/gui/src/main.cpp
-# src/gui/src/example.cpp
-# src/gui/include/example.h
-# )
+# add_executable(test_fibonacci_callback src/CPP_demo/fibonacci_callback_client.cpp)
 
 # target_link_libraries(
-#   GUI_node
+#   test_fibonacci_callback
 #   ${catkin_LIBRARIES}
-#   ${LIBRARIES}
-#   Qt5::Widgets
 # )
-
-# # target_link_libraries(GUI_node PRIVATE Qt5::Widgets)
 
 # add_dependencies(
-#   GUI_node
+#   test_fibonacci_callback
 #   ${cpp_EXPORTED_TARGETS}
 # )
+
+
+

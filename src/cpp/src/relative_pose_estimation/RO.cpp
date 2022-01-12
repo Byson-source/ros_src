@@ -5,6 +5,14 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include <opencv2/core.hpp>
+#include <opencv2/features2d.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/xfeatures2d.hpp>
+#include <opencv2/opencv.hpp>
+#include <opencv2/core/eigen.hpp>
+
 #include <ros/ros.h>
 #include <string>
 #include <vector>
@@ -29,7 +37,8 @@ private:
     std::vector<Eigen::Matrix<float, 4, 4>> 2_poses;
 
     // points location
-    std::map<int,Eigen::Vector3d>
+
+    Calibration camera(525.0, cv::Point2d pp(319.5, 239.5));
 
 public:
     RO_Estimator()
@@ -74,51 +83,75 @@ public:
 
         int who_detect = data.who_detect;
         int signal = data.signal;
+        std::vector<cv::Point3f> kp_loc_r1_s;
+        std::vector<cv::Point3f> kp_loc_r2_s;
+
+        for (size_t index{1}; index < data.r1.size() + 1; ++index)
+        {
+            // ３つ目の要素に差し掛かった時
+            if (index % 3 == 0)
+            {
+                cv::Point3f kp_loc_r1(data.r1[index - 2], data.r1[index - 1], data.r1[index]);
+                cv::Point3f kp_loc_r2(data.r2[index - 2], data.r2[index - 1], data.r2[index]);
+                kp_loc_r1_s.push_back(kp_loc_r1);
+                kp_loc_r2_s.push_back(kp_loc_r2);
+            }
+        }
 
         if (signal == 0)
         {
             1_poses.push_back(pose1);
             2_poses.push_back(pose2);
+            RO_estimator::mlpnp(who_detect, kp_loc_r1_s, kp_loc_r2_s);
             // NOTE mlpnp
-
-
         }
         else
         {
             // NOTE BA
         }
     }
-
-    opengv::transformation_t mlpnp(int numberOfPoints)
+    // FIXME 前処理が必要
+    opengv::transformation_t mlpnp(int who_detect, std::vector<cv::Point3f> kp_loc_r1, std::vector<cv::Point3f> kp_loc_r2)
     {
         // bearing vectors
+        // 3Dポイント集
+        points_t points;
+        if (who_detect == 1)
+            points = camera::img2cam(kp_loc_r1, kp_loc_r2);
+        else
+            points = camera::img2cam(kp_loc_r2, kp_loc_r1);
+
+        // Bearing Vectors
+        opengv::bearingVectors_t bearingVectors;
+        bearingVectors = camera::bearing_v();
+
+        opengv::cov3_mats_t bearing_covs;
+        bearing_covs = camera::v_cov();
+
         Eigen::MatrixXd cov_xx;
         Eigen::MatrixXd cov_ldld;
 
-        points_t points;
-        // FIXME pointsの座標はcalibration.hで求める
-        Eigen::MatrixXd gt(3, numberOfPoints);
-        // FIXME number of points,原点から見た点の三次元座標
-        for(int i{0};i<numberOfPoints;++i){
-            Eigen::Vector3d gt_;
-            gt_
-            gt.col(i)=
+        opengv::absolute_pose::CentralAbsoluteAdapter adapter(bearingVectors,
+                                                              bearing_covs,
+                                                              points);
 
-        }
+        iterations = 50;
+        for (size_t i{0}; i < iterations; i++)
+            mlpnp_transformation = opengv::absolute_pose::mlpnp(adapter, cov_xx, cov_ldld);
 
-
-        opengv::bearingVectors_t bearingVectors;
-        size_t numberCams{1};
-        size_t caamCorrespondence{0};
-        // FIXME number of points
-        for (size_t i = 0; i < $Number of points; i++)
-        {
-            translation_t camOffset = Eigen::Vector3d::Zero();
-            rotation_t camRotation = Eigen::Matrix3d::Identity();
-            points.push_back(gt.col(i));
-
-            point_t bodyPoint = rotation.transpose() * (gt.col(i) - position);
-            // FIXME multiThreadの必要？？どこかでPoseを知る
-        }
+        std::cout << "transformation is..." << std::endl;
+        std::cout << mlpnp_transformation << std::endl;
+        std::cout << "cov is..." << std::endl;
+        std::cout << cov_xx << std::endl;
     }
 };
+
+int main(int argc, char **argv)
+{
+    ros::init(argc, argv, "RO_estimator");
+    RO_Estimator detector;
+
+    ros::spin();
+
+    return 0;
+}
