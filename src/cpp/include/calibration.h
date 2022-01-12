@@ -24,17 +24,18 @@ private:
     Eigen::Matrix3d intrinstic_parameter;
     Eigen::Matrix3d inv_intrinstic;
 
-    std::vector<Eigen::Vector3d> X_s;
+    opengv::points_t X_s;
     std::vector<Eigen::Vector3d> pixels
 
         double focal;
     cv::Point2d pp;
 
     // bearing vectors
-    std::vector<Eigen::Vector3d> v_s;
+    opengv::bearingVectors_t v_s;
     // bearing-covariance
     Eigen::Matrix3d observe_cov;
-    std::vector<Eigen::Matrix3d> covs;
+    std::vector<Eigen::Matrix3d> proj_list;
+    opengv::cov3_mats_t covs;
     // std::vector<Eigen::Matrix3d> covs_2;
 
 public:
@@ -51,8 +52,8 @@ public:
         inv_intrinstic = intrinstic_parameter.inverse();
     }
 
-    std::vector<Eigen::Vector3d> img2cam(std::vector<cv::Point2f> kp_loc,
-                                         std::vector<double> depth)
+    opengv::points_t img2cam(std::vector<cv::Point2f> kp_loc,
+                             std::vector<double> depth)
     {
         X_s.clear();
         pixels.clear();
@@ -74,33 +75,35 @@ public:
         return X_s;
     }
 
-    std::vector<Eigen::Vector3d> bearing_v(void)
+    opengv::bearingVectors_t bearing_v(void)
     {
         v_s.clear();
         for (int indice{0}; indice < pixels.size(); ++indice)
         {
             Eigen::Vector3d v;
-            v.z= 1;
-            v.x= pixels[indice].x / pixels[indice].z, pixels[indice].x / pixels[indice].z;
-            v.y= pixels[indice].y / pixels[indice].z, pixels[indice].y / pixels[indice].z;
+            v.z = 1;
+            v.x = pixels[indice].x / pixels[indice].z;
+            v.y = pixels[indice].y / pixels[indice].z;
+            proj_list.push_back(v);
+            // ↑x（MLPNPの論文を参照！！)
             v_s.push_back(v.normalized());
         }
         return v_s;
     }
+
     // bearing vectorの共分散!
-    std::vector<Eigen::Matrix3d> v_cov(void)
+
+    opengv::cov3_mat_t v_cov(void)
     {
-        covs_1.clear();
-        covs_2.clear();
-        for (int i{0}; i < pixels_1.size(); ++i)
+        covs.clear();
+        for (int i{0}; i < pixels.size(); ++i)
         {
             // Eigen::Matrix3d Xcov = inv_intrinstic.dot(observe_cov).dot(inv_intrinstic.transpose());
-            Eigen::Matrix3d vcov_1 = 1 / pixels_1[i].norm() * (Eigen::Matrix3d::Identity() - v1_s[i].dot(v1_s[i].transpose()));
-            Eigen::Matrix3d vcov_2 = 1 / pixels_2[i].norm() * (Eigen::Matrix3d::Identity() - v2_s[i].dot(v2_s[i].transpose()));
-            covs_1.push_back(vcov_1);
-            covs_2.push_back(vcov_2);
+            Eigen::Matrix3d vcov = 1 / proj_list[i].norm() * (Eigen::Matrix3d::Identity() - v_s[i].dot(v_s[i].transpose()));
+            // ↑論文参照！
+            covs.push_back(vcov);
         }
-        return vcov_1, vcov_2;
+        return covs
     }
 };
 #endif
