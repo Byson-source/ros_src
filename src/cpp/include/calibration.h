@@ -25,17 +25,21 @@ private:
     Eigen::Matrix3d inv_intrinstic;
 
     opengv::points_t X_s;
-    std::vector<Eigen::Vector3d> pixels
+    std::vector<Eigen::Vector3d> pixels;
 
-        double focal;
+    double focal;
+
     cv::Point2d pp;
 
     // bearing vectors
     opengv::bearingVectors_t v_s;
-    // bearing-covariance
-    Eigen::Matrix3d observe_cov;
-    std::vector<Eigen::Matrix3d> proj_list;
-    opengv::cov3_mats_t covs;
+    // bearing vectorの深く不確実性のリスト
+    opengv::cov3_mats_t vcovs;
+    // 画像上の不確実性
+    opengv::cov3_mat_t image_cov;
+    // カメラ座標での不確実性
+    opengv::cov3_mat_t observe_cam_cov;
+
     // std::vector<Eigen::Matrix3d> covs_2;
 
 public:
@@ -50,6 +54,9 @@ public:
             0.0, focal, pp.y,
             0.0, 0.0, 1.0;
         inv_intrinstic = intrinstic_parameter.inverse();
+
+        image_cov = Eigen::Identity();
+        observe_cam_cov = inv_intrinstic.dot(image_cov).dot(inv_intrinstic.transpose())
     }
 
     opengv::points_t img2cam(std::vector<cv::Point2f> kp_loc,
@@ -84,7 +91,6 @@ public:
             v.z = 1;
             v.x = pixels[indice].x / pixels[indice].z;
             v.y = pixels[indice].y / pixels[indice].z;
-            proj_list.push_back(v);
             // ↑x（MLPNPの論文を参照！！)
             v_s.push_back(v.normalized());
         }
@@ -93,17 +99,17 @@ public:
 
     // bearing vectorの共分散!
 
-    opengv::cov3_mat_t v_cov(void)
+    opengv::cov3_mats_t v_cov(void)
     {
         covs.clear();
         for (int i{0}; i < pixels.size(); ++i)
         {
-            // Eigen::Matrix3d Xcov = inv_intrinstic.dot(observe_cov).dot(inv_intrinstic.transpose());
-            Eigen::Matrix3d vcov = 1 / proj_list[i].norm() * (Eigen::Matrix3d::Identity() - v_s[i].dot(v_s[i].transpose()));
+            Eigen::Matrix3d jacobian = 1 / pixels[i].norm() * (Eigen::Matrix3d::Identity() - v_s[i].dot(v_s[i].transpose()));
+            opengv::cov3_mat_t vcov = jacobian.dot(observe_cam_cov).dot(jacobian.transpose());
             // ↑論文参照！
-            covs.push_back(vcov);
+            vcovs.push_back(vcov);
         }
-        return covs
+        return vcovs
     }
 };
 #endif
