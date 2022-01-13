@@ -43,9 +43,6 @@ private:
     // std::vector<Eigen::Matrix3d> covs_2;
 
 public:
-    // Calibration(std::vector<cv::Point2f>　kp1_loc, std::vector<cv::Point2f> kp2_loc,
-    //             double focal_val, cv::Point2d pp_val,
-    //             std::vector<double> depth_1, std::vector<double> depth_2) : focal{focal_val}, pp{pp_val}
     Calibration(double focal_val, cv::Point2d pp_val) : focal{focal_val}, pp{pp_val}
     {
         // 全ての画像座標を格納
@@ -66,14 +63,14 @@ public:
         pixels.clear();
         for (int i{0}; i < kp_loc.size(); ++i)
         {
-            Eigen::Vector3d pix;
-            cv::cv2eigen(kp_loc[i], pix);
+            Eigen::Vector3f pix(kp_loc[i].x, kp_loc[i].y, kp_loc[i].z);
+            Eigen::Vector3f pixel_(kp_loc_other[i].x, kp_loc_other[i].y, kp_loc_other[i].z);
             // Homogeneous coordinate
             Eigen::Vector3d X;
-            X = inv_intrinstic * pix;
+            X = inv_intrinstic * pix.cast<double>();
             X_s.push_back(X);
+            pixels.push_back(pixel_);
         }
-        pixels = kp_loc_other;
         return X_s;
     }
 
@@ -83,9 +80,9 @@ public:
         for (int indice{0}; indice < pixels.size(); ++indice)
         {
             Eigen::Vector3d v;
-            v.z = 1;
-            v.x = pixels[indice].x / pixels[indice].z;
-            v.y = pixels[indice].y / pixels[indice].z;
+            v.z() = 1.0;
+            v.x() = pixels[indice].x() / pixels[indice].z();
+            v.y() = pixels[indice].y() / pixels[indice].z();
             // ↑x（MLPNPの論文を参照！！)
             v_s.push_back(v.normalized());
         }
@@ -96,7 +93,7 @@ public:
 
     opengv::cov3_mats_t v_cov(void)
     {
-        covs.clear();
+        vcovs.clear();
         for (int i{0}; i < pixels.size(); ++i)
         {
             Eigen::Matrix3d jacobian = 1 / pixels[i].norm() * (Eigen::Matrix3d::Identity() - v_s[i] * v_s[i].transpose());
@@ -104,7 +101,7 @@ public:
             // ↑論文参照！
             vcovs.push_back(vcov);
         }
-        return vcovs
+        return vcovs;
     }
 };
 #endif
