@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 project(cpp)
 
 set(CMAKE_BUILD_TYPE Debug)
+set(DCMAKE_BUILD_TYPE RELEASE)
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
@@ -23,6 +24,8 @@ find_package(catkin REQUIRED COMPONENTS
 ########################################################
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}")
 
+set(opengv_DIR "/home/ayumi/Documents/tohoku_uni/CLOVERs/c-slam/opengv/build")
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOUIC ON)
@@ -36,6 +39,7 @@ FIND_PACKAGE(RTABMap REQUIRED)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 FIND_PACKAGE(OpenCV REQUIRED)
 find_package(PCL 1.3 REQUIRED COMPONENTS common io)
+find_package(opengv REQUIRED)
 
 link_directories(${PCL_LIBRARIES_DIRS})
 add_definitions(${PCL_DEFINITIONS})
@@ -60,6 +64,7 @@ SET(INCLUDE_DIRS
 ${RTABMap_INCLUDE_DIRS}
 ${OpenCV_INCLUDE_DIRS}
 ${PCL_INCLUDE_DIRS}
+# ${opengv_INCLUDE_DIRS}
 )
 
 # libraries
@@ -67,6 +72,7 @@ SET(LIBRARIES
 ${RTABMap_LIBRARIES}
 ${OpenCV_LIBRARIES}
 ${PCL_LIBRARIES}
+# ${opengv_INCLUDE_DIRS}
 )
 
 
@@ -326,6 +332,7 @@ add_executable(RO_estimator
 target_link_libraries(
   RO_estimator
   ${catkin_LIBRARIES}
+  opengv
   )
 # add_executable(detection_checker loop_closure/detection_checker/LoopClosureDetection.cpp)
 # target_link_libraries(detection_checker ${catkin_LIBRARIES})

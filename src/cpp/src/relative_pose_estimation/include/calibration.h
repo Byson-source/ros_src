@@ -27,8 +27,6 @@ private:
     opengv::points_t X_s;
     std::vector<Eigen::Vector3d> pixels;
 
-    double focal;
-
     cv::Point2d pp;
 
     // bearing vectors
@@ -43,12 +41,12 @@ private:
     // std::vector<Eigen::Matrix3d> covs_2;
 
 public:
-    Calibration(double focal_val, cv::Point2d pp_val) : focal{focal_val}, pp{pp_val}
+    Calibration(void)
     {
         // 全ての画像座標を格納
 
-        intrinstic_parameter << focal, 0.0, pp.x,
-            0.0, focal, pp.y,
+        intrinstic_parameter << 525.0, 0.0, 319.5,
+            0.0, 525.0, 239.5,
             0.0, 0.0, 1.0;
         inv_intrinstic = intrinstic_parameter.inverse();
 
@@ -69,7 +67,7 @@ public:
             Eigen::Vector3d X;
             X = inv_intrinstic * pix.cast<double>();
             X_s.push_back(X);
-            pixels.push_back(pixel_);
+            pixels.push_back(pixel_.cast<double>());
         }
         return X_s;
     }

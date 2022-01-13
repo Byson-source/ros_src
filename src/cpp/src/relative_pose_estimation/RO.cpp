@@ -2,6 +2,7 @@
 #include <opengv/absolute_pose/methods.hpp>
 #include <opengv/absolute_pose/CentralAbsoluteAdapter.hpp>
 #include <opengv/math/cayley.hpp>
+#include <iomanip>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
@@ -16,7 +17,7 @@
 #include <ros/ros.h>
 #include <string>
 #include <vector>
-#include "cpp/MultiArray.h"
+#include "cpp/FeatureArray.h"
 #include "cpp/RO_Array.h"
 #include <math.h>
 #include "calibration.h"
@@ -33,41 +34,48 @@ private:
     tf::TransformListener listener1;
     tf::TransformListener listener2;
 
-    std::vector<Eigen::Matrix<float, 4, 4>> 1_poses;
-    std::vector<Eigen::Matrix<float, 4, 4>> 2_poses;
+    std::vector<Eigen::Matrix<float, 4, 4>> poses_1;
+    std::vector<Eigen::Matrix<float, 4, 4>> poses_2;
 
     // points location
 
-    Calibration camera(525.0, cv::Point2d pp(319.5, 239.5));
+    Calibration camera;
 
 public:
     RO_Estimator()
     {
-        feature_sub = n.subscribe("features", 20, &RO_estimator::RO_CB, this);
+        feature_sub = n.subscribe("features", 20, &RO_Estimator::RO_CB, this);
         // from robot/map to robot/base_footprint
     }
 
-    void RO_CB(const std_msgs::cpp::ConstPtr &data)
+    void RO_CB(const cpp::FeatureArray::ConstPtr &data)
     {
         tf::StampedTransform transform1;
         tf::StampedTransform transform2;
         try
         {
             listener1.lookupTransform("/robot1/map", "/robot1/base_footprint",
-                                      ros::Time(0), transform1)
-                listener2.lookupTransform("/robot2/map", "/robot2/base_footprint",
-                                          ros::Time(0), transform2)
+                                      ros::Time(0), transform1);
+            listener2.lookupTransform("/robot2/map", "/robot2/base_footprint",
+                                      ros::Time(0), transform2);
         }
         catch (tf::TransformException &ex)
         {
             ROS_ERROR("%s", ex.what());
-            continue;
+            exit(1);
         }
-        double x1, y1, z1 = transform1.getOrigin().x(), transform1.getOrigin().y(), transform1.getOrigin().z();
-        double x2, y2, z2 = transform2.getOrigin().x(), transform2.getOrigin().y(), transform2.getOrigin().z();
+
+        double x1 = transform1.getOrigin().x();
+        double y1 = transform1.getOrigin().y();
+        double z1 = transform1.getOrigin().z();
+        double x2 = transform2.getOrigin().x();
+        double y2 = transform2.getOrigin().y();
+        double z2 = transform2.getOrigin().z();
+        tf::Quaternion q1 = transform1.getRotation();
+        tf::Quaternion q2 = transform2.getRotation();
+
         double roll1, pitch1, yaw1;
         double roll2, pitch2, yaw2;
-        tf::Quaternion q1, q2 = transform1.getRotation(), transform2.getRotation();
         tf::Matrix3x3(q1).getRPY(roll1, pitch1, yaw1);
         tf::Matrix3x3(q2).getRPY(roll2, pitch2, yaw2);
 
@@ -81,18 +89,18 @@ public:
             -sin(pitch2), cos(pitch2) * sin(yaw2), cos(pitch2) * cos(yaw2), z2,
             0, 0, 0, 1;
 
-        int who_detect = data.who_detect;
-        int signal = data.signal;
+        int who_detect = data->who_detect;
+        int signal = data->signal;
         std::vector<cv::Point3f> kp_loc_r1_s;
         std::vector<cv::Point3f> kp_loc_r2_s;
 
-        for (size_t index{1}; index < data.r1.size() + 1; ++index)
+        for (size_t index{1}; index < data->r1.size() + 1; ++index)
         {
             // ３つ目の要素に差し掛かった時
             if (index % 3 == 0)
             {
-                cv::Point3f kp_loc_r1(data.r1[index - 2], data.r1[index - 1], data.r1[index]);
-                cv::Point3f kp_loc_r2(data.r2[index - 2], data.r2[index - 1], data.r2[index]);
+                cv::Point3f kp_loc_r1(data->r1[index - 2], data->r1[index - 1], data->r1[index]);
+                cv::Point3f kp_loc_r2(data->r2[index - 2], data->r2[index - 1], data->r2[index]);
                 kp_loc_r1_s.push_back(kp_loc_r1);
                 kp_loc_r2_s.push_back(kp_loc_r2);
             }
@@ -100,14 +108,15 @@ public:
 
         if (signal == 0)
         {
-            1_poses.push_back(pose1);
-            2_poses.push_back(pose2);
-            RO_estimator::mlpnp(who_detect, kp_loc_r1_s, kp_loc_r2_s);
+            poses_1.push_back(pose1);
+            poses_2.push_back(pose2);
+            RO_Estimator::mlpnp(who_detect, kp_loc_r1_s, kp_loc_r2_s);
             // NOTE mlpnp
         }
         else
         {
-            // NOTE BA
+
+                        // NOTE BA
         }
     }
     // FIXME 前処理が必要
@@ -115,27 +124,28 @@ public:
     {
         // bearing vectors
         // 3Dポイント集
-        points_t points;
+        opengv::points_t points;
         if (who_detect == 1)
-            points = camera::img2cam(kp_loc_r1, kp_loc_r2);
+            points = camera.img2cam(kp_loc_r1, kp_loc_r2);
         else
-            points = camera::img2cam(kp_loc_r2, kp_loc_r1);
+            points = camera.img2cam(kp_loc_r2, kp_loc_r1);
 
         // Bearing Vectors
         opengv::bearingVectors_t bearingVectors;
-        bearingVectors = camera::bearing_v();
+        bearingVectors = camera.bearing_v();
 
         opengv::cov3_mats_t bearing_covs;
-        bearing_covs = camera::v_cov();
+        bearing_covs = camera.v_cov();
 
         Eigen::MatrixXd cov_xx;
         Eigen::MatrixXd cov_ldld;
 
         opengv::absolute_pose::CentralAbsoluteAdapter adapter(bearingVectors,
-                                                              bearing_covs,
-                                                              points);
+                                                              points,
+                                                              bearing_covs);
 
-        iterations = 50;
+        int iterations = 50;
+        opengv::transformation_t mlpnp_transformation;
         for (size_t i{0}; i < iterations; i++)
             mlpnp_transformation = opengv::absolute_pose::mlpnp(adapter, cov_xx, cov_ldld);
 
@@ -143,6 +153,8 @@ public:
         std::cout << mlpnp_transformation << std::endl;
         std::cout << "cov is..." << std::endl;
         std::cout << cov_xx << std::endl;
+
+        return mlpnp_transformation;
     }
 };
 
