@@ -33,11 +33,11 @@ IF(OPENGV_IMPORT)
   set(CMAKE_BUILD_TYPE Release)
 
   #set the default path for built executables to the "bin" directory
-  set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
+  set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/opengv/bin)
   #set the default path for built libraries to the "lib" directory
-  set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
+  set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/opengv/lib)
 
-  OPTION(BUILD_TESTS "Build tests" ON)
+  OPTION(BUILD_TESTS "Build tests" OFF)
   OPTION(BUILD_SHARED_LIBS "Build shared libraries" OFF)
   OPTION(BUILD_PYTHON "Build Python extension" OFF)
   OPTION(BUILD_POSITION_INDEPENDENT_CODE "Build position independent code (-fPIC)" ON)
@@ -61,259 +61,270 @@ IF(OPENGV_IMPORT)
                                 ${PROJECT_SOURCE_DIR}/third_party/eigen3
                                 ${PROJECT_SOURCE_DIR}/third_party/eigen3/unsupported )
   ELSE()
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/modules/")
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/opengv/modules/")
     find_package(Eigen REQUIRED)
     set(ADDITIONAL_INCLUDE_DIRS ${EIGEN_INCLUDE_DIRS} ${EIGEN_INCLUDE_DIR}/unsupported )
   ENDIF()
 
-  include_directories(${ADDITIONAL_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include)
+  include_directories(${ADDITIONAL_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/opengv/include)
 
   set( OPENGV_SOURCE_FILES
-    opengv/src/absolute_pose/modules/main.cpp
-    opengv/src/absolute_pose/modules/gp3p/code.cpp
-    opengv/src/absolute_pose/modules/gp3p/init.cpp
-    opengv/src/absolute_pose/modules/gp3p/reductors.cpp
-    opengv/src/absolute_pose/modules/gp3p/spolynomials.cpp
-    opengv/src/absolute_pose/modules/Epnp.cpp
-    opengv/src/absolute_pose/modules/gpnp1/code.cpp
-    opengv/src/absolute_pose/modules/gpnp1/init.cpp
-    opengv/src/absolute_pose/modules/gpnp1/reductors.cpp
-    opengv/src/absolute_pose/modules/gpnp1/spolynomials.cpp
-    opengv/src/absolute_pose/modules/gpnp2/code.cpp
-    opengv/src/absolute_pose/modules/gpnp2/init.cpp
-    opengv/src/absolute_pose/modules/gpnp2/reductors.cpp
-    opengv/src/absolute_pose/modules/gpnp2/spolynomials.cpp
-    opengv/src/absolute_pose/modules/gpnp3/code.cpp
-    opengv/src/absolute_pose/modules/gpnp3/init.cpp
-    opengv/src/absolute_pose/modules/gpnp3/reductors.cpp
-    opengv/src/absolute_pose/modules/gpnp3/spolynomials.cpp
-    opengv/src/absolute_pose/modules/gpnp4/code.cpp
-    opengv/src/absolute_pose/modules/gpnp4/init.cpp
-    opengv/src/absolute_pose/modules/gpnp4/reductors.cpp
-    opengv/src/absolute_pose/modules/gpnp4/spolynomials.cpp
-    opengv/src/absolute_pose/modules/gpnp5/code.cpp
-    opengv/src/absolute_pose/modules/gpnp5/init.cpp
-    opengv/src/absolute_pose/modules/gpnp5/reductors.cpp
-    opengv/src/absolute_pose/modules/gpnp5/spolynomials.cpp
-    opengv/src/absolute_pose/modules/upnp2.cpp
-    opengv/src/absolute_pose/modules/upnp4.cpp
-    opengv/src/absolute_pose/modules/mlpnp/mlpnp.cpp
-    opengv/src/absolute_pose/modules/mlpnp/mlpnp_lm.cpp
-    opengv/src/relative_pose/modules/main.cpp
-    opengv/src/relative_pose/modules/fivept_nister/modules.cpp
-    opengv/src/relative_pose/modules/fivept_stewenius/modules.cpp
-    opengv/src/relative_pose/modules/fivept_kneip/code.cpp
-    opengv/src/relative_pose/modules/fivept_kneip/init.cpp
-    opengv/src/relative_pose/modules/fivept_kneip/reductors.cpp
-    opengv/src/relative_pose/modules/fivept_kneip/spolynomials.cpp
-    opengv/src/relative_pose/modules/sixpt/modules2.cpp
-    opengv/src/relative_pose/modules/eigensolver/modules.cpp
-    opengv/src/relative_pose/modules/ge/modules.cpp
-    opengv/src/relative_pose/modules/sixpt_ventura/approx_relpose_generalized_fast_computeA.cpp
-    opengv/src/math/cayley.cpp
-    opengv/src/math/rodrigues.cpp
-    opengv/src/math/quaternion.cpp
-    opengv/src/math/arun.cpp
-    opengv/src/math/Sturm.cpp
-    opengv/src/math/roots.cpp
-    opengv/src/math/gauss_jordan.cpp
-    opengv/src/absolute_pose/methods.cpp
-    opengv/src/absolute_pose/CentralAbsoluteAdapter.cpp
-    opengv/src/absolute_pose/NoncentralAbsoluteAdapter.cpp
-    opengv/src/absolute_pose/NoncentralAbsoluteMultiAdapter.cpp
-    opengv/src/relative_pose/methods.cpp
-    opengv/src/relative_pose/CentralRelativeAdapter.cpp
-    opengv/src/relative_pose/CentralRelativeWeightingAdapter.cpp
-    opengv/src/relative_pose/NoncentralRelativeAdapter.cpp
-    opengv/src/relative_pose/CentralRelativeMultiAdapter.cpp
-    opengv/src/relative_pose/NoncentralRelativeMultiAdapter.cpp
-    opengv/src/triangulation/methods.cpp
-    opengv/src/point_cloud/methods.cpp
-    opengv/src/point_cloud/PointCloudAdapter.cpp
-    opengv/src/sac_problems/absolute_pose/AbsolutePoseSacProblem.cpp
-    opengv/src/sac_problems/absolute_pose/MultiNoncentralAbsolutePoseSacProblem.cpp
-    opengv/src/sac_problems/relative_pose/CentralRelativePoseSacProblem.cpp
-    opengv/src/sac_problems/relative_pose/NoncentralRelativePoseSacProblem.cpp
-    opengv/src/sac_problems/relative_pose/RotationOnlySacProblem.cpp
-    opengv/src/sac_problems/relative_pose/TranslationOnlySacProblem.cpp
-    opengv/src/sac_problems/relative_pose/EigensolverSacProblem.cpp
-    opengv/src/sac_problems/relative_pose/MultiCentralRelativePoseSacProblem.cpp
-    opengv/src/sac_problems/relative_pose/MultiNoncentralRelativePoseSacProblem.cpp
-    opengv/src/sac_problems/point_cloud/PointCloudSacProblem.cpp
-    opengv/src/absolute_pose/MACentralAbsolute.cpp
-    opengv/src/absolute_pose/MANoncentralAbsolute.cpp
-    opengv/src/relative_pose/MACentralRelative.cpp
-    opengv/src/relative_pose/MANoncentralRelative.cpp
-    opengv/src/relative_pose/MANoncentralRelativeMulti.cpp
-    opengv/src/point_cloud/MAPointCloud.cpp )
+      opengv/src/absolute_pose/modules/main.cpp
+      opengv/src/absolute_pose/modules/gp3p/code.cpp
+      opengv/src/absolute_pose/modules/gp3p/init.cpp
+      opengv/src/absolute_pose/modules/gp3p/reductors.cpp
+      opengv/src/absolute_pose/modules/gp3p/spolynomials.cpp
+      opengv/src/absolute_pose/modules/Epnp.cpp
+      opengv/src/absolute_pose/modules/gpnp1/code.cpp
+      opengv/src/absolute_pose/modules/gpnp1/init.cpp
+      opengv/src/absolute_pose/modules/gpnp1/reductors.cpp
+      opengv/src/absolute_pose/modules/gpnp1/spolynomials.cpp
+      opengv/src/absolute_pose/modules/gpnp2/code.cpp
+      opengv/src/absolute_pose/modules/gpnp2/init.cpp
+      opengv/src/absolute_pose/modules/gpnp2/reductors.cpp
+      opengv/src/absolute_pose/modules/gpnp2/spolynomials.cpp
+      opengv/src/absolute_pose/modules/gpnp3/code.cpp
+      opengv/src/absolute_pose/modules/gpnp3/init.cpp
+      opengv/src/absolute_pose/modules/gpnp3/reductors.cpp
+      opengv/src/absolute_pose/modules/gpnp3/spolynomials.cpp
+      opengv/src/absolute_pose/modules/gpnp4/code.cpp
+      opengv/src/absolute_pose/modules/gpnp4/init.cpp
+      opengv/src/absolute_pose/modules/gpnp4/reductors.cpp
+      opengv/src/absolute_pose/modules/gpnp4/spolynomials.cpp
+      opengv/src/absolute_pose/modules/gpnp5/code.cpp
+      opengv/src/absolute_pose/modules/gpnp5/init.cpp
+      opengv/src/absolute_pose/modules/gpnp5/reductors.cpp
+      opengv/src/absolute_pose/modules/gpnp5/spolynomials.cpp
+      opengv/src/absolute_pose/modules/upnp2.cpp
+      opengv/src/absolute_pose/modules/upnp4.cpp
+      opengv/src/absolute_pose/modules/mlpnp/mlpnp.cpp
+      opengv/src/absolute_pose/modules/mlpnp/mlpnp_lm.cpp
+      opengv/src/relative_pose/modules/main.cpp
+      opengv/src/relative_pose/modules/fivept_nister/modules.cpp
+      opengv/src/relative_pose/modules/fivept_stewenius/modules.cpp
+      opengv/src/relative_pose/modules/fivept_kneip/code.cpp
+      opengv/src/relative_pose/modules/fivept_kneip/init.cpp
+      opengv/src/relative_pose/modules/fivept_kneip/reductors.cpp
+      opengv/src/relative_pose/modules/fivept_kneip/spolynomials.cpp
+      opengv/src/relative_pose/modules/sixpt/modules2.cpp
+      opengv/src/relative_pose/modules/eigensolver/modules.cpp
+      opengv/src/relative_pose/modules/ge/modules.cpp
+      opengv/src/relative_pose/modules/sixpt_ventura/approx_relpose_generalized_fast_computeA.cpp
+      opengv/src/math/cayley.cpp
+      opengv/src/math/rodrigues.cpp
+      opengv/src/math/quaternion.cpp
+      opengv/src/math/arun.cpp
+      opengv/src/math/Sturm.cpp
+      opengv/src/math/roots.cpp
+      opengv/src/math/gauss_jordan.cpp
+      opengv/src/absolute_pose/methods.cpp
+      opengv/src/absolute_pose/CentralAbsoluteAdapter.cpp
+      opengv/src/absolute_pose/NoncentralAbsoluteAdapter.cpp
+      opengv/src/absolute_pose/NoncentralAbsoluteMultiAdapter.cpp
+      opengv/src/relative_pose/methods.cpp
+      opengv/src/relative_pose/CentralRelativeAdapter.cpp
+      opengv/src/relative_pose/CentralRelativeWeightingAdapter.cpp
+      opengv/src/relative_pose/NoncentralRelativeAdapter.cpp
+      opengv/src/relative_pose/CentralRelativeMultiAdapter.cpp
+      opengv/src/relative_pose/NoncentralRelativeMultiAdapter.cpp
+      opengv/src/triangulation/methods.cpp
+      opengv/src/point_cloud/methods.cpp
+      opengv/src/point_cloud/PointCloudAdapter.cpp
+      opengv/src/sac_problems/absolute_pose/AbsolutePoseSacProblem.cpp
+      opengv/src/sac_problems/absolute_pose/MultiNoncentralAbsolutePoseSacProblem.cpp
+      opengv/src/sac_problems/relative_pose/CentralRelativePoseSacProblem.cpp
+      opengv/src/sac_problems/relative_pose/NoncentralRelativePoseSacProblem.cpp
+      opengv/src/sac_problems/relative_pose/RotationOnlySacProblem.cpp
+      opengv/src/sac_problems/relative_pose/TranslationOnlySacProblem.cpp
+      opengv/src/sac_problems/relative_pose/EigensolverSacProblem.cpp
+      opengv/src/sac_problems/relative_pose/MultiCentralRelativePoseSacProblem.cpp
+      opengv/src/sac_problems/relative_pose/MultiNoncentralRelativePoseSacProblem.cpp
+      opengv/src/sac_problems/point_cloud/PointCloudSacProblem.cpp
+      opengv/src/absolute_pose/MACentralAbsolute.cpp
+      opengv/src/absolute_pose/MANoncentralAbsolute.cpp
+      opengv/src/relative_pose/MACentralRelative.cpp
+      opengv/src/relative_pose/MANoncentralRelative.cpp
+      opengv/src/relative_pose/MANoncentralRelativeMulti.cpp
+      opengv/src/point_cloud/MAPointCloud.cpp )
 
   set( OPENGV_HEADER_FILES
-  opengv/include/opengv/types.hpp
-  opengv/include/opengv/OptimizationFunctor.hpp
-  opengv/include/opengv/absolute_pose/methods.hpp
-  opengv/include/opengv/relative_pose/methods.hpp
-  opengv/include/opengv/triangulation/methods.hpp
-  opengv/include/opengv/point_cloud/methods.hpp
-  opengv/include/opengv/math/cayley.hpp
-  opengv/include/opengv/math/rodrigues.hpp
-  opengv/include/opengv/math/quaternion.hpp
-  opengv/include/opengv/math/arun.hpp
-  opengv/include/opengv/math/Sturm.hpp
-  opengv/include/opengv/math/roots.hpp
-  opengv/include/opengv/math/gauss_jordan.hpp
-  opengv/include/opengv/absolute_pose/AbsoluteAdapterBase.hpp
-  opengv/include/opengv/absolute_pose/CentralAbsoluteAdapter.hpp
-  opengv/include/opengv/absolute_pose/NoncentralAbsoluteAdapter.hpp
-  opengv/include/opengv/absolute_pose/NoncentralAbsoluteMultiAdapter.hpp
-  opengv/include/opengv/absolute_pose/AbsoluteMultiAdapterBase.hpp
-  opengv/include/opengv/relative_pose/RelativeAdapterBase.hpp
-  opengv/include/opengv/relative_pose/RelativeMultiAdapterBase.hpp
-  opengv/include/opengv/relative_pose/CentralRelativeAdapter.hpp
-  opengv/include/opengv/relative_pose/CentralRelativeWeightingAdapter.hpp
-  opengv/include/opengv/relative_pose/NoncentralRelativeAdapter.hpp
-  opengv/include/opengv/relative_pose/CentralRelativeMultiAdapter.hpp
-  opengv/include/opengv/relative_pose/NoncentralRelativeMultiAdapter.hpp
-  opengv/include/opengv/point_cloud/PointCloudAdapterBase.hpp
-  opengv/include/opengv/point_cloud/PointCloudAdapter.hpp
-  opengv/include/opengv/sac_problems/absolute_pose/AbsolutePoseSacProblem.hpp
-  opengv/include/opengv/sac_problems/absolute_pose/MultiNoncentralAbsolutePoseSacProblem.hpp
-  opengv/include/opengv/sac_problems/relative_pose/CentralRelativePoseSacProblem.hpp
-  opengv/include/opengv/sac_problems/relative_pose/NoncentralRelativePoseSacProblem.hpp
-  opengv/include/opengv/sac_problems/relative_pose/MultiCentralRelativePoseSacProblem.hpp
-  opengv/include/opengv/sac_problems/relative_pose/MultiNoncentralRelativePoseSacProblem.hpp
-  opengv/include/opengv/sac_problems/relative_pose/EigensolverSacProblem.hpp
-  opengv/include/opengv/sac_problems/relative_pose/RotationOnlySacProblem.hpp
-  opengv/include/opengv/sac_problems/relative_pose/TranslationOnlySacProblem.hpp
-  opengv/include/opengv/sac_problems/point_cloud/PointCloudSacProblem.hpp
-  opengv/include/opengv/absolute_pose/MACentralAbsolute.hpp
-  opengv/include/opengv/absolute_pose/MANoncentralAbsolute.hpp
-  opengv/include/opengv/relative_pose/MACentralRelative.hpp
-  opengv/include/opengv/relative_pose/MANoncentralRelative.hpp
-  opengv/include/opengv/relative_pose/MANoncentralRelativeMulti.hpp
-  opengv/include/opengv/point_cloud/MAPointCloud.hpp )
+      opengv/include/opengv/types.hpp
+      opengv/include/opengv/OptimizationFunctor.hpp
+      opengv/include/opengv/absolute_pose/methods.hpp
+      opengv/include/opengv/relative_pose/methods.hpp
+      opengv/include/opengv/triangulation/methods.hpp
+      opengv/include/opengv/point_cloud/methods.hpp
+      opengv/include/opengv/math/cayley.hpp
+      opengv/include/opengv/math/rodrigues.hpp
+      opengv/include/opengv/math/quaternion.hpp
+      opengv/include/opengv/math/arun.hpp
+      opengv/include/opengv/math/Sturm.hpp
+      opengv/include/opengv/math/roots.hpp
+      opengv/include/opengv/math/gauss_jordan.hpp
+      opengv/include/opengv/absolute_pose/AbsoluteAdapterBase.hpp
+      opengv/include/opengv/absolute_pose/CentralAbsoluteAdapter.hpp
+      opengv/include/opengv/absolute_pose/NoncentralAbsoluteAdapter.hpp
+      opengv/include/opengv/absolute_pose/NoncentralAbsoluteMultiAdapter.hpp
+      opengv/include/opengv/absolute_pose/AbsoluteMultiAdapterBase.hpp
+      opengv/include/opengv/relative_pose/RelativeAdapterBase.hpp
+      opengv/include/opengv/relative_pose/RelativeMultiAdapterBase.hpp
+      opengv/include/opengv/relative_pose/CentralRelativeAdapter.hpp
+      opengv/include/opengv/relative_pose/CentralRelativeWeightingAdapter.hpp
+      opengv/include/opengv/relative_pose/NoncentralRelativeAdapter.hpp
+      opengv/include/opengv/relative_pose/CentralRelativeMultiAdapter.hpp
+      opengv/include/opengv/relative_pose/NoncentralRelativeMultiAdapter.hpp
+      opengv/include/opengv/point_cloud/PointCloudAdapterBase.hpp
+      opengv/include/opengv/point_cloud/PointCloudAdapter.hpp
+      opengv/include/opengv/sac_problems/absolute_pose/AbsolutePoseSacProblem.hpp
+      opengv/include/opengv/sac_problems/absolute_pose/MultiNoncentralAbsolutePoseSacProblem.hpp
+      opengv/include/opengv/sac_problems/relative_pose/CentralRelativePoseSacProblem.hpp
+      opengv/include/opengv/sac_problems/relative_pose/NoncentralRelativePoseSacProblem.hpp
+      opengv/include/opengv/sac_problems/relative_pose/MultiCentralRelativePoseSacProblem.hpp
+      opengv/include/opengv/sac_problems/relative_pose/MultiNoncentralRelativePoseSacProblem.hpp
+      opengv/include/opengv/sac_problems/relative_pose/EigensolverSacProblem.hpp
+      opengv/include/opengv/sac_problems/relative_pose/RotationOnlySacProblem.hpp
+      opengv/include/opengv/sac_problems/relative_pose/TranslationOnlySacProblem.hpp
+      opengv/include/opengv/sac_problems/point_cloud/PointCloudSacProblem.hpp
+      opengv/include/opengv/absolute_pose/MACentralAbsolute.hpp
+      opengv/include/opengv/absolute_pose/MANoncentralAbsolute.hpp
+      opengv/include/opengv/relative_pose/MACentralRelative.hpp
+      opengv/include/opengv/relative_pose/MANoncentralRelative.hpp
+      opengv/include/opengv/relative_pose/MANoncentralRelativeMulti.hpp
+      opengv/include/opengv/point_cloud/MAPointCloud.hpp )
 
   IF(WIN32)
     add_library( opengv ${OPENGV_SOURCE_FILES} ${OPENGV_HEADER_FILES} )
-    add_library( random_generators opengv/test/random_generators.cpp opengv/test/random_generators.hpp opengv/test/experiment_helpers.cpp opengv/test/experiment_helpers.hpp opengv/test/time_measurement.cpp opengv/test/time_measurement.hpp )
+    add_library( random_generators opengv/test/random_generators.cpp 
+                opengv/test/random_generators.hpp 
+                opengv/test/experiment_helpers.cpp 
+                opengv/test/experiment_helpers.hpp 
+                opengv/test/time_measurement.cpp 
+                opengv/test/time_measurement.hpp )
   ELSE()
     add_library( opengv ${OPENGV_SOURCE_FILES} ${OPENGV_HEADER_FILES} )
-    add_library( random_generators opengv/test/random_generators.cpp opengv/test/random_generators.hpp opengv/test/experiment_helpers.cpp opengv/test/experiment_helpers.hpp opengv/test/time_measurement.cpp opengv/test/time_measurement.hpp )
+    add_library( random_generators 
+    opengv/test/random_generators.cpp 
+    opengv/test/random_generators.hpp 
+    opengv/test/experiment_helpers.cpp 
+    opengv/test/experiment_helpers.hpp 
+    opengv/test/time_measurement.cpp 
+    opengv/test/time_measurement.hpp )
     target_link_libraries(random_generators opengv)
   ENDIF()
 
 
-  IF (BUILD_TESTS)
-    enable_testing()
+  # IF (BUILD_TESTS)
+  #   enable_testing()
 
-    add_executable( test_absolute_pose test/test_absolute_pose.cpp )
-    target_link_libraries( test_absolute_pose opengv random_generators )
-    add_test(NAME test_absolute_pose
-      WORKING_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}
-      COMMAND test_absolute_pose)
+  #   add_executable( test_absolute_pose test/test_absolute_pose.cpp )
+  #   target_link_libraries( test_absolute_pose opengv random_generators )
+  #   add_test(NAME test_absolute_pose
+  #     WORKING_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}
+  #     COMMAND test_absolute_pose)
 
-    add_executable( test_absolute_pose_sac test/test_absolute_pose_sac.cpp )
-    target_link_libraries( test_absolute_pose_sac opengv random_generators )
-    add_test(NAME test_absolute_pose_sac
-      WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-      COMMAND test_absolute_pose_sac)
+  #   add_executable( test_absolute_pose_sac test/test_absolute_pose_sac.cpp )
+  #   target_link_libraries( test_absolute_pose_sac opengv random_generators )
+  #   add_test(NAME test_absolute_pose_sac
+  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+  #     COMMAND test_absolute_pose_sac)
 
-    add_executable( test_noncentral_absolute_pose test/test_noncentral_absolute_pose.cpp )
-    target_link_libraries( test_noncentral_absolute_pose opengv random_generators )
-    add_test(NAME test_noncentral_absolute_pose
-      WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-      COMMAND test_noncentral_absolute_pose)
+  #   add_executable( test_noncentral_absolute_pose test/test_noncentral_absolute_pose.cpp )
+  #   target_link_libraries( test_noncentral_absolute_pose opengv random_generators )
+  #   add_test(NAME test_noncentral_absolute_pose
+  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+  #     COMMAND test_noncentral_absolute_pose)
 
-    add_executable( test_noncentral_absolute_pose_sac test/test_noncentral_absolute_pose_sac.cpp )
-    target_link_libraries( test_noncentral_absolute_pose_sac opengv random_generators )
-    add_test(NAME test_noncentral_absolute_pose_sac
-      WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-      COMMAND test_noncentral_absolute_pose_sac)
+  #   add_executable( test_noncentral_absolute_pose_sac test/test_noncentral_absolute_pose_sac.cpp )
+  #   target_link_libraries( test_noncentral_absolute_pose_sac opengv random_generators )
+  #   add_test(NAME test_noncentral_absolute_pose_sac
+  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+  #     COMMAND test_noncentral_absolute_pose_sac)
 
-    add_executable( test_multi_noncentral_absolute_pose_sac test/test_multi_noncentral_absolute_pose_sac.cpp )
-    target_link_libraries( test_multi_noncentral_absolute_pose_sac opengv random_generators )
-    add_test(NAME test_multi_noncentral_absolute_pose_sac
-      WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-      COMMAND test_multi_noncentral_absolute_pose_sac)
+  #   add_executable( test_multi_noncentral_absolute_pose_sac test/test_multi_noncentral_absolute_pose_sac.cpp )
+  #   target_link_libraries( test_multi_noncentral_absolute_pose_sac opengv random_generators )
+  #   add_test(NAME test_multi_noncentral_absolute_pose_sac
+  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+  #     COMMAND test_multi_noncentral_absolute_pose_sac)
 
-    add_executable( test_relative_pose test/test_relative_pose.cpp )
-    target_link_libraries( test_relative_pose opengv random_generators )
-    add_test(NAME test_relative_pose
-      WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-      COMMAND test_relative_pose)
+  #   add_executable( test_relative_pose test/test_relative_pose.cpp )
+  #   target_link_libraries( test_relative_pose opengv random_generators )
+  #   add_test(NAME test_relative_pose
+  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+  #     COMMAND test_relative_pose)
 
-    add_executable( test_relative_pose_rotationOnly test/test_relative_pose_rotationOnly.cpp )
-    target_link_libraries( test_relative_pose_rotationOnly opengv random_generators )
-    add_test(NAME test_relative_pose_rotationOnly
-      WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-      COMMAND test_relative_pose_rotationOnly)
+  #   add_executable( test_relative_pose_rotationOnly test/test_relative_pose_rotationOnly.cpp )
+  #   target_link_libraries( test_relative_pose_rotationOnly opengv random_generators )
+  #   add_test(NAME test_relative_pose_rotationOnly
+  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+  #     COMMAND test_relative_pose_rotationOnly)
 
-    add_executable( test_relative_pose_rotationOnly_sac test/test_relative_pose_rotationOnly_sac.cpp )
-    target_link_libraries( test_relative_pose_rotationOnly_sac opengv random_generators )
-    add_test(NAME test_relative_pose_rotationOnly_sac
-      WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-      COMMAND test_relative_pose_rotationOnly_sac)
+  #   add_executable( test_relative_pose_rotationOnly_sac test/test_relative_pose_rotationOnly_sac.cpp )
+  #   target_link_libraries( test_relative_pose_rotationOnly_sac opengv random_generators )
+  #   add_test(NAME test_relative_pose_rotationOnly_sac
+  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+  #     COMMAND test_relative_pose_rotationOnly_sac)
 
-    add_executable( test_relative_pose_sac test/test_relative_pose_sac.cpp )
-    target_link_libraries( test_relative_pose_sac opengv random_generators )
-    add_test(NAME test_relative_pose_sac
-      WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-      COMMAND test_relative_pose_sac)
+  #   add_executable( test_relative_pose_sac test/test_relative_pose_sac.cpp )
+  #   target_link_libraries( test_relative_pose_sac opengv random_generators )
+  #   add_test(NAME test_relative_pose_sac
+  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+  #     COMMAND test_relative_pose_sac)
 
-    add_executable( test_noncentral_relative_pose test/test_noncentral_relative_pose.cpp )
-    target_link_libraries( test_noncentral_relative_pose opengv random_generators )
-    add_test(NAME test_noncentral_relative_pose
-      WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-      COMMAND test_noncentral_relative_pose)
+  #   add_executable( test_noncentral_relative_pose test/test_noncentral_relative_pose.cpp )
+  #   target_link_libraries( test_noncentral_relative_pose opengv random_generators )
+  #   add_test(NAME test_noncentral_relative_pose
+  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+  #     COMMAND test_noncentral_relative_pose)
 
-    add_executable( test_noncentral_relative_pose_sac test/test_noncentral_relative_pose_sac.cpp )
-    target_link_libraries( test_noncentral_relative_pose_sac opengv random_generators )
-    add_test(NAME test_noncentral_relative_pose_sac
-      WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-      COMMAND test_noncentral_relative_pose_sac)
+  #   add_executable( test_noncentral_relative_pose_sac test/test_noncentral_relative_pose_sac.cpp )
+  #   target_link_libraries( test_noncentral_relative_pose_sac opengv random_generators )
+  #   add_test(NAME test_noncentral_relative_pose_sac
+  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+  #     COMMAND test_noncentral_relative_pose_sac)
 
-    add_executable( test_multi_noncentral_relative_pose_sac test/test_multi_noncentral_relative_pose_sac.cpp )
-    target_link_libraries( test_multi_noncentral_relative_pose_sac opengv random_generators )
-    add_test(NAME test_multi_noncentral_relative_pose_sac
-      WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-      COMMAND test_multi_noncentral_relative_pose_sac)
+  #   add_executable( test_multi_noncentral_relative_pose_sac test/test_multi_noncentral_relative_pose_sac.cpp )
+  #   target_link_libraries( test_multi_noncentral_relative_pose_sac opengv random_generators )
+  #   add_test(NAME test_multi_noncentral_relative_pose_sac
+  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+  #     COMMAND test_multi_noncentral_relative_pose_sac)
 
-    add_executable( test_eigensolver_sac test/test_eigensolver_sac.cpp )
-    target_link_libraries( test_eigensolver_sac opengv random_generators )
-    add_test(NAME test_eigensolver_sac
-      WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-      COMMAND test_eigensolver_sac)
+  #   add_executable( test_eigensolver_sac test/test_eigensolver_sac.cpp )
+  #   target_link_libraries( test_eigensolver_sac opengv random_generators )
+  #   add_test(NAME test_eigensolver_sac
+  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+  #     COMMAND test_eigensolver_sac)
 
-    add_executable( test_triangulation test/test_triangulation.cpp )
-    target_link_libraries( test_triangulation opengv random_generators )
-    add_test(NAME test_triangulation
-      WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-      COMMAND test_triangulation)
+  #   add_executable( test_triangulation test/test_triangulation.cpp )
+  #   target_link_libraries( test_triangulation opengv random_generators )
+  #   add_test(NAME test_triangulation
+  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+  #     COMMAND test_triangulation)
 
-    add_executable( test_eigensolver test/test_eigensolver.cpp )
-    target_link_libraries( test_eigensolver opengv random_generators )
-    add_test(NAME test_eigensolver
-      WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-      COMMAND test_eigensolver)
+  #   add_executable( test_eigensolver test/test_eigensolver.cpp )
+  #   target_link_libraries( test_eigensolver opengv random_generators )
+  #   add_test(NAME test_eigensolver
+  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+  #     COMMAND test_eigensolver)
 
-    add_executable( test_point_cloud test/test_point_cloud.cpp )
-    target_link_libraries( test_point_cloud opengv random_generators )
-    add_test(NAME  test_point_cloud
-      WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-      COMMAND test_point_cloud)
+  #   add_executable( test_point_cloud test/test_point_cloud.cpp )
+  #   target_link_libraries( test_point_cloud opengv random_generators )
+  #   add_test(NAME  test_point_cloud
+  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+  #     COMMAND test_point_cloud)
 
-    add_Executable( test_point_cloud_sac test/test_point_cloud_sac.cpp )
-    target_link_libraries( test_point_cloud_sac opengv random_generators )
-    add_test(NAME test_point_cloud_sac
-      WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-      COMMAND test_point_cloud_sac)
+  #   add_Executable( test_point_cloud_sac test/test_point_cloud_sac.cpp )
+  #   target_link_libraries( test_point_cloud_sac opengv random_generators )
+  #   add_test(NAME test_point_cloud_sac
+  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+  #     COMMAND test_point_cloud_sac)
 
-    add_Executable( test_Sturm test/test_Sturm.cpp )
-    target_link_libraries( test_Sturm opengv random_generators )
-    add_test(NAME test_Sturm
-      WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-      COMMAND test_Sturm)
+  #   add_Executable( test_Sturm test/test_Sturm.cpp )
+  #   target_link_libraries( test_Sturm opengv random_generators )
+  #   add_test(NAME test_Sturm
+  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+  #     COMMAND test_Sturm)
 
-  ENDIF()
+  # ENDIF()
 
 
 ENDIF(OPENGV_IMPORT)
