@@ -31,8 +31,7 @@ private:
     ros::Subscriber feature_sub;
     ros::Subscriber pose_sub;
 
-    tf::TransformListener listener1;
-    tf::TransformListener listener2;
+    tf::TransformListener listener;
 
     std::vector<Eigen::Matrix<float, 4, 4>> poses_1;
     std::vector<Eigen::Matrix<float, 4, 4>> poses_2;
@@ -42,7 +41,7 @@ private:
     Calibration camera;
 
 public:
-    RO_Estimator()
+    RO_Estimator(void)
     {
         feature_sub = n.subscribe("features", 20, &RO_Estimator::RO_CB, this);
         // from robot/map to robot/base_footprint
@@ -50,14 +49,20 @@ public:
 
     void RO_CB(const cpp::FeatureArray::ConstPtr &data)
     {
-        tf::StampedTransform transform1;
-        tf::StampedTransform transform2;
+        tf::StampedTransform transform;
         try
         {
-            listener1.lookupTransform("/robot1/map", "/robot1/base_footprint",
-                                      ros::Time(0), transform1);
-            listener2.lookupTransform("/robot2/map", "/robot2/base_footprint",
-                                      ros::Time(0), transform2);
+            if (data->who_detect == 1)
+            {
+
+                listener.lookupTransform("/robot1/map", "/robot1/base_footprint",
+                                         ros::Time(0), transform);
+            }
+            else
+            {
+                listener.lookupTransform("/robot2/map", "/robot2/base_footprint",
+                                         ros::Time(0), transform);
+            }
         }
         catch (tf::TransformException &ex)
         {
@@ -65,28 +70,18 @@ public:
             exit(1);
         }
 
-        double x1 = transform1.getOrigin().x();
-        double y1 = transform1.getOrigin().y();
-        double z1 = transform1.getOrigin().z();
-        double x2 = transform2.getOrigin().x();
-        double y2 = transform2.getOrigin().y();
-        double z2 = transform2.getOrigin().z();
-        tf::Quaternion q1 = transform1.getRotation();
-        tf::Quaternion q2 = transform2.getRotation();
+        double x = transform.getOrigin().x();
+        double y = transform.getOrigin().y();
+        double z = transform.getOrigin().z();
+        tf::Quaternion q = transform.getRotation();
 
-        double roll1, pitch1, yaw1;
-        double roll2, pitch2, yaw2;
-        tf::Matrix3x3(q1).getRPY(roll1, pitch1, yaw1);
-        tf::Matrix3x3(q2).getRPY(roll2, pitch2, yaw2);
+        double roll, pitch, yaw;
+        tf::Matrix3x3(q).getRPY(roll, pitch, yaw);
 
-        Eigen::Matrix<float, 4, 4> pose1, pose2;
-        pose1 << cos(roll1) * cos(pitch1), cos(roll1) * sin(pitch1) * sin(yaw1) - sin(roll1) * cos(yaw1), cos(roll1) * sin(pitch1) * cos(yaw1) + sin(roll1) * sin(yaw1), x1,
-            sin(roll1) * cos(pitch1), sin(roll1) * sin(pitch1) * sin(yaw1) + cos(roll1) * cos(yaw1), sin(roll1) * sin(pitch1) * cos(yaw1) - cos(roll1) * sin(yaw1), y1,
-            -sin(pitch1), cos(pitch1) * sin(yaw1), cos(pitch1) * cos(yaw1), z1,
-            0, 0, 0, 1;
-        pose2 << cos(roll2) * cos(pitch2), cos(roll2) * sin(pitch2) * sin(yaw2) - sin(roll2) * cos(yaw2), cos(roll2) * sin(pitch2) * cos(yaw2) + sin(roll2) * sin(yaw2), x2,
-            sin(roll2) * cos(pitch2), sin(roll2) * sin(pitch2) * sin(yaw2) + cos(roll2) * cos(yaw2), sin(roll2) * sin(pitch2) * cos(yaw2) - cos(roll2) * sin(yaw2), y2,
-            -sin(pitch2), cos(pitch2) * sin(yaw2), cos(pitch2) * cos(yaw2), z2,
+        Eigen::Matrix<float, 4, 4> pose;
+        pose << cos(roll) * cos(pitch), cos(roll) * sin(pitch) * sin(yaw) - sin(roll) * cos(yaw), cos(roll) * sin(pitch) * cos(yaw) + sin(roll) * sin(yaw), x,
+            sin(roll) * cos(pitch), sin(roll) * sin(pitch) * sin(yaw) + cos(roll) * cos(yaw), sin(roll) * sin(pitch) * cos(yaw) - cos(roll) * sin(yaw), y,
+            -sin(pitch), cos(pitch) * sin(yaw), cos(pitch) * cos(yaw), z,
             0, 0, 0, 1;
 
         int who_detect = data->who_detect;
@@ -108,15 +103,14 @@ public:
 
         if (signal == 0)
         {
-            poses_1.push_back(pose1);
-            poses_2.push_back(pose2);
+            poses_1.push_back(pose);
             RO_Estimator::mlpnp(who_detect, kp_loc_r1_s, kp_loc_r2_s);
             // NOTE mlpnp
         }
         else
         {
 
-                        // NOTE BA
+            // NOTE BA
         }
     }
     // FIXME 前処理が必要

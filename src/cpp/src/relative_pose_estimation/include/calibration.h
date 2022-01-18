@@ -51,6 +51,7 @@ public:
         inv_intrinstic = intrinstic_parameter.inverse();
 
         image_cov = Eigen::Matrix3d::Identity();
+        // FIXME covを決めること!
         observe_cam_cov = inv_intrinstic * image_cov * inv_intrinstic.transpose();
     }
 

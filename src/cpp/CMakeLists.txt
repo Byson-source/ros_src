@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.0.2)
 project(cpp)
 
 set(OPENGV_IMPORT 1)
-set(CMAKE_BUILD_TYPE RELEASE)
 
 IF(OPENGV_IMPORT)
   set (OPENGV_VERSION_MAJOR 1)
@@ -211,122 +210,6 @@ IF(OPENGV_IMPORT)
     opengv/test/time_measurement.hpp )
     target_link_libraries(random_generators opengv)
   ENDIF()
-
-
-  # IF (BUILD_TESTS)
-  #   enable_testing()
-
-  #   add_executable( test_absolute_pose test/test_absolute_pose.cpp )
-  #   target_link_libraries( test_absolute_pose opengv random_generators )
-  #   add_test(NAME test_absolute_pose
-  #     WORKING_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}
-  #     COMMAND test_absolute_pose)
-
-  #   add_executable( test_absolute_pose_sac test/test_absolute_pose_sac.cpp )
-  #   target_link_libraries( test_absolute_pose_sac opengv random_generators )
-  #   add_test(NAME test_absolute_pose_sac
-  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  #     COMMAND test_absolute_pose_sac)
-
-  #   add_executable( test_noncentral_absolute_pose test/test_noncentral_absolute_pose.cpp )
-  #   target_link_libraries( test_noncentral_absolute_pose opengv random_generators )
-  #   add_test(NAME test_noncentral_absolute_pose
-  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  #     COMMAND test_noncentral_absolute_pose)
-
-  #   add_executable( test_noncentral_absolute_pose_sac test/test_noncentral_absolute_pose_sac.cpp )
-  #   target_link_libraries( test_noncentral_absolute_pose_sac opengv random_generators )
-  #   add_test(NAME test_noncentral_absolute_pose_sac
-  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  #     COMMAND test_noncentral_absolute_pose_sac)
-
-  #   add_executable( test_multi_noncentral_absolute_pose_sac test/test_multi_noncentral_absolute_pose_sac.cpp )
-  #   target_link_libraries( test_multi_noncentral_absolute_pose_sac opengv random_generators )
-  #   add_test(NAME test_multi_noncentral_absolute_pose_sac
-  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  #     COMMAND test_multi_noncentral_absolute_pose_sac)
-
-  #   add_executable( test_relative_pose test/test_relative_pose.cpp )
-  #   target_link_libraries( test_relative_pose opengv random_generators )
-  #   add_test(NAME test_relative_pose
-  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  #     COMMAND test_relative_pose)
-
-  #   add_executable( test_relative_pose_rotationOnly test/test_relative_pose_rotationOnly.cpp )
-  #   target_link_libraries( test_relative_pose_rotationOnly opengv random_generators )
-  #   add_test(NAME test_relative_pose_rotationOnly
-  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  #     COMMAND test_relative_pose_rotationOnly)
-
-  #   add_executable( test_relative_pose_rotationOnly_sac test/test_relative_pose_rotationOnly_sac.cpp )
-  #   target_link_libraries( test_relative_pose_rotationOnly_sac opengv random_generators )
-  #   add_test(NAME test_relative_pose_rotationOnly_sac
-  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  #     COMMAND test_relative_pose_rotationOnly_sac)
-
-  #   add_executable( test_relative_pose_sac test/test_relative_pose_sac.cpp )
-  #   target_link_libraries( test_relative_pose_sac opengv random_generators )
-  #   add_test(NAME test_relative_pose_sac
-  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  #     COMMAND test_relative_pose_sac)
-
-  #   add_executable( test_noncentral_relative_pose test/test_noncentral_relative_pose.cpp )
-  #   target_link_libraries( test_noncentral_relative_pose opengv random_generators )
-  #   add_test(NAME test_noncentral_relative_pose
-  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  #     COMMAND test_noncentral_relative_pose)
-
-  #   add_executable( test_noncentral_relative_pose_sac test/test_noncentral_relative_pose_sac.cpp )
-  #   target_link_libraries( test_noncentral_relative_pose_sac opengv random_generators )
-  #   add_test(NAME test_noncentral_relative_pose_sac
-  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  #     COMMAND test_noncentral_relative_pose_sac)
-
-  #   add_executable( test_multi_noncentral_relative_pose_sac test/test_multi_noncentral_relative_pose_sac.cpp )
-  #   target_link_libraries( test_multi_noncentral_relative_pose_sac opengv random_generators )
-  #   add_test(NAME test_multi_noncentral_relative_pose_sac
-  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  #     COMMAND test_multi_noncentral_relative_pose_sac)
-
-  #   add_executable( test_eigensolver_sac test/test_eigensolver_sac.cpp )
-  #   target_link_libraries( test_eigensolver_sac opengv random_generators )
-  #   add_test(NAME test_eigensolver_sac
-  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  #     COMMAND test_eigensolver_sac)
-
-  #   add_executable( test_triangulation test/test_triangulation.cpp )
-  #   target_link_libraries( test_triangulation opengv random_generators )
-  #   add_test(NAME test_triangulation
-  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  #     COMMAND test_triangulation)
-
-  #   add_executable( test_eigensolver test/test_eigensolver.cpp )
-  #   target_link_libraries( test_eigensolver opengv random_generators )
-  #   add_test(NAME test_eigensolver
-  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  #     COMMAND test_eigensolver)
-
-  #   add_executable( test_point_cloud test/test_point_cloud.cpp )
-  #   target_link_libraries( test_point_cloud opengv random_generators )
-  #   add_test(NAME  test_point_cloud
-  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  #     COMMAND test_point_cloud)
-
-  #   add_Executable( test_point_cloud_sac test/test_point_cloud_sac.cpp )
-  #   target_link_libraries( test_point_cloud_sac opengv random_generators )
-  #   add_test(NAME test_point_cloud_sac
-  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  #     COMMAND test_point_cloud_sac)
-
-  #   add_Executable( test_Sturm test/test_Sturm.cpp )
-  #   target_link_libraries( test_Sturm opengv random_generators )
-  #   add_test(NAME test_Sturm
-  #     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  #     COMMAND test_Sturm)
-
-  # ENDIF()
-
-
 ENDIF(OPENGV_IMPORT)
 # set(CMAKE_BUILD_TYPE Debug)
 

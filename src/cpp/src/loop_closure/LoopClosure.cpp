@@ -136,7 +136,7 @@ public:
         int file_number = 0;
         for (const auto &entry : fs::directory_iterator(template_path))
         {
-            file_number+=1;
+            file_number += 1;
             // std::cout << entry.path() << std::endl;
         }
         return file_number;
@@ -246,7 +246,7 @@ public:
         }
         // criteriaは真値のhypothesisと期待できるもの
         // loopが連続している時
-        else if (nextIndex - std::max(all_loop[1]["index"].back(), all_loop[2]["index"].back()) <= 3)
+        else if (nextIndex - std::max(all_loop[1]["index"].back(), all_loop[2]["index"].back()) <= 5)
         {
             if ((((index_belong == "R2")) && ((criteria_R1 - 5 <= hypothesis) && (criteria_R1 + 5 >= hypothesis))) ||
                 (((index_belong == "R1")) && ((criteria_R2 - 5 <= hypothesis) && (criteria_R2 + 5 >= hypothesis))))
@@ -344,8 +344,6 @@ public:
                             all_loop[2]["LoopID"].push_back(rtabmap.getLoopClosureId());
                         }
                     }
-                    else
-                        ROS_ERROR("False positive was detected");
                 }
 
                 ++nextIndex;
