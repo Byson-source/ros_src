@@ -49,19 +49,24 @@ public:
 
     void RO_CB(const cpp::FeatureArray::ConstPtr &data)
     {
-        tf::StampedTransform transform;
+        tf::StampedTransform transform_map2odom;
+        tf::StampedTransform transform_odom2base;
         try
         {
             if (data->who_detect == 1)
             {
-
-                listener.lookupTransform("/robot1/map", "/robot1/base_footprint",
-                                         ros::Time(0), transform);
+                // listener.waitForTransform("/robot1/map", "/robot1/odom", ros::Time(0), ros::Duration(3.0));
+                listener.lookupTransform("/robot1/map", "/robot1/odom",
+                                         ros::Time(0), transform_map2odom);
+                // listener.waitForTransform("/robot1/map", "/robot1/odom", ros::Time(0), ros::Duration(3.0));
+                listener.lookupTransform("/robot1/odom", "/robot1/base_footprint",
+                                         ros::Time(0), transform_odom2base);
             }
             else
             {
-                listener.lookupTransform("/robot2/map", "/robot2/base_footprint",
-                                         ros::Time(0), transform);
+                // listener.waitForTransform("/robot2/map", "/robot2/odom", ros::Time(0), ros::Duration(3.0));
+                listener.lookupTransform("/robot2/map", "/robot2/odom", ros::Time(0), transform_map2odom);
+                listener.lookupTransform("/robot2/odom", "/robot2/base_footprint", ros::Time(0), transform_odom2base);
             }
         }
         catch (tf::TransformException &ex)
@@ -70,10 +75,10 @@ public:
             exit(1);
         }
 
-        double x = transform.getOrigin().x();
-        double y = transform.getOrigin().y();
-        double z = transform.getOrigin().z();
-        tf::Quaternion q = transform.getRotation();
+        double x = transform_map2odom.getOrigin().x() + transform_odom2base.getOrigin().x();
+        double y = transform_map2odom.getOrigin().y() + transform_odom2base.getOrigin().y();
+        double z = transform_map2odom.getOrigin().z() + transform_odom2base.getOrigin().z();
+        tf::Quaternion q = transform_map2odom.getRotation() + transform_odom2base.getRotation();
 
         double roll, pitch, yaw;
         tf::Matrix3x3(q).getRPY(roll, pitch, yaw);
@@ -100,7 +105,7 @@ public:
                 kp_loc_r2_s.push_back(kp_loc_r2);
             }
         }
-
+        ROS_INFO("Yahoo");
         if (signal == 0)
         {
             poses_1.push_back(pose);
