@@ -51,14 +51,14 @@ def callback(rgb, id):
         condition["cb1 storing"] = 1
         cv2.imwrite(path + "rgb/"+str(img_number) + ".jpg", cv2_img)
         cv2.imwrite(all_rgb + str(img_number) + ".jpg", cv2_img)
-        print("image storing;"+str(img_number))
+        # print("image storing;"+str(img_number))
         img_number += 2
         condition["cb1 storing"] = 0
 
     # REVIEW 中止
     else:
         condition["cb1 storing"] = -1
-        rospy.loginfo("CB1 stocking img "+str(img_number))
+        # rospy.loginfo("CB1 stocking img "+str(img_number))
         cv2.imwrite(all_rgb + str(img_number) + ".jpg", cv2_img)
         stock[str(img_number)] = cv2_img
 
@@ -76,13 +76,13 @@ def callback2(rgb, id):
         condition["cb2 storing"] = 1
         cv2.imwrite(path + "rgb/"+str(img_number2) + ".jpg", cv2_img)
         cv2.imwrite(all_rgb + str(img_number2) + ".jpg", cv2_img)
-        print("image storing;"+str(img_number2))
+        # print("image storing;"+str(img_number2))
         img_number2 += 2
         condition["cb2 storing"] = 0
     # 中止
     else:
         condition["cb2 storing"] = -1
-        rospy.loginfo("CB2 stocking img "+str(img_number2))
+        # rospy.loginfo("CB2 stocking img "+str(img_number2))
         cv2.imwrite(all_rgb + str(img_number2) + ".jpg", cv2_img)
         stock[str(img_number2)] = cv2_img
 
@@ -128,6 +128,8 @@ def setup():
     os.mkdir(all_rgb)
     os.mkdir(path+"/rgb/")
     os.mkdir(path+"/sorted_rgb/")
+    os.mkdir(path+"/feature_match/")
+    os.mkdir(path+"depth/")
 
 
 def commandCB(event):

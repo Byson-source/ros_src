@@ -1,7 +1,3 @@
-# TODO 特徴点に該当する深度算出
-
-# TODO 特徴点の座標と深度をPublish
-
 import rospy
 from sensor_msgs.msg import Image as msg_Image
 from sensor_msgs.msg import CameraInfo
@@ -30,17 +26,19 @@ depth_img = 1
 depth_img2 = 2
 container = {}
 bridge = CvBridge()
+index = 0
 
 
 def depthCB1(depth1, id):
     global depth_img
 
-    cv2_img = bridge.imgmsg_to_cv2(depth1, depth1.encoding)
+    cv2_img = bridge.imgmsg_to_cv2(depth1, "passthrough")
     # FIXME Maybe should change to (640,480)
     cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
+    cv2.imwrite(depth_path+str(depth_img)+".png", cv2_img)
 
     # REVIEW 再開
-    container[depth_img] = cv2_img
+    container[depth_img] = np.array(cv2_img, dtype=np.float32)
 
     depth_img += 2
 
@@ -48,11 +46,14 @@ def depthCB1(depth1, id):
 def depthCB2(depth2, id):
     global depth_img2
 
-    img = bridge.imgmsg_to_cv2(depth2, depth2.encoding)
+    img = bridge.imgmsg_to_cv2(depth2, "passthrough")
     # FIXME Maybe should change to (640,480)
     img = cv2.resize(img, dsize=(512, 384))
 
-    container[depth_img2] = img
+    cv2.imwrite(depth_path+str(depth_img2)+".png", img)
+    depth_array = np.array(img, dtype=np.float32)
+    # print(depth_array.shape)
+    container[depth_img2] = depth_array
 
     depth_img2 += 2
 
@@ -61,6 +62,8 @@ def depthCB2(depth2, id):
 
 
 def orbmatch(fileName1, fileName2):
+    global index
+    index += 1
     img1 = cv2.imread(rgb_path+str(fileName1)+".jpg")
     img2 = cv2.imread(rgb_path+str(fileName2)+".jpg")
 
@@ -131,6 +134,9 @@ def orbmatch(fileName1, fileName2):
             img3 = cv2.drawMatches(img1, kp1, img2, kp2, true_mask, img_matches,
                                    flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
 
+            cv2.imwrite(
+                "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/feature_match/"+str(fileName1)+"->"+str(fileName2)+".jpg", img3)
+
             # loc1とloc2がRANSACでふるい分けられた特徴点の座標
 
             return loc1, loc2, 1
@@ -154,28 +160,37 @@ def loop_CB(data):
         else:
             element["num"] = len(data.r2_index)
 
-        # NOTE detected pair of images
+        # NOTE 1ペア毎にpublishする
+
         for iter in range(element["num"]):
             element["R1"][iter+1], element["R2"][iter+1] = [], []
             i += 1
             indice1, indice2, good = 0, 0, 0
             r1_feature, r2_feature = [], []
 
+            info = FeatureArray()
             if index == "R1":
                 # filter
+                # TODO 座標軸の定義を見直すこと.この場合は画像の左上
                 r1_feature, r2_feature, good = orbmatch(
                     data.r1_index[iter], data.r1_value[iter])
                 indice1, indice2 = data.r1_index[iter], data.r1_value[iter]
+                info.index2value = [indice1, indice2]
+                info.who_detect = 1
             else:
                 r2_feature, r1_feature, good = orbmatch(
                     data.r2_index[iter], data.r2_value[iter])
                 # indice1,indice2="value","index"
                 indice2, indice1 = data.r2_index[iter], data.r2_value[iter]
+                info.index2value = [indice2, indice1]
+                info.who_detect = 2
 
             # NOTE feature iterations
             if(good):
+                rospy.loginfo("This is No."+str(indice1))
                 for val in r1_feature:
                     # x
+                    # iterは0から始まる
                     element["R1"][iter+1].append(val[0])
                     # y
                     element["R1"][iter+1].append(val[1])
@@ -183,6 +198,11 @@ def loop_CB(data):
                     element["R1"][iter +
                                   1].append(container[indice1][int(val[1]), int(val[0])])
                     # TODO check if the order is (y,x) or (x,y)
+                    # TODO 0の特徴点を除く
+                    rospy.loginfo("x="+str(val[0])+", y="+str(val[1]))
+                    rospy.loginfo(
+                        "depth is "+str(container[indice1][int(val[1]), int(val[0])]))
+                    # print(container[indice1][int(val[1]), int(val[0])])
                 for val in r2_feature:
                     # x
                     element["R2"][iter+1].append(val[0])
@@ -193,23 +213,16 @@ def loop_CB(data):
                                   1].append(container[indice2][int(val[1]), int(val[0])])
                     # element["FeaturePair"]["R2Depth"][i].append(container[element[indice2]][val[1],val[0]])
 
-                info = FeatureArray()
                 info.signal = 0
                 info.r1 = element["R1"][iter+1]
                 info.r2 = element["R2"][iter+1]
 
-                if index == "R2":
-                    info.who_detect = 2
-
-                    # if iter==len(element["index"]-1):
-                    if iter == element["num"]-1:
-                        info.signal = 1
-                else:
-                    info.who_detect = 1
-
                 feature_pub.publish(info)
-
-    # depth算出
+        # Loop sequence終了
+        if index == "R2":
+            info2 = FeatureArray()
+            info2.signal = 1
+            feature_pub.publish(info2)
 
 
 if __name__ == '__main__':

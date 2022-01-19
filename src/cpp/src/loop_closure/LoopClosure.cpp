@@ -175,7 +175,7 @@ public:
             {
             }
 
-            std::cout << "For R1, old name; " << std::to_string(file_dir["R1"][iteration]) << " to new name; " << std::to_string(nextIndex + iteration) << std::endl;
+            // std::cout << "For R1, old name; " << std::to_string(file_dir["R1"][iteration]) << " to new name; " << std::to_string(nextIndex + iteration) << std::endl;
         }
         // R2
         for (int iteration = 0; iteration < file_dir["R2"].size(); ++iteration)
@@ -197,7 +197,7 @@ public:
             {
             }
 
-            std::cout << "For R2, old name; " << std::to_string(file_dir["R2"][iteration]) << " to new name; " << std::to_string(nextIndex + iteration + file_dir["R1"].size()) << std::endl;
+            // std::cout << "For R2, old name; " << std::to_string(file_dir["R2"][iteration]) << " to new name; " << std::to_string(nextIndex + iteration + file_dir["R1"].size()) << std::endl;
         }
 
         std::map<std::string, int> ans;
@@ -271,7 +271,7 @@ public:
         // ディレクトリができるのを待つ必要がある.
         if (!camera.init())
         {
-            ROS_ERROR("Camera init failed!");
+            // ROS_ERROR("Camera init failed!");
             exit(1);
         }
 
@@ -291,7 +291,7 @@ public:
 
         if (data.imageRaw().empty())
         {
-            ROS_ERROR("Images are not stored");
+            // ROS_ERROR("Images are not stored");
             exit(1);
         }
 

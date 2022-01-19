@@ -36,6 +36,8 @@ private:
     std::vector<Eigen::Matrix<float, 4, 4>> poses_1;
     std::vector<Eigen::Matrix<float, 4, 4>> poses_2;
 
+    std::vector<int> loop_info;
+
     // points location
 
     Calibration camera;
@@ -91,6 +93,7 @@ public:
 
         int who_detect = data->who_detect;
         int signal = data->signal;
+        loop_info = data->index2value;
         std::vector<cv::Point3f> kp_loc_r1_s;
         std::vector<cv::Point3f> kp_loc_r2_s;
 
@@ -148,7 +151,7 @@ public:
         for (size_t i{0}; i < iterations; i++)
             mlpnp_transformation = opengv::absolute_pose::mlpnp(adapter, cov_xx, cov_ldld);
 
-        std::cout << "transformation is..." << std::endl;
+        std::cout << loop_info[0] << "->" << loop_info[1] << "transformation is..." << std::endl;
         std::cout << mlpnp_transformation << std::endl;
         std::cout << "cov is..." << std::endl;
         std::cout << cov_xx << std::endl;
