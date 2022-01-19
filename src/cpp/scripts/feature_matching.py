@@ -187,35 +187,40 @@ def loop_CB(data):
 
             # NOTE feature iterations
             if(good):
-                rospy.loginfo("This is No."+str(indice1))
+                # rospy.loginfo("This is No."+str(indice1))
                 for val in r1_feature:
-                    # x
-                    # iterは0から始まる
-                    element["R1"][iter+1].append(val[0])
-                    # y
-                    element["R1"][iter+1].append(val[1])
-                    # depth
-                    element["R1"][iter +
-                                  1].append(container[indice1][int(val[1]), int(val[0])])
-                    # TODO check if the order is (y,x) or (x,y)
-                    # TODO 0の特徴点を除く
-                    rospy.loginfo("x="+str(val[0])+", y="+str(val[1]))
-                    rospy.loginfo(
-                        "depth is "+str(container[indice1][int(val[1]), int(val[0])]))
+                    if(container[indice1][int(val[1]), int(val[0])] != 0):
+                        # x
+                        # iterは0から始まる
+                        element["R1"][iter+1].append(int(val[0]))
+                        # y
+                        element["R1"][iter+1].append(int(val[1]))
+                        # depth
+                        element["R1"][iter +
+                                      1].append(int(container[indice1][int(val[1]), int(val[0])]))
+                    # rospy.loginfo("x="+str(val[0])+", y="+str(val[1]))
+                    # rospy.loginfo(
+                    #     "depth is "+str(container[indice1][int(val[1]), int(val[0])]))
                     # print(container[indice1][int(val[1]), int(val[0])])
                 for val in r2_feature:
-                    # x
-                    element["R2"][iter+1].append(val[0])
-                    # y
-                    element["R2"][iter+1].append(val[1])
-                    # depth
-                    element["R2"][iter +
-                                  1].append(container[indice2][int(val[1]), int(val[0])])
+                    if(container[indice2][int(val[1]), int(val[0])] != 0):
+                        # x
+                        element["R2"][iter+1].append(int(val[0]))
+                        # y
+                        element["R2"][iter+1].append(int(val[1]))
+                        # depth
+                        element["R2"][iter +
+                                      1].append(int(container[indice2][int(val[1]), int(val[0])]))
                     # element["FeaturePair"]["R2Depth"][i].append(container[element[indice2]][val[1],val[0]])
 
                 info.signal = 0
                 info.r1 = element["R1"][iter+1]
                 info.r2 = element["R2"][iter+1]
+
+                rospy.loginfo(element["R1"][iter+1])
+                rospy.loginfo(element["R2"][iter+1])
+
+                # FIXME 一つ要素ぶんずれている
 
                 feature_pub.publish(info)
         # Loop sequence終了

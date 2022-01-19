@@ -51,74 +51,90 @@ public:
 
     void RO_CB(const cpp::FeatureArray::ConstPtr &data)
     {
-        tf::StampedTransform transform_map2odom;
-        tf::StampedTransform transform_odom2base;
-        try
+        if (data->r1.size() > 5)
         {
-            if (data->who_detect == 1)
+
+            tf::StampedTransform transform_map2odom;
+            tf::StampedTransform transform_odom2base;
+            try
             {
-                // listener.waitForTransform("/robot1/map", "/robot1/odom", ros::Time(0), ros::Duration(3.0));
-                listener.lookupTransform("/robot1/map", "/robot1/odom",
-                                         ros::Time(0), transform_map2odom);
-                // listener.waitForTransform("/robot1/map", "/robot1/odom", ros::Time(0), ros::Duration(3.0));
-                listener.lookupTransform("/robot1/odom", "/robot1/base_footprint",
-                                         ros::Time(0), transform_odom2base);
+                if (data->who_detect == 1)
+                {
+                    // listener.waitForTransform("/robot1/map", "/robot1/odom", ros::Time(0), ros::Duration(3.0));
+                    listener.lookupTransform("/robot1/map", "/robot1/odom",
+                                             ros::Time(0), transform_map2odom);
+                    // listener.waitForTransform("/robot1/map", "/robot1/odom", ros::Time(0), ros::Duration(3.0));
+                    listener.lookupTransform("/robot1/odom", "/robot1/base_footprint",
+                                             ros::Time(0), transform_odom2base);
+                }
+                else
+                {
+                    // listener.waitForTransform("/robot2/map", "/robot2/odom", ros::Time(0), ros::Duration(3.0));
+                    listener.lookupTransform("/robot2/map", "/robot2/odom", ros::Time(0), transform_map2odom);
+                    listener.lookupTransform("/robot2/odom", "/robot2/base_footprint", ros::Time(0), transform_odom2base);
+                }
+            }
+            catch (tf::TransformException &ex)
+            {
+                ROS_ERROR("%s", ex.what());
+                exit(1);
+            }
+
+            double x = transform_map2odom.getOrigin().x() + transform_odom2base.getOrigin().x();
+            double y = transform_map2odom.getOrigin().y() + transform_odom2base.getOrigin().y();
+            double z = transform_map2odom.getOrigin().z() + transform_odom2base.getOrigin().z();
+            tf::Quaternion q = transform_map2odom.getRotation() + transform_odom2base.getRotation();
+
+            double roll, pitch, yaw;
+            tf::Matrix3x3(q).getRPY(roll, pitch, yaw);
+
+            Eigen::Matrix<float, 4, 4> pose;
+            pose << cos(roll) * cos(pitch), cos(roll) * sin(pitch) * sin(yaw) - sin(roll) * cos(yaw), cos(roll) * sin(pitch) * cos(yaw) + sin(roll) * sin(yaw), x,
+                sin(roll) * cos(pitch), sin(roll) * sin(pitch) * sin(yaw) + cos(roll) * cos(yaw), sin(roll) * sin(pitch) * cos(yaw) - cos(roll) * sin(yaw), y,
+                -sin(pitch), cos(pitch) * sin(yaw), cos(pitch) * cos(yaw), z,
+                0, 0, 0, 1;
+
+            int who_detect = data->who_detect;
+            int signal = data->signal;
+            loop_info = data->index2value;
+            std::vector<cv::Point3f> kp_loc_r1_s;
+            std::vector<cv::Point3f> kp_loc_r2_s;
+            std::cout << "In case of r1" << std::endl;
+            // for (auto val : data->r1)
+            // {
+            //     std::cout << val << " ";
+            // }
+            // std::cout << std::endl;
+
+            // std::cout << "In case of r2" << std::endl;
+            // for (auto val : data->r2)
+            // {
+            //     std::cout << val << " ";
+            // }
+            // std::cout << std::endl;
+
+            for (size_t index{1}; index < data->r1.size() + 1; ++index)
+            {
+                // ３つ目の要素に差し掛かった時
+                if (index % 3 == 0)
+                {
+                    cv::Point3f kp_loc_r1(data->r1[index - 3], data->r1[index - 2], data->r1[index - 1]);
+                    cv::Point3f kp_loc_r2(data->r2[index - 3], data->r2[index - 2], data->r2[index - 1]);
+                    kp_loc_r1_s.push_back(kp_loc_r1);
+                    kp_loc_r2_s.push_back(kp_loc_r2);
+                }
+            }
+            if (signal == 0)
+            {
+                poses_1.push_back(pose);
+                RO_Estimator::mlpnp(who_detect, kp_loc_r1_s, kp_loc_r2_s);
+                // NOTE mlpnp
             }
             else
             {
-                // listener.waitForTransform("/robot2/map", "/robot2/odom", ros::Time(0), ros::Duration(3.0));
-                listener.lookupTransform("/robot2/map", "/robot2/odom", ros::Time(0), transform_map2odom);
-                listener.lookupTransform("/robot2/odom", "/robot2/base_footprint", ros::Time(0), transform_odom2base);
+
+                // NOTE BA
             }
-        }
-        catch (tf::TransformException &ex)
-        {
-            ROS_ERROR("%s", ex.what());
-            exit(1);
-        }
-
-        double x = transform_map2odom.getOrigin().x() + transform_odom2base.getOrigin().x();
-        double y = transform_map2odom.getOrigin().y() + transform_odom2base.getOrigin().y();
-        double z = transform_map2odom.getOrigin().z() + transform_odom2base.getOrigin().z();
-        tf::Quaternion q = transform_map2odom.getRotation() + transform_odom2base.getRotation();
-
-        double roll, pitch, yaw;
-        tf::Matrix3x3(q).getRPY(roll, pitch, yaw);
-
-        Eigen::Matrix<float, 4, 4> pose;
-        pose << cos(roll) * cos(pitch), cos(roll) * sin(pitch) * sin(yaw) - sin(roll) * cos(yaw), cos(roll) * sin(pitch) * cos(yaw) + sin(roll) * sin(yaw), x,
-            sin(roll) * cos(pitch), sin(roll) * sin(pitch) * sin(yaw) + cos(roll) * cos(yaw), sin(roll) * sin(pitch) * cos(yaw) - cos(roll) * sin(yaw), y,
-            -sin(pitch), cos(pitch) * sin(yaw), cos(pitch) * cos(yaw), z,
-            0, 0, 0, 1;
-
-        int who_detect = data->who_detect;
-        int signal = data->signal;
-        loop_info = data->index2value;
-        std::vector<cv::Point3f> kp_loc_r1_s;
-        std::vector<cv::Point3f> kp_loc_r2_s;
-
-        for (size_t index{1}; index < data->r1.size() + 1; ++index)
-        {
-            // ３つ目の要素に差し掛かった時
-            if (index % 3 == 0)
-            {
-                cv::Point3f kp_loc_r1(data->r1[index - 2], data->r1[index - 1], data->r1[index]);
-                cv::Point3f kp_loc_r2(data->r2[index - 2], data->r2[index - 1], data->r2[index]);
-                kp_loc_r1_s.push_back(kp_loc_r1);
-                kp_loc_r2_s.push_back(kp_loc_r2);
-            }
-        }
-        ROS_INFO("Yahoo");
-        if (signal == 0)
-        {
-            poses_1.push_back(pose);
-            RO_Estimator::mlpnp(who_detect, kp_loc_r1_s, kp_loc_r2_s);
-            // NOTE mlpnp
-        }
-        else
-        {
-
-            // NOTE BA
         }
     }
     // FIXME 前処理が必要
@@ -133,30 +149,30 @@ public:
             points = camera.img2cam(kp_loc_r2, kp_loc_r1);
 
         // Bearing Vectors
-        opengv::bearingVectors_t bearingVectors;
-        bearingVectors = camera.bearing_v();
+        // opengv::bearingVectors_t bearingVectors;
+        // bearingVectors = camera.bearing_v();
 
-        opengv::cov3_mats_t bearing_covs;
-        bearing_covs = camera.v_cov();
+        // opengv::cov3_mats_t bearing_covs;
+        // bearing_covs = camera.v_cov();
 
-        Eigen::MatrixXd cov_xx;
-        Eigen::MatrixXd cov_ldld;
+        // Eigen::MatrixXd cov_xx;
+        // Eigen::MatrixXd cov_ldld;
 
-        opengv::absolute_pose::CentralAbsoluteAdapter adapter(bearingVectors,
-                                                              points,
-                                                              bearing_covs);
+        // opengv::absolute_pose::CentralAbsoluteAdapter adapter(bearingVectors,
+        //                                                       points,
+        //                                                       bearing_covs);
 
-        int iterations = 50;
-        opengv::transformation_t mlpnp_transformation;
-        for (size_t i{0}; i < iterations; i++)
-            mlpnp_transformation = opengv::absolute_pose::mlpnp(adapter, cov_xx, cov_ldld);
+        // size_t iterations = 50;
+        // opengv::transformation_t mlpnp_transformation;
+        // for (size_t i{0}; i < iterations; i++)
+        //     mlpnp_transformation = opengv::absolute_pose::mlpnp(adapter, cov_xx, cov_ldld);
 
-        std::cout << loop_info[0] << "->" << loop_info[1] << "transformation is..." << std::endl;
-        std::cout << mlpnp_transformation << std::endl;
-        std::cout << "cov is..." << std::endl;
-        std::cout << cov_xx << std::endl;
+        // std::cout << loop_info[0] << "->" << loop_info[1] << " transformation is..." << std::endl;
+        // std::cout << mlpnp_transformation << std::endl;
+        // std::cout << "cov is..." << std::endl;
+        // std::cout << cov_xx << std::endl;
 
-        return mlpnp_transformation;
+        // return mlpnp_transformation;
     }
 };
 

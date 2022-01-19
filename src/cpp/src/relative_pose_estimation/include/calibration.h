@@ -60,13 +60,16 @@ public:
     {
         X_s.clear();
         pixels.clear();
-        for (int i{0}; i < kp_loc.size(); ++i)
+        for (long unsigned int i{0}; i < kp_loc.size(); ++i)
         {
-            Eigen::Vector3f pix(kp_loc[i].x, kp_loc[i].y, kp_loc[i].z);
-            Eigen::Vector3f pixel_(kp_loc_other[i].x, kp_loc_other[i].y, kp_loc_other[i].z);
+            Eigen::Vector3f pix(kp_loc[i].x, kp_loc[i].y, kp_loc[i].z / 1000);
+            std::cout << "pix is " << kp_loc[i].x << " " << kp_loc[i].y << " " << kp_loc[i].z / 1000 << std::endl;
+            Eigen::Vector3f pixel_(kp_loc_other[i].x, kp_loc_other[i].y, kp_loc_other[i].z / 1000);
+            std::cout << "pixel_ is " << kp_loc_other[i].x << " " << kp_loc_other[i].y << " " << kp_loc_other[i].z / 1000 << std::endl;
             // Homogeneous coordinate
             Eigen::Vector3d X;
             X = inv_intrinstic * pix.cast<double>();
+            std::cout << "3D coordinate is " << X << std::endl;
             X_s.push_back(X);
             pixels.push_back(pixel_.cast<double>());
         }
@@ -76,7 +79,7 @@ public:
     opengv::bearingVectors_t bearing_v(void)
     {
         v_s.clear();
-        for (int indice{0}; indice < pixels.size(); ++indice)
+        for (long unsigned int indice{0}; indice < pixels.size(); ++indice)
         {
             Eigen::Vector3d v;
             v.z() = 1.0;
@@ -93,7 +96,7 @@ public:
     opengv::cov3_mats_t v_cov(void)
     {
         vcovs.clear();
-        for (int i{0}; i < pixels.size(); ++i)
+        for (long unsigned int i{0}; i < pixels.size(); ++i)
         {
             Eigen::Matrix3d jacobian = 1 / pixels[i].norm() * (Eigen::Matrix3d::Identity() - v_s[i] * v_s[i].transpose());
             opengv::cov3_mat_t vcov = jacobian * observe_cam_cov * jacobian.transpose();
