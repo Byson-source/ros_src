@@ -51,7 +51,8 @@ public:
 
     void RO_CB(const cpp::FeatureArray::ConstPtr &data)
     {
-        if ((data->r1.size() > 5) && (data->signal == 0))
+        if ((data->r1.size() > 27) && (data->signal == 0))
+        // NOTE特徴点が10個以上ないとだめ
         {
 
             tf::StampedTransform transform_map2odom;
@@ -110,6 +111,7 @@ public:
                     kp_loc_r2_s.push_back(kp_loc_r2);
                 }
             }
+
             poses_1.push_back(pose);
             RO_Estimator::mlpnp(who_detect, kp_loc_r1_s, kp_loc_r2_s);
             // NOTE mlpnp

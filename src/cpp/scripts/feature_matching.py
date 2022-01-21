@@ -130,11 +130,24 @@ def orbmatch(fileName1, fileName2):
             img3 = cv2.drawMatches(img1, kp1, img2, kp2, true_mask, img_matches,
                                    flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
 
-            cv2.imwrite(
-                "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/feature_match/"+str(fileName1)+"->"+str(fileName2)+".jpg", img3)
+            if(len(loc1) > 9):
+                # img_rect = cv2.circle(
+                #     img1, (int(loc1[0][0][0]), int(loc1[0][0][1])), 3, (255, 0, 255), thickness=1)
+                cv2.imwrite(
+                    "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/feature_match/"+str(fileName1)+"->"+str(fileName2)+".jpg", img3)
+
+            # for val in loc1:
+            #     if(val[0] > 320 or val[1] > 240):
+            #         rospy.loginfo("File num is "+str(fileName1))
+            #         rospy.loginfo("Boo!")
+            #         print(val)
+            #         img_rect = cv2.circle(
+            #             img1, (int(val[0]), int(val[1])), 3, (255, 0, 255), thickness=1)
+            #         cv2.imwrite(
+            #             "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/test/"+str(fileName1)+".jpg", img_rect)
 
             # loc1とloc2がRANSACでふるい分けられた特徴点の座標
-
+            # print(loc1[0][0])
             return loc1, loc2, 1
 
     return [], [], 0
@@ -204,6 +217,10 @@ def loop_CB(data):
                         element["R2"][iter +
                                       1].append(int(container[indice2][int(r2_feature[index][1]), int(r2_feature[index][0])]))
                         # element["FeaturePair"]["R2Depth"][i].append(container[element[indice2]][val[1],val[0]])
+
+                        # if(int(r1_feature[index][0]) > 320 and int(r1_feature[index][1]) > 240):
+                        #     rospy.loginfo("Boo!")
+                        #     print(element["R1"][iter+1])
 
                 info.signal = 0
                 info.r1 = element["R1"][iter+1]

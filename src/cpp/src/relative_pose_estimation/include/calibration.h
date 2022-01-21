@@ -28,6 +28,10 @@ private:
     opengv::points_t X_s;
     std::vector<Eigen::Vector3d> pixels;
 
+    double focal{525.0};
+    double height{320};
+    double width{640};
+
     cv::Point2d pp;
 
     // bearing vectors
@@ -39,10 +43,6 @@ private:
     // カメラ座標での不確実性
     opengv::cov3_mat_t observe_cam_cov;
     // FIXME
-    // double rgb_pixel2m{1.25 * std::pow(10, -6)};
-    // double depth_pixel2m{3.5 * std::pow(10, -6)};
-
-    // std::vector<Eigen::Matrix3d> covs_2;
 
 public:
     Calibration(void)
@@ -54,9 +54,10 @@ public:
             0.0, 0.0, 1.0;
         inv_intrinstic = intrinstic_parameter.inverse();
 
-        img_to_cam_coordinate<<0.0,1.0,0.0,
-                               0.0,0.0,-1.0,
-                               1.0,0.0,0.0;
+        img_to_cam_coordinate << 0.0, 0.0, 1.0,
+            -1.0, 0.0, 0.0,
+            0.0, -1.0, 0.0;
+        // NOTE gazeboと全く同じ右手座標系
 
         image_cov = Eigen::Matrix3d::Identity();
         // FIXME covを決めること!
@@ -66,24 +67,22 @@ public:
     opengv::points_t img2cam(std::vector<Eigen::Vector3d> kp_loc,
                              std::vector<Eigen::Vector3d> kp_loc_other)
     {
+        // 世界座標から見た点の座標を求める
         X_s.clear();
         pixels.clear();
         for (long unsigned int i{0}; i < kp_loc.size(); ++i)
         {
-            Eigen::Vector3d pix(kp_loc[i].x(), kp_loc[i].y(), kp_loc[i].z()/1000);
-            // std::cout << "pix is " << kp_loc[i].x << " " << kp_loc[i].y << " " << kp_loc[i].z / 1000 << std::endl;
-            Eigen::Vector3d pixel_(kp_loc_other[i].x(), kp_loc_other[i].y(), kp_loc_other[i].z()/1000);
+            std::cout << "pix is " << kp_loc[i].x() << " " << kp_loc[i].y() << " " << kp_loc[i].z() / 1000 << std::endl;
+            Eigen::Vector3d pixel_(kp_loc_other[i].x(), kp_loc_other[i].y(), kp_loc_other[i].z() / 1000);
 
-            Eigen::Vector3d X = inv_intrinstic * pix;
+            Eigen::Vector3d X((kp_loc[i].x() - width / 2) / focal, (kp_loc[i].y() - height / 2) / focal, kp_loc[i].z() / 1000);
 
-            // X << (kp_loc[i].x() * rgb_pixel2m), (kp_loc[i].y() * rgb_pixel2m), kp_loc[i].z() / 1000;
-
-            // Eigen::Vector3d X;
-            // X = inv_intrinstic * pix.cast<double>();
-            X=img_to_cam_coordinate*X;
-            std::cout << "3D coordinate is " << X << std::endl;
+            X = img_to_cam_coordinate * X;
+            std::cout << "3D coordinate is " << std::endl;
+            std::cout << X << std::endl;
             X_s.push_back(X);
-            pixels.push_back(pixel_.cast<double>());
+            // for bearing vector
+            pixels.push_back(pixel_);
         }
         return X_s;
     }

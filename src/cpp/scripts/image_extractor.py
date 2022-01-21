@@ -129,6 +129,7 @@ def setup():
     os.mkdir(path+"/rgb/")
     os.mkdir(path+"/sorted_rgb/")
     os.mkdir(path+"/feature_match/")
+    os.mkdir(path+"/test/")
 
 
 def commandCB(event):
