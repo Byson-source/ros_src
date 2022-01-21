@@ -51,7 +51,7 @@ public:
 
     void RO_CB(const cpp::FeatureArray::ConstPtr &data)
     {
-        if (data->r1.size() > 5)
+        if ((data->r1.size() > 5) && (data->signal == 0))
         {
 
             tf::StampedTransform transform_map2odom;
@@ -95,50 +95,33 @@ public:
                 0, 0, 0, 1;
 
             int who_detect = data->who_detect;
-            int signal = data->signal;
             loop_info = data->index2value;
-            std::vector<cv::Point3f> kp_loc_r1_s;
-            std::vector<cv::Point3f> kp_loc_r2_s;
-            std::cout << "In case of r1" << std::endl;
-            // for (auto val : data->r1)
-            // {
-            //     std::cout << val << " ";
-            // }
-            // std::cout << std::endl;
-
-            // std::cout << "In case of r2" << std::endl;
-            // for (auto val : data->r2)
-            // {
-            //     std::cout << val << " ";
-            // }
-            // std::cout << std::endl;
+            std::vector<Eigen::Vector3d> kp_loc_r1_s;
+            std::vector<Eigen::Vector3d> kp_loc_r2_s;
 
             for (size_t index{1}; index < data->r1.size() + 1; ++index)
             {
                 // ３つ目の要素に差し掛かった時
                 if (index % 3 == 0)
                 {
-                    cv::Point3f kp_loc_r1(data->r1[index - 3], data->r1[index - 2], data->r1[index - 1]);
-                    cv::Point3f kp_loc_r2(data->r2[index - 3], data->r2[index - 2], data->r2[index - 1]);
+                    Eigen::Vector3d kp_loc_r1(data->r1[index - 3], data->r1[index - 2], data->r1[index - 1]);
+                    Eigen::Vector3d kp_loc_r2(data->r2[index - 3], data->r2[index - 2], data->r2[index - 1]);
                     kp_loc_r1_s.push_back(kp_loc_r1);
                     kp_loc_r2_s.push_back(kp_loc_r2);
                 }
             }
-            if (signal == 0)
-            {
-                poses_1.push_back(pose);
-                RO_Estimator::mlpnp(who_detect, kp_loc_r1_s, kp_loc_r2_s);
-                // NOTE mlpnp
-            }
-            else
-            {
+            poses_1.push_back(pose);
+            RO_Estimator::mlpnp(who_detect, kp_loc_r1_s, kp_loc_r2_s);
+            // NOTE mlpnp
+        }
+        else
+        {
 
-                // NOTE BA
-            }
+            // NOTE BA
         }
     }
     // FIXME 前処理が必要
-    opengv::transformation_t mlpnp(int who_detect, std::vector<cv::Point3f> kp_loc_r1, std::vector<cv::Point3f> kp_loc_r2)
+    opengv::transformation_t mlpnp(int who_detect, std::vector<Eigen::Vector3d> kp_loc_r1, std::vector<Eigen::Vector3d> kp_loc_r2)
     {
         // bearing vectors
         // 3Dポイント集
@@ -148,31 +131,30 @@ public:
         else
             points = camera.img2cam(kp_loc_r2, kp_loc_r1);
 
-        // Bearing Vectors
-        // opengv::bearingVectors_t bearingVectors;
-        // bearingVectors = camera.bearing_v();
+        opengv::bearingVectors_t bearingVectors;
+        bearingVectors = camera.bearing_v();
 
-        // opengv::cov3_mats_t bearing_covs;
-        // bearing_covs = camera.v_cov();
+        opengv::cov3_mats_t bearing_covs;
+        bearing_covs = camera.v_cov();
 
-        // Eigen::MatrixXd cov_xx;
-        // Eigen::MatrixXd cov_ldld;
+        Eigen::MatrixXd cov_xx;
+        Eigen::MatrixXd cov_ldld;
 
-        // opengv::absolute_pose::CentralAbsoluteAdapter adapter(bearingVectors,
-        //                                                       points,
-        //                                                       bearing_covs);
+        opengv::absolute_pose::CentralAbsoluteAdapter adapter(bearingVectors,
+                                                              points,
+                                                              bearing_covs);
 
-        // size_t iterations = 50;
-        // opengv::transformation_t mlpnp_transformation;
-        // for (size_t i{0}; i < iterations; i++)
-        //     mlpnp_transformation = opengv::absolute_pose::mlpnp(adapter, cov_xx, cov_ldld);
+        size_t iterations = 50;
+        opengv::transformation_t mlpnp_transformation;
+        for (size_t i{0}; i < iterations; i++)
+            mlpnp_transformation = opengv::absolute_pose::mlpnp(adapter, cov_xx, cov_ldld);
 
-        // std::cout << loop_info[0] << "->" << loop_info[1] << " transformation is..." << std::endl;
-        // std::cout << mlpnp_transformation << std::endl;
-        // std::cout << "cov is..." << std::endl;
-        // std::cout << cov_xx << std::endl;
+        std::cout << loop_info[0] << "->" << loop_info[1] << " transformation is..." << std::endl;
+        std::cout << mlpnp_transformation << std::endl;
+        std::cout << "cov is..." << std::endl;
+        std::cout << cov_xx << std::endl;
 
-        // return mlpnp_transformation;
+        return mlpnp_transformation;
     }
 };
 

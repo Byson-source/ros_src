@@ -23,6 +23,7 @@ class Calibration
 private:
     Eigen::Matrix3d intrinstic_parameter;
     Eigen::Matrix3d inv_intrinstic;
+    Eigen::Matrix3d img_to_cam_coordinate;
 
     opengv::points_t X_s;
     std::vector<Eigen::Vector3d> pixels;
@@ -37,6 +38,9 @@ private:
     opengv::cov3_mat_t image_cov;
     // カメラ座標での不確実性
     opengv::cov3_mat_t observe_cam_cov;
+    // FIXME
+    // double rgb_pixel2m{1.25 * std::pow(10, -6)};
+    // double depth_pixel2m{3.5 * std::pow(10, -6)};
 
     // std::vector<Eigen::Matrix3d> covs_2;
 
@@ -44,31 +48,39 @@ public:
     Calibration(void)
     {
         // 全ての画像座標を格納
-
+        // NOTE this is pixel size
         intrinstic_parameter << 525.0, 0.0, 319.5,
             0.0, 525.0, 239.5,
             0.0, 0.0, 1.0;
         inv_intrinstic = intrinstic_parameter.inverse();
+
+        img_to_cam_coordinate<<0.0,1.0,0.0,
+                               0.0,0.0,-1.0,
+                               1.0,0.0,0.0;
 
         image_cov = Eigen::Matrix3d::Identity();
         // FIXME covを決めること!
         observe_cam_cov = inv_intrinstic * image_cov * inv_intrinstic.transpose();
     }
 
-    opengv::points_t img2cam(std::vector<cv::Point3f> kp_loc,
-                             std::vector<cv::Point3f> kp_loc_other)
+    opengv::points_t img2cam(std::vector<Eigen::Vector3d> kp_loc,
+                             std::vector<Eigen::Vector3d> kp_loc_other)
     {
         X_s.clear();
         pixels.clear();
         for (long unsigned int i{0}; i < kp_loc.size(); ++i)
         {
-            Eigen::Vector3f pix(kp_loc[i].x, kp_loc[i].y, kp_loc[i].z / 1000);
-            std::cout << "pix is " << kp_loc[i].x << " " << kp_loc[i].y << " " << kp_loc[i].z / 1000 << std::endl;
-            Eigen::Vector3f pixel_(kp_loc_other[i].x, kp_loc_other[i].y, kp_loc_other[i].z / 1000);
-            std::cout << "pixel_ is " << kp_loc_other[i].x << " " << kp_loc_other[i].y << " " << kp_loc_other[i].z / 1000 << std::endl;
-            // Homogeneous coordinate
-            Eigen::Vector3d X;
-            X = inv_intrinstic * pix.cast<double>();
+            Eigen::Vector3d pix(kp_loc[i].x(), kp_loc[i].y(), kp_loc[i].z()/1000);
+            // std::cout << "pix is " << kp_loc[i].x << " " << kp_loc[i].y << " " << kp_loc[i].z / 1000 << std::endl;
+            Eigen::Vector3d pixel_(kp_loc_other[i].x(), kp_loc_other[i].y(), kp_loc_other[i].z()/1000);
+
+            Eigen::Vector3d X = inv_intrinstic * pix;
+
+            // X << (kp_loc[i].x() * rgb_pixel2m), (kp_loc[i].y() * rgb_pixel2m), kp_loc[i].z() / 1000;
+
+            // Eigen::Vector3d X;
+            // X = inv_intrinstic * pix.cast<double>();
+            X=img_to_cam_coordinate*X;
             std::cout << "3D coordinate is " << X << std::endl;
             X_s.push_back(X);
             pixels.push_back(pixel_.cast<double>());

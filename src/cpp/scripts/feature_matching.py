@@ -20,7 +20,6 @@ import cv2
 
 # if (not hasattr(rs2, 'intrinsics')):
 #     import pyrealsense2.pyrealsense2 as rs2
-depth_path = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/depth/"
 rgb_path = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/all_rgb/"
 depth_img = 1
 depth_img2 = 2
@@ -34,8 +33,7 @@ def depthCB1(depth1, id):
 
     cv2_img = bridge.imgmsg_to_cv2(depth1, "passthrough")
     # FIXME Maybe should change to (640,480)
-    cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
-    cv2.imwrite(depth_path+str(depth_img)+".png", cv2_img)
+    cv2_img = cv2.resize(cv2_img, dsize=(640, 480))
 
     # REVIEW 再開
     container[depth_img] = np.array(cv2_img, dtype=np.float32)
@@ -48,9 +46,7 @@ def depthCB2(depth2, id):
 
     img = bridge.imgmsg_to_cv2(depth2, "passthrough")
     # FIXME Maybe should change to (640,480)
-    img = cv2.resize(img, dsize=(512, 384))
-
-    cv2.imwrite(depth_path+str(depth_img2)+".png", img)
+    img = cv2.resize(img, dsize=(640, 480))
     depth_array = np.array(img, dtype=np.float32)
     # print(depth_array.shape)
     container[depth_img2] = depth_array
@@ -186,41 +182,32 @@ def loop_CB(data):
                 info.who_detect = 2
 
             # NOTE feature iterations
+
             if(good):
                 # rospy.loginfo("This is No."+str(indice1))
-                for val in r1_feature:
-                    if(container[indice1][int(val[1]), int(val[0])] != 0):
+                for index in range(len(r1_feature)):
+                    if(container[indice1][int(r1_feature[index][1]), int(r1_feature[index][0])] != 0 and
+                       container[indice2][int(r2_feature[index][1]), int(r2_feature[index][0])] != 0):
                         # x
                         # iterは0から始まる
-                        element["R1"][iter+1].append(int(val[0]))
+                        element["R1"][iter+1].append(int(r1_feature[index][0]))
                         # y
-                        element["R1"][iter+1].append(int(val[1]))
+                        element["R1"][iter+1].append(int(r1_feature[index][1]))
                         # depth
                         element["R1"][iter +
-                                      1].append(int(container[indice1][int(val[1]), int(val[0])]))
-                    # rospy.loginfo("x="+str(val[0])+", y="+str(val[1]))
-                    # rospy.loginfo(
-                    #     "depth is "+str(container[indice1][int(val[1]), int(val[0])]))
-                    # print(container[indice1][int(val[1]), int(val[0])])
-                for val in r2_feature:
-                    if(container[indice2][int(val[1]), int(val[0])] != 0):
+                                      1].append(int(container[indice1][int(r1_feature[index][1]), int(r1_feature[index][0])]))
                         # x
-                        element["R2"][iter+1].append(int(val[0]))
+                        element["R2"][iter+1].append(int(r2_feature[index][0]))
                         # y
-                        element["R2"][iter+1].append(int(val[1]))
+                        element["R2"][iter+1].append(int(r2_feature[index][1]))
                         # depth
                         element["R2"][iter +
-                                      1].append(int(container[indice2][int(val[1]), int(val[0])]))
-                    # element["FeaturePair"]["R2Depth"][i].append(container[element[indice2]][val[1],val[0]])
+                                      1].append(int(container[indice2][int(r2_feature[index][1]), int(r2_feature[index][0])]))
+                        # element["FeaturePair"]["R2Depth"][i].append(container[element[indice2]][val[1],val[0]])
 
                 info.signal = 0
                 info.r1 = element["R1"][iter+1]
                 info.r2 = element["R2"][iter+1]
-
-                rospy.loginfo(element["R1"][iter+1])
-                rospy.loginfo(element["R2"][iter+1])
-
-                # FIXME 一つ要素ぶんずれている
 
                 feature_pub.publish(info)
         # Loop sequence終了

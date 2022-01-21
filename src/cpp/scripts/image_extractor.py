@@ -44,7 +44,7 @@ def callback(rgb, id):
 
     cv2_img = bridge.imgmsg_to_cv2(rgb, "bgr8")
 # FIXME Maybe should change to (640,480)
-    cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
+    cv2_img = cv2.resize(cv2_img, dsize=(640, 480))
 
     # REVIEW 再開
     if already_loop == 1:
@@ -70,7 +70,7 @@ def callback2(rgb, id):
 
     cv2_img = bridge.imgmsg_to_cv2(rgb, "bgr8")
 # FIXME Maybe should change to (640,480)
-    cv2_img = cv2.resize(cv2_img, dsize=(512, 384))
+    cv2_img = cv2.resize(cv2_img, dsize=(640, 480))
     # 再開
     if already_loop == 1:
         condition["cb2 storing"] = 1
@@ -129,7 +129,6 @@ def setup():
     os.mkdir(path+"/rgb/")
     os.mkdir(path+"/sorted_rgb/")
     os.mkdir(path+"/feature_match/")
-    os.mkdir(path+"depth/")
 
 
 def commandCB(event):
