@@ -191,6 +191,7 @@ IF(OPENGV_IMPORT)
       opengv/include/opengv/relative_pose/MANoncentralRelativeMulti.hpp
       opengv/include/opengv/point_cloud/MAPointCloud.hpp )
 
+
   IF(WIN32)
     add_library( opengv ${OPENGV_SOURCE_FILES} ${OPENGV_HEADER_FILES} )
     add_library( random_generators opengv/test/random_generators.cpp 

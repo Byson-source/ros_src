@@ -78,10 +78,6 @@ public:
             X = img_to_cam_coordinate * X;
             pixel_ = img_to_cam_coordinate * pixel_;
 
-            Eigen::Vector3d test, test2;
-            test = X;
-            test2 = pixel_;
-
             X.y() = X.x() / focal * X.y();
             X.z() = X.x() / focal * X.z();
 
@@ -96,21 +92,6 @@ public:
             // for bearing vector
             bearingVectors.push_back(pixel_);
             cam_coords.push_back(cam_coord);
-
-            // if (i < 3)
-            // {
-            //     std::cout << "---------------------------------------------" << std::endl;
-            //     std::cout << "------------------" << std::endl;
-            //     std::cout << kp_loc[i] << std::endl;
-            //     std::cout << "---" << std::endl;
-            //     std::cout << X << std::endl;
-            //     std::cout << std::endl;
-            //     std::cout << kp_loc_other[i] << std::endl;
-            //     std::cout << "---" << std::endl;
-            //     std::cout << cam_coord << std::endl;
-            //     std::cout << "---------------------------------------------" << std::endl;
-            //     std::cout << std::endl;
-            // }
         }
         return X_s;
     }
@@ -120,28 +101,6 @@ public:
     {
 
         return bearingVectors;
-        // v_s.clear();
-        // for (long unsigned int indice{0}; indice < pixels.size(); ++indice)
-        // {
-        //     pixels[indice]
-
-        // Eigen::Vector3d v;
-        // v.z() = 1.0;
-        // v.x() = pixels[indice].x() / pixels[indice].z();
-        // v.y() = pixels[indice].y() / pixels[indice].z();
-        // // ↑x（MLPNPの論文を参照！！)
-        // v_s.push_back((img_to_cam_coordinate * v).normalized());
-
-        // if (indice == 0)
-        // {
-
-        //     std::cout << "point is " << std::endl;
-        //     std::cout << X_s[indice] << std::endl;
-        //     std::cout << "bearing vector is " << std::endl;
-        //     std::cout << v_s[indice] << std::endl;
-        // }
-        // }
-        // return v_s;
     }
 
     // bearing vectorの共分散!

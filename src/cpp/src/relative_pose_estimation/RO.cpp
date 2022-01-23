@@ -1,3 +1,7 @@
+// TODO 求めた4×3の行列からオイラー角と、tを求めるようにすること。
+// TODO 各ノードのposeを受けとり、t=0どうしのR,tを逆算すること、また、共分散行列も
+// TODO かさみ付き平均を適用して最適なR,tも求める
+// TODO convert from ros pointcloud to open3d one.
 #include <iostream>
 #include <opengv/absolute_pose/methods.hpp>
 #include <opengv/absolute_pose/CentralAbsoluteAdapter.hpp>
@@ -29,7 +33,9 @@ class RO_Estimator
 private:
     ros::NodeHandle n;
     ros::Subscriber feature_sub;
-    ros::Subscriber pose_sub;
+    ros::Publisher rt_pub;
+    // ros::Subscriber node_sub1;
+    // ros::Subscriber node_sub2;
 
     tf::TransformListener listener;
 
@@ -37,7 +43,7 @@ private:
     std::vector<Eigen::Matrix<float, 4, 4>> poses_2;
 
     std::vector<int> loop_info;
-
+    // NOTE node_map...{time;{1:[]}
     // points location
 
     Calibration camera;
@@ -45,7 +51,10 @@ private:
 public:
     RO_Estimator(void)
     {
+        rt_pub = n.advertise<cpp::RO_Array>("RT_result", 50);
         feature_sub = n.subscribe("features", 20, &RO_Estimator::RO_CB, this);
+        // node_sub1 = n.subscribe("robot1/rtabmap/mapPath");
+        // node_sub2 = n.subscribe("robot2/rtabmap/mapPath");
         // from robot/map to robot/base_footprint
     }
 
@@ -113,7 +122,18 @@ public:
             }
 
             poses_1.push_back(pose);
-            RO_Estimator::mlpnp(who_detect, kp_loc_r1_s, kp_loc_r2_s);
+            opengv::transformation_t result = RO_Estimator::mlpnp(who_detect, kp_loc_r1_s, kp_loc_r2_s);
+
+            Eigen::Matrix3d R_ = result.block(0, 0, 3, 3);
+            Eigen::Vector3d t_ = result.block(0, 3, 3, 1);
+            Eigen::Vector3d euler = R_.eulerAngles(2, 1, 0);
+            Eigen::Vector3d Euler(euler.z(), euler.y(), euler.x());
+
+            std::cout << t_ << std::endl;
+            std::cout << "---------------------------------------------------" << std::endl;
+            std::cout << Euler << std::endl;
+            std::cout << std::endl;
+
             // NOTE mlpnp
         }
         else
@@ -152,7 +172,7 @@ public:
         for (size_t i{0}; i < iterations; i++)
             mlpnp_transformation = opengv::absolute_pose::mlpnp(adapter, cov_xx, cov_ldld);
 
-        std::cout << mlpnp_transformation << std::endl;
+        // std::cout << mlpnp_transformation << std::endl;
         // std::cout << "cov is..." << std::endl;
         // std::cout << cov_xx << std::endl;
 
