@@ -127,6 +127,7 @@ public:
     {
         // bearing vectors
         // 3Dポイント集
+        std::cout << loop_info[0] << "->" << loop_info[1] << std::endl;
         opengv::points_t points;
         if (who_detect == 1)
             points = camera.img2cam(kp_loc_r1, kp_loc_r2);
@@ -151,10 +152,9 @@ public:
         for (size_t i{0}; i < iterations; i++)
             mlpnp_transformation = opengv::absolute_pose::mlpnp(adapter, cov_xx, cov_ldld);
 
-        std::cout << loop_info[0] << "->" << loop_info[1] << " transformation is..." << std::endl;
         std::cout << mlpnp_transformation << std::endl;
-        std::cout << "cov is..." << std::endl;
-        std::cout << cov_xx << std::endl;
+        // std::cout << "cov is..." << std::endl;
+        // std::cout << cov_xx << std::endl;
 
         return mlpnp_transformation;
     }
