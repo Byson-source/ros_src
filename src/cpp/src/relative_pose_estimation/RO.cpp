@@ -126,15 +126,25 @@ public:
 
             Eigen::Matrix3d R_ = result.block(0, 0, 3, 3);
             Eigen::Vector3d t_ = result.block(0, 3, 3, 1);
-            Eigen::Vector3d euler = R_.eulerAngles(2, 1, 0);
-            Eigen::Vector3d Euler(euler.z(), euler.y(), euler.x());
 
-            std::cout << t_ << std::endl;
-            std::cout << "---------------------------------------------------" << std::endl;
-            std::cout << Euler << std::endl;
-            std::cout << std::endl;
+            std::vector<double> R, t;
+            // std::vector<double> t=t_;
+
+            cpp::RO_Array pose_result;
+            for (int row{0}; row < 3; ++row)
+            {
+                for (int column{0}; column < 3; ++column)
+                {
+                    R.push_back(R_(row, column));
+                }
+                t.push_back(t_[row]);
+            }
+            pose_result.translation = t;
+            pose_result.euler = R;
 
             // NOTE mlpnp
+
+            rt_pub.publish(pose_result);
         }
         else
         {
