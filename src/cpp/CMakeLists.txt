@@ -231,6 +231,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   cv_bridge
   image_transport
+  open3d_conversions
 )
 ########################################################
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}")
@@ -250,6 +251,7 @@ FIND_PACKAGE(RTABMap REQUIRED)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 FIND_PACKAGE(OpenCV REQUIRED)
 find_package(PCL 1.3 REQUIRED COMPONENTS common io)
+find_package(Open3D HINTS ${CMAKE_INSTALL_PREFIX}/lib/cmake)
 # find_package(opengv REQUIRED)
 
 link_directories(${PCL_LIBRARIES_DIRS})
@@ -275,7 +277,7 @@ SET(INCLUDE_DIRS
 ${RTABMap_INCLUDE_DIRS}
 ${OpenCV_INCLUDE_DIRS}
 ${PCL_INCLUDE_DIRS}
-# ${opengv_INCLUDE_DIRS}
+${Open3D_INCLUDE_DIRS}
 )
 
 # libraries
@@ -399,9 +401,9 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES cpp
+ LIBRARIES cpp
  CATKIN_DEPENDS message_generation roscpp std_msgs message_runtime
-#  DEPENDS system_lib
+ DEPENDS Open3D
 )
 
 ###########
@@ -413,6 +415,7 @@ catkin_package(
 include_directories(
   src/relative_pose_estimation/include/
   ${catkin_INCLUDE_DIRS}
+  /home/ayumi/catkin_ws/src/perception_open3d/open3d_conversions/include/
 )
 
 ## Declare a C++ library
@@ -546,6 +549,12 @@ target_link_libraries(
   ${catkin_LIBRARIES}
   opengv
   )
+add_executable(open3d_conversions_ex_sub src/gui/src/gui.cpp)
+add_dependencies(open3d_conversions_ex_sub ${open3d_conversions_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(open3d_conversions_ex_sub
+${catkin_LIBRARIES}
+${Open3D_LIBRARIES})
+  
 
 
 # add_executable(detection_checker loop_closure/detection_checker/LoopClosureDetection.cpp)

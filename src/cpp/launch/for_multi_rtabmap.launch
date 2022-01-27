@@ -1,3 +1,4 @@
+<!-- NOTE I have changed a bit from Pierre's work. I set "Grid/CellSize" to 0.01 -->
 <launch>
     <!--
     $ sudo apt install ros-melodic-turtlebot3* ros-melodic-dwa-local-planner
@@ -66,6 +67,8 @@
             <param unless="$(eval model=='waffle')" name="subscribe_rgbd" type="bool" value="false"/>
             <param name="subscribe_scan" type="bool" value="true"/>
             <param name="approx_sync" type="bool" value="true"/>
+            <param name="publish_tf" value="true"/>
+            <param name="Grid/CellSize" type="double" value="0.01"/>
 
             <!-- use actionlib to send goals to move_base -->
             <!-- <param name="use_action_for_goal" type="bool" value="true"/>

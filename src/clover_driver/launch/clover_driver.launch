@@ -1,0 +1,20 @@
+<launch>
+ <group ns="clover2">
+
+  <node pkg="rosserial_python" type="serial_node.py" name="serial_node">
+    <param name="port" value="/dev/ttyUSB0"/>
+    <param name="baud" value="57600"/>
+  </node>
+  <include file="$(find teleop_twist_joy)/launch/teleop.launch"/>
+
+  <node pkg="clover_driver" type="cmd_vel_mux" name="cmd_vel_mux" clear_params="true" output="screen" respawn="true">
+  <param name="block_duration" type="int" value="4"/>
+  <!-- INPUT TOPICS -->
+  <remap from="teleop/cmd_vel" to="teleop/cmd_vel" />
+  <remap from="move_base/cmd_vel" to="move_base/cmd_vel" />
+  <!-- OUTPUT TOPICS -->
+  <remap from="cmd_vel" to="cmd_vel" />
+  </node>
+
+ </group>
+</launch>
