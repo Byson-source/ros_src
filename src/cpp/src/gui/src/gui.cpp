@@ -10,6 +10,7 @@
 #include <sensor_msgs/PointCloud2.h>
 
 #include "open3d_conversions/open3d_conversions.h"
+#include "cpp/RO_Array.h"
 #include <ros/package.h>
 
 using namespace open3d;
@@ -22,6 +23,11 @@ private:
     ros::NodeHandle nh;
     ros::Subscriber cloud_sub1;
     ros::Subscriber cloud_sub2;
+
+    std::vector<double> t;
+    std::vector<double> rpy;
+
+    ros::Subscriber transform_sub;
     open3d::visualization::Visualizer vis;
 
 public:
@@ -31,6 +37,7 @@ public:
     {
         cloud_sub1 = nh.subscribe("robot1/rtabmap/cloud_map", 10, &SubscriberExample::cloud_cb1, this);
         cloud_sub2 = nh.subscribe("robot2/rtabmap/cloud_map", 10, &SubscriberExample::cloud_cb2, this);
+        transform_sub = nh.subscribe("transform_info", 10, &SubscriberExample::cloud_cb2);
         // open3d::utility::SetVerbosityLevel(utility::VerbosityLevel::Debug);
         pcd = pcd->VoxelDownSample(0.02);
         vis.CreateVisualizerWindow();

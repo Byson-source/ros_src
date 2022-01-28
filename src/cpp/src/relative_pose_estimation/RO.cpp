@@ -127,22 +127,22 @@ public:
             Eigen::Matrix3d R_ = result.block(0, 0, 3, 3);
             Eigen::Vector3d t_ = result.block(0, 3, 3, 1);
 
-            std::vector<double> R, t;
-            // std::vector<double> t=t_;
+            Eigen::Vector3d euler = R_.eulerAngles(2, 1, 0);
+            euler << euler.z(), euler.y(), euler.x();
 
-            cpp::RO_Array pose_result;
-            for (int row{0}; row < 3; ++row)
+            std::vector<double> R, t;
+
+            for (int index{0}; index < R_.size(); ++index)
             {
-                for (int column{0}; column < 3; ++column)
-                {
-                    R.push_back(R_(row, column));
-                }
-                t.push_back(t_[row]);
+                R.push_back(euler[index]);
+                t.push_back(t_[index]);
             }
+            cpp::RO_Array pose_result;
+
             pose_result.translation = t;
             pose_result.euler = R;
 
-            // NOTE mlpnp
+            // // NOTE mlpnp
 
             rt_pub.publish(pose_result);
         }
@@ -181,10 +181,6 @@ public:
         opengv::transformation_t mlpnp_transformation;
         for (size_t i{0}; i < iterations; i++)
             mlpnp_transformation = opengv::absolute_pose::mlpnp(adapter, cov_xx, cov_ldld);
-
-        // std::cout << mlpnp_transformation << std::endl;
-        // std::cout << "cov is..." << std::endl;
-        // std::cout << cov_xx << std::endl;
 
         return mlpnp_transformation;
     }
