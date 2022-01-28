@@ -37,7 +37,7 @@ public:
     {
         cloud_sub1 = nh.subscribe("robot1/rtabmap/cloud_map", 10, &SubscriberExample::cloud_cb1, this);
         cloud_sub2 = nh.subscribe("robot2/rtabmap/cloud_map", 10, &SubscriberExample::cloud_cb2, this);
-        transform_sub = nh.subscribe("transform_info", 10, &SubscriberExample::cloud_cb2);
+        // transform_sub = nh.subscribe("transform_info", 10, &SubscriberExample::cloud_cb2);
         // open3d::utility::SetVerbosityLevel(utility::VerbosityLevel::Debug);
         pcd = pcd->VoxelDownSample(0.02);
         vis.CreateVisualizerWindow();

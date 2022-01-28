@@ -9,7 +9,7 @@
 
 int main(int argc, char **argv)
 {
-    using namespace open3d;
+    using namespace std;
 
     utility::SetVerbosityLevel(utility::VerbosityLevel::Debug);
     auto cloud_ptr_1 = std::make_shared<geometry::PointCloud>();
@@ -17,8 +17,8 @@ int main(int argc, char **argv)
     io::ReadPointCloud("/home/ayumi/Open3D/examples/test_data/ICP/cloud_bin_0.pcd", *cloud_ptr_1);
     io::ReadPointCloud("/home/ayumi/Open3D/examples/test_data/ICP/cloud_bin_1.pcd", *cloud_ptr_2);
 
-    cloud_ptr_1 = cloud_ptr_1->VoxelDownSample(0.02);
-    cloud_ptr_2 = cloud_ptr_2->VoxelDownSample(0.02);
+    *cloud_ptr_1 = cloud_ptr_1->VoxelDownSample(0.02);
+    *cloud_ptr_2 = cloud_ptr_2->VoxelDownSample(0.02);
 
     Eigen::Matrix4d trans;
 
@@ -39,28 +39,28 @@ int main(int argc, char **argv)
 
     visualization::Visualizer vis;
     vis.CreateVisualizerWindow();
-    vis.AddGeometry(cloud_ptr_1);
-    vis.AddGeometry(cloud_ptr_2);
+    vis.AddGeometry(*cloud_ptr_1);
+    vis.AddGeometry(*cloud_ptr_2);
     double threshold{0.05};
     size_t icp_iteration{100};
     bool save_image{0};
 
-    Eigen::Translation<double, 3> trans_(0.0, 1.0, 1.0);
-    Eigen::Quaterniond rot = Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitX()) *
-                             Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitY()) *
-                             Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitZ());
-    for (int i{0}; i < icp_iteration; ++i)
+    Eigen::Translation<double, 3> trans(0.0, 1.0, 1.0);
+    Eigen::MatrixXd rot = Eigen::AngleAxisd(0, Eigen::Vector3d::UnitX()) *
+                          Eigen::AngleAxisd(0, Eigen::Vector3d::UnitY()) *
+                          Eigen::AngleAxisd(0, Eigen::Vector3d::UnitZ());
+    for (int i{0}; i < icp_iteration; ++I)
     {
-        trans_.x() += 0.3;
-        Eigen::Affine3d affine = trans_ * rot;
+        trans.x() += 0.3;
+        Eigen::Affine3d affine = trans * rot;
 
         Eigen::Matrix4d transform = affine.matrix();
 
-        // cloud_ptr_1->Transform(transform);
+        cloud_ptr_1->transform(transform);
 
-        vis.UpdateGeometry(cloud_ptr_1);
+        vis.UpdateGeometry(*cloud_ptr_1);
         vis.PollEvents();
         vis.UpdateRender();
     }
-    vis.DestroyVisualizerWindow();
+    vis.DestroyWindow();
 }

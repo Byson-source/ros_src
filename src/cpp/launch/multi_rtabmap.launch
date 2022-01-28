@@ -1,6 +1,4 @@
 <launch>
-
-    <param name="use_sim_time" value="true" />
     <!-- <include file="$(find multiple_turtlebots_sim)/launch/multi-bot.launch"/> -->
     <node pkg="rosbag" type="play" name="rosbag_play1" args="-r 3 /home/ayumi/Documents/RTAB-Map/out1.bag">
         <remap from="robot1/base_scan" to="robot1/scan" />
@@ -65,7 +63,15 @@
     <node pkg="cpp" name="feature_matchor" type="feature_matching.py" output="screen" />
     <node pkg="cpp" name="loop_closure_server" type="detection_checker" output="screen" />
     <node pkg="cpp" name="RO_node" type="RO_estimator" output="screen" />
-    <!-- <node pkg="cpp" name="gui_node" type="open3d_conversions_ex_sub" output="screen" /> -->
+    <node pkg="cpp" name="open3d_conversions_ex_sub" type="open3d_conversions_ex_sub" output="screen" />
+    <!-- <node pkg="cpp" name="loop_closure" type="loop_closure_client" output="screen"/>
+    <node pkg="cpp" name="loop_closure_server" type="detection_checker" output="screen"/> -->
+
+    <!--<node pkg="cpp" name="reprocess" type="reprocess_client_node" output="screen">
+        <param name="robot_num" value="2"/>
+    </node>
+    <node pkg="cpp" name="reprocess_server" type="reprocess_server_node" output="screen"/>
+    <node pkg="cpp" name="gui" type="GUI_node" output="screen"/-->
 
 
 </launch>
