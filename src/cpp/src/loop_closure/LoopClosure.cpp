@@ -259,10 +259,10 @@ public:
         return 1;
     }
 
-    // FIXME Multi thread!!
     void confirm_CB(const std_msgs::Int32::ConstPtr &turn_on)
     {
         // ROS_INFO("Loop node was actuated");
+        ROS_INFO("HELLOOOOOOOOOOOOOOOOOOOOO");
         std_msgs::Int32 msg;
 
         msg.data = 1;
