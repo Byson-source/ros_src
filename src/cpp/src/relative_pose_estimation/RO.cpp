@@ -1,7 +1,6 @@
-// TODO 求めた4×3の行列からオイラー角と、tを求めるようにすること。
+
 // TODO 各ノードのposeを受けとり、t=0どうしのR,tを逆算すること、また、共分散行列も
 // TODO かさみ付き平均を適用して最適なR,tも求める
-// TODO convert from ros pointcloud to open3d one.
 #include <iostream>
 #include <opengv/absolute_pose/methods.hpp>
 #include <opengv/absolute_pose/CentralAbsoluteAdapter.hpp>
@@ -27,6 +26,9 @@
 #include "calibration.h"
 // FIXME CMakeLists.txtを修正
 #include <tf/transform_listener.h>
+#include "nav_msgs/Path.h"
+#include "geometry_msgs/PoseStamped.h"
+#include "geometry_msgs/Point.h"
 
 class RO_Estimator
 {
@@ -34,15 +36,16 @@ private:
     ros::NodeHandle n;
     ros::Subscriber feature_sub;
     ros::Publisher rt_pub;
-    // ros::Subscriber node_sub1;
-    // ros::Subscriber node_sub2;
+    ros::Subscriber path_sub1;
+    // ros::Subscriber path_sub2;
 
     tf::TransformListener listener;
 
-    std::vector<Eigen::Matrix<float, 4, 4>> poses_1;
-    std::vector<Eigen::Matrix<float, 4, 4>> poses_2;
-
     std::vector<int> loop_info;
+    // NOTE xyz / xyzw
+    std::vector<std::vector<double>> path_1;
+    std::vector<std::vector<double>> path_2;
+
     // NOTE node_map...{time;{1:[]}
     // points location
 
@@ -53,9 +56,47 @@ public:
     {
         rt_pub = n.advertise<cpp::RO_Array>("RT_result", 50);
         feature_sub = n.subscribe("features", 20, &RO_Estimator::RO_CB, this);
-        // node_sub1 = n.subscribe("robot1/rtabmap/mapPath");
-        // node_sub2 = n.subscribe("robot2/rtabmap/mapPath");
+        path_sub1 = n.subscribe("robot1/rtabmap/mapPath", 10, &RO_Estimator::path1_CB, this);
+        // path_sub2 = n.subscribe("robot2/rtabmap/mapPath", 10, &RO_Estimator::path2_CB, this);
         // from robot/map to robot/base_footprint
+    }
+
+    void path1_CB(const nav_msgs::Path::ConstPtr &path)
+    {
+        path_1.clear();
+        for (auto val : path->poses)
+        {
+            std::vector<double> pose;
+            pose.push_back(val.pose.position.x);
+            pose.push_back(val.pose.position.y);
+            pose.push_back(val.pose.position.z);
+            pose.push_back(val.pose.orientation.x);
+            pose.push_back(val.pose.orientation.y);
+            pose.push_back(val.pose.orientation.z);
+            pose.push_back(val.pose.orientation.w);
+            path_1.push_back(pose);
+        }
+
+        // std::vector<double> pose;
+    }
+
+    void path1_CB(const nav_msgs::Path::ConstPtr &path)
+    {
+        path_2.clear();
+        for (auto val : path->poses)
+        {
+            std::vector<double> pose;
+            pose.push_back(val.pose.position.x);
+            pose.push_back(val.pose.position.y);
+            pose.push_back(val.pose.position.z);
+            pose.push_back(val.pose.orientation.x);
+            pose.push_back(val.pose.orientation.y);
+            pose.push_back(val.pose.orientation.z);
+            pose.push_back(val.pose.orientation.w);
+            path_2.push_back(pose);
+        }
+
+        // std::vector<double> pose;
     }
 
     void RO_CB(const cpp::FeatureArray::ConstPtr &data)
@@ -63,46 +104,6 @@ public:
         if ((data->r1.size() > 27) && (data->signal == 0))
         // NOTE特徴点が10個以上ないとだめ
         {
-
-            tf::StampedTransform transform_map2odom;
-            tf::StampedTransform transform_odom2base;
-            try
-            {
-                if (data->who_detect == 1)
-                {
-                    // listener.waitForTransform("/robot1/map", "/robot1/odom", ros::Time(0), ros::Duration(3.0));
-                    listener.lookupTransform("/robot1/map", "/robot1/odom",
-                                             ros::Time(0), transform_map2odom);
-                    // listener.waitForTransform("/robot1/map", "/robot1/odom", ros::Time(0), ros::Duration(3.0));
-                    listener.lookupTransform("/robot1/odom", "/robot1/base_footprint",
-                                             ros::Time(0), transform_odom2base);
-                }
-                else
-                {
-                    // listener.waitForTransform("/robot2/map", "/robot2/odom", ros::Time(0), ros::Duration(3.0));
-                    listener.lookupTransform("/robot2/map", "/robot2/odom", ros::Time(0), transform_map2odom);
-                    listener.lookupTransform("/robot2/odom", "/robot2/base_footprint", ros::Time(0), transform_odom2base);
-                }
-            }
-            catch (tf::TransformException &ex)
-            {
-                ROS_ERROR("%s", ex.what());
-                exit(1);
-            }
-
-            double x = transform_map2odom.getOrigin().x() + transform_odom2base.getOrigin().x();
-            double y = transform_map2odom.getOrigin().y() + transform_odom2base.getOrigin().y();
-            double z = transform_map2odom.getOrigin().z() + transform_odom2base.getOrigin().z();
-            tf::Quaternion q = transform_map2odom.getRotation() + transform_odom2base.getRotation();
-
-            double roll, pitch, yaw;
-            tf::Matrix3x3(q).getRPY(roll, pitch, yaw);
-
-            Eigen::Matrix<float, 4, 4> pose;
-            pose << cos(roll) * cos(pitch), cos(roll) * sin(pitch) * sin(yaw) - sin(roll) * cos(yaw), cos(roll) * sin(pitch) * cos(yaw) + sin(roll) * sin(yaw), x,
-                sin(roll) * cos(pitch), sin(roll) * sin(pitch) * sin(yaw) + cos(roll) * cos(yaw), sin(roll) * sin(pitch) * cos(yaw) - cos(roll) * sin(yaw), y,
-                -sin(pitch), cos(pitch) * sin(yaw), cos(pitch) * cos(yaw), z,
-                0, 0, 0, 1;
 
             int who_detect = data->who_detect;
             loop_info = data->index2value;
@@ -121,28 +122,16 @@ public:
                 }
             }
 
-            poses_1.push_back(pose);
             opengv::transformation_t result = RO_Estimator::mlpnp(who_detect, kp_loc_r1_s, kp_loc_r2_s);
 
             Eigen::Matrix3d R_ = result.block(0, 0, 3, 3);
             Eigen::Vector3d t_ = result.block(0, 3, 3, 1);
 
-            Eigen::Vector3d euler = R_.eulerAngles(2, 1, 0);
-            euler << euler.z(), euler.y(), euler.x();
-
-            std::vector<double> R, t;
-
-            for (int index{0}; index < R_.size(); ++index)
-            {
-                R.push_back(euler[index]);
-                t.push_back(t_[index]);
-            }
             cpp::RO_Array pose_result;
 
+            std::vector<double> R, t;
             pose_result.translation = t;
             pose_result.euler = R;
-
-            // // NOTE mlpnp
 
             rt_pub.publish(pose_result);
         }
@@ -151,6 +140,42 @@ public:
 
             // NOTE BA
         }
+    }
+
+    // NOTE R_o2o'=R_o2a * R_a2b * R_b2o'
+    Eigen::Matrix3d turnout_R(Eigen::Matrix3d rotation_matrix int, who_detect)
+    {
+        Eigen::Quaterniond index_q;
+        Eigen::Quaterniond value_q;
+
+        std::vector<std::vector<double>> index_path;
+        std::vector<std::vector<double>> value_path;
+
+        if (who_detect == 1)
+        {
+            index_path = path_1;
+            value_path = path_2;
+        }
+        else
+        {
+            index_path = path_2;
+            value_path = path_1;
+        }
+
+        index_q.x() = index_path[loop_info[0]][3];
+        index_q.y() = index_path[loop_info[0]][4];
+        index_q.z() = index_path[loop_info[0]][5];
+        index_q.w() = index_path[loop_info[0]][6];
+
+        value_q.x() = value_path[loop_info[1]][3];
+        value_q.y() = value_path[loop_info[1]][4];
+        value_q.z() = value_path[loop_info[1]][5];
+        value_q.w() = value_path[loop_info[1]][6];
+
+        Eigen::Matrix3d R_index = index_q.normalized().toRotationMatrix();
+        Eigen::Matrix3d R_value = value_q.normalized().toRotationMatrix();
+
+        index_q.x() = path_1
     }
     // FIXME 前処理が必要
     opengv::transformation_t mlpnp(int who_detect, std::vector<Eigen::Vector3d> kp_loc_r1, std::vector<Eigen::Vector3d> kp_loc_r2)
