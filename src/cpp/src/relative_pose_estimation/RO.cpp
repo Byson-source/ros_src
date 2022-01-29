@@ -80,7 +80,7 @@ public:
         // std::vector<double> pose;
     }
 
-    void path1_CB(const nav_msgs::Path::ConstPtr &path)
+    void path2_CB(const nav_msgs::Path::ConstPtr &path)
     {
         path_2.clear();
         for (auto val : path->poses)
@@ -128,10 +128,18 @@ public:
             Eigen::Vector3d t_ = result.block(0, 3, 3, 1);
 
             cpp::RO_Array pose_result;
+            Eigen::Vector3d ans_r = turnout_R(R_, who_detect);
+            Eigen::Vector3d ans_t = turnout_T(t_, who_detect);
 
             std::vector<double> R, t;
-            pose_result.translation = t;
-            pose_result.euler = R;
+
+            for (int index{0}; index < 3; ++index)
+            {
+                R.push_back(ans_r[index]);
+                t.push_back(ans_t[index]);
+            }
+            pose_result.translation = R;
+            pose_result.euler = t;
 
             rt_pub.publish(pose_result);
         }
@@ -143,42 +151,74 @@ public:
     }
 
     // NOTE R_o2o'=R_o2a * R_a2b * R_b2o'
-    Eigen::Matrix3d turnout_R(Eigen::Matrix3d rotation_matrix int, who_detect)
+    Eigen::Vector3d turnout_R(Eigen::Matrix3d rotation_matrix, int who_detect)
     {
-        Eigen::Quaterniond index_q;
-        Eigen::Quaterniond value_q;
+        Eigen::Quaterniond r1_q;
+        Eigen::Quaterniond r2_q;
 
-        std::vector<std::vector<double>> index_path;
-        std::vector<std::vector<double>> value_path;
+        int r1_img_index, r2_img_index;
+        Eigen::Matrix3d rotation_1TO2;
 
         if (who_detect == 1)
         {
-            index_path = path_1;
-            value_path = path_2;
+            rotation_1TO2 = rotation_matrix;
+            r1_img_index = loop_info[0];
+            r2_img_index = loop_info[1];
         }
         else
         {
-            index_path = path_2;
-            value_path = path_1;
+            rotation_1TO2 = rotation_matrix.transpose();
+            r1_img_index = loop_info[1];
+            r2_img_index = loop_info[0];
         }
 
-        index_q.x() = index_path[loop_info[0]][3];
-        index_q.y() = index_path[loop_info[0]][4];
-        index_q.z() = index_path[loop_info[0]][5];
-        index_q.w() = index_path[loop_info[0]][6];
+        r1_q.x() = path_1[r1_img_index][3];
+        r1_q.y() = path_1[r1_img_index][4];
+        r1_q.z() = path_1[r1_img_index][5];
+        r1_q.w() = path_1[r1_img_index][6];
 
-        value_q.x() = value_path[loop_info[1]][3];
-        value_q.y() = value_path[loop_info[1]][4];
-        value_q.z() = value_path[loop_info[1]][5];
-        value_q.w() = value_path[loop_info[1]][6];
+        r2_q.x() = path_2[r2_img_index][3];
+        r2_q.y() = path_2[r2_img_index][4];
+        r2_q.z() = path_2[r2_img_index][5];
+        r2_q.w() = path_2[r2_img_index][6];
 
-        Eigen::Matrix3d R_index = index_q.normalized().toRotationMatrix();
-        Eigen::Matrix3d R_value = value_q.normalized().toRotationMatrix();
+        Eigen::Matrix3d R1_origin2node = r1_q.normalized().toRotationMatrix();
+        Eigen::Matrix3d R2_origin2node = r2_q.normalized().toRotationMatrix();
+        Eigen::Vector3d ans_R = (R1_origin2node * rotation_1TO2 * (R2_origin2node.transpose())).eulerAngles(2, 1, 0);
+        ans_R << ans_R.z(), ans_R.y(), ans_R.x();
+        return ans_R;
+    }
 
-        index_q.x() = path_1
+    Eigen::Vector3d turnout_T(Eigen::Vector3d transfer, int who_detect)
+    {
+        Eigen::Vector3d r1_to_r2;
+        Eigen::Vector3d origin2r1;
+        Eigen::Vector3d origin2r2;
+
+        int r1_img_index, r2_img_index;
+        Eigen::Vector3d transfer_1_to_2;
+        if (who_detect == 1)
+        {
+            r1_img_index = loop_info[0];
+            r2_img_index = loop_info[1];
+            transfer_1_to_2 = transfer;
+        }
+        else
+        {
+            r1_img_index = loop_info[1];
+            r2_img_index = loop_info[0];
+            transfer_1_to_2 = (-1) * transfer;
+        }
+
+        origin2r1 << path_1[r1_img_index][0], path_1[r1_img_index][1], path_1[r1_img_index][2];
+        origin2r2 << path_2[r2_img_index][0], path_2[r2_img_index][1], path_2[r2_img_index][2];
+
+        Eigen::Vector3d ans_t = transfer_1_to_2 - (origin2r2 - origin2r1);
+        return ans_t;
     }
     // FIXME 前処理が必要
-    opengv::transformation_t mlpnp(int who_detect, std::vector<Eigen::Vector3d> kp_loc_r1, std::vector<Eigen::Vector3d> kp_loc_r2)
+    opengv::transformation_t
+    mlpnp(int who_detect, std::vector<Eigen::Vector3d> kp_loc_r1, std::vector<Eigen::Vector3d> kp_loc_r2)
     {
         // bearing vectors
         // 3Dポイント集
