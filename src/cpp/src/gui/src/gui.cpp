@@ -30,6 +30,8 @@ private:
     ros::Subscriber transform_sub;
     open3d::visualization::Visualizer vis;
 
+    int status{0};
+
 public:
     // open3d::geometry::PointCloud pcd;
 
@@ -37,18 +39,22 @@ public:
     {
         cloud_sub1 = nh.subscribe("robot1/rtabmap/cloud_map", 10, &SubscriberExample::cloud_cb1, this);
         cloud_sub2 = nh.subscribe("robot2/rtabmap/cloud_map", 10, &SubscriberExample::cloud_cb2, this);
+        rt_sub = nh.subscribe("RT_result", 10, &SubscriberExample::cloudAssembler, this);
         // transform_sub = nh.subscribe("transform_info", 10, &SubscriberExample::cloud_cb2);
         // open3d::utility::SetVerbosityLevel(utility::VerbosityLevel::Debug);
         pcd = pcd->VoxelDownSample(0.02);
         vis.CreateVisualizerWindow();
     }
 
-    void cloud_cb1(const sensor_msgs::PointCloud2ConstPtr &cloud_data)
+    void cloudAssebler(const cpp::RO_Array::ConstPtr &transform)
     {
-        open3d::geometry::PointCloud *pcd_ = pcd.get();
-        open3d_conversions::rosToOpen3d(cloud_data, *pcd_);
+    }
 
-        vis.AddGeometry(pcd);
+    void cloud_cb1(const sensor_msgs::PointCloud2::ConstPtr &cloud_data)
+    {
+        pcd1 = pcd.get();
+        open3d_conversions::rosToOpen3d(cloud_data, *pcd1);
+        vis.AddGeometry(pcd1);
         vis.UpdateGeometry(pcd);
         vis.PollEvents();
         vis.UpdateRender();
@@ -56,11 +62,10 @@ public:
         // Do something with the Open3D pointcloud
     }
 
-    void cloud_cb2(const sensor_msgs::PointCloud2ConstPtr &cloud_data)
+    void cloud_cb2(const sensor_msgs::PointCloud2::ConstPtr &cloud_data)
     {
-        open3d::geometry::PointCloud *pcd_ = pcd.get();
-        open3d_conversions::rosToOpen3d(cloud_data, *pcd_);
-
+        pcd2 = pcd.get();
+        open3d_conversions::rosToOpen3d(cloud_data, *pcd2);
         vis.AddGeometry(pcd);
         vis.UpdateGeometry(pcd);
         vis.PollEvents();

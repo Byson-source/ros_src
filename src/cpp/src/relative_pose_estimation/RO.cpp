@@ -36,10 +36,8 @@ private:
     ros::NodeHandle n;
     ros::Subscriber feature_sub;
     ros::Publisher rt_pub;
-    ros::Publisher path_pub1;
-    ros::Publisher path_pub2;
     ros::Subscriber path_sub1;
-    // ros::Subscriber path_sub2;
+    ros::Subscriber path_sub2;
 
     tf::TransformListener listener;
 
@@ -47,6 +45,11 @@ private:
     // NOTE xyz / xyzw
     std::vector<std::vector<double>> path_1;
     std::vector<std::vector<double>> path_2;
+
+    std::map<int, int> mapPath_dict;
+    std::map<int, int> mapPath_dict_2;
+    int info_index{0};
+    int info_index_2{0};
 
     // NOTE node_map...{time;{1:[]}
     // points location
@@ -57,17 +60,16 @@ public:
     RO_Estimator(void)
     {
         rt_pub = n.advertise<cpp::RO_Array>("RT_result", 50);
-        path_pub1 = n.advertise<geometry_msgs::PoseStamped>("path_r1", 10);
-        path_pub2 = n.advertise<geometry_msgs::PoseStamped>("path_r2", 10);
 
         feature_sub = n.subscribe("features", 20, &RO_Estimator::RO_CB, this);
         path_sub1 = n.subscribe("robot1/rtabmap/mapPath", 10, &RO_Estimator::path1_CB, this);
-        // path_sub2 = n.subscribe("robot2/rtabmap/mapPath", 10, &RO_Estimator::path2_CB, this);
+        path_sub2 = n.subscribe("robot2/rtabmap/mapPath", 10, &RO_Estimator::path2_CB, this);
         // from robot/map to robot/base_footprint
     }
 
     void path1_CB(const nav_msgs::Path::ConstPtr &path)
     {
+        info_index += 1;
         path_1.clear();
         for (auto val : path->poses)
         {
@@ -81,12 +83,14 @@ public:
             pose.push_back(val.pose.orientation.w);
             path_1.push_back(pose);
         }
+        mapPath_dict[info_index] = path_1.size();
 
         // std::vector<double> pose;
     }
 
     void path2_CB(const nav_msgs::Path::ConstPtr &path)
     {
+        info_index_2 += 1;
         path_2.clear();
         for (auto val : path->poses)
         {
@@ -100,6 +104,7 @@ public:
             pose.push_back(val.pose.orientation.w);
             path_2.push_back(pose);
         }
+        mapPath_dict_2[info_index_2] = path_2.size();
 
         // std::vector<double> pose;
     }
@@ -133,18 +138,14 @@ public:
             Eigen::Vector3d t_ = result.block(0, 3, 3, 1);
 
             cpp::RO_Array pose_result;
-            Eigen::Vector3d ans_r = turnout_R(R_, who_detect);
             Eigen::Vector3d ans_t = turnout_T(t_, who_detect);
+            Eigen::Quaterniond ans_r = turnout_R(R_, who_detect);
 
-            std::vector<double> R, t;
+            std::vector<double> R{ans_r.x(), ans_r.y(), ans_r.z(), ans_r.w()};
+            std::vector<double> t{ans_t[0], ans_t[1], ans_t[2]};
 
-            for (int index{0}; index < 3; ++index)
-            {
-                R.push_back(ans_r[index]);
-                t.push_back(ans_t[index]);
-            }
-            pose_result.translation = R;
-            pose_result.euler = t;
+            pose_result.translation = t;
+            pose_result.euler = R;
 
             rt_pub.publish(pose_result);
         }
@@ -155,16 +156,44 @@ public:
         }
     }
 
+    Eigen::Vector3d turnout_T(Eigen::Vector3d transfer, int who_is_detect)
+    {
+        Eigen::Vector3d r1_to_r2;
+        Eigen::Vector3d origin2r1;
+        Eigen::Vector3d origin2r2;
+
+        int r1_img_index, r2_img_index;
+        Eigen::Vector3d transfer_1_to_2;
+        if (who_is_detect == 1)
+        {
+            r1_img_index = loop_info[0];
+            r2_img_index = loop_info[1];
+            transfer_1_to_2 = transfer;
+        }
+        else
+        {
+            r1_img_index = loop_info[1];
+            r2_img_index = loop_info[0];
+            transfer_1_to_2 = Eigen::Vector3d::Ones() - transfer;
+        }
+
+        origin2r1 << path_1[mapPath_dict[r1_img_index]][0], path_1[mapPath_dict[r1_img_index]][1], path_1[mapPath_dict[r1_img_index]][2];
+        origin2r2 << path_2[mapPath_dict_2[r2_img_index]][0], path_2[mapPath_dict_2[r2_img_index]][1], path_2[mapPath_dict_2[r2_img_index]][2];
+
+        Eigen::Vector3d ans_t = transfer_1_to_2 - (origin2r2 - origin2r1);
+        return ans_t;
+    }
+
     // NOTE R_o2o'=R_o2a * R_a2b * R_b2o'
-    Eigen::Vector3d turnout_R(Eigen::Matrix3d rotation_matrix, int who_detect)
+    Eigen::Quaterniond turnout_R(Eigen::Matrix3d rotation_matrix, int who_is_detect)
     {
         Eigen::Quaterniond r1_q;
         Eigen::Quaterniond r2_q;
 
         int r1_img_index, r2_img_index;
-        Eigen::Matrix3d rotation_1TO2;
+        Eigen::Quaterniond rotation_1TO2;
 
-        if (who_detect == 1)
+        if (who_is_detect == 1)
         {
             rotation_1TO2 = rotation_matrix;
             r1_img_index = loop_info[0];
@@ -177,50 +206,22 @@ public:
             r2_img_index = loop_info[0];
         }
 
-        r1_q.x() = path_1[r1_img_index][3];
-        r1_q.y() = path_1[r1_img_index][4];
-        r1_q.z() = path_1[r1_img_index][5];
-        r1_q.w() = path_1[r1_img_index][6];
+        r1_q.x() = path_1[mapPath_dict[r1_img_index]][3];
+        r1_q.y() = path_1[mapPath_dict[r1_img_index]][4];
+        r1_q.z() = path_1[mapPath_dict[r1_img_index]][5];
+        r1_q.w() = path_1[mapPath_dict[r1_img_index]][6];
 
-        r2_q.x() = path_2[r2_img_index][3];
-        r2_q.y() = path_2[r2_img_index][4];
-        r2_q.z() = path_2[r2_img_index][5];
-        r2_q.w() = path_2[r2_img_index][6];
+        r2_q.x() = path_2[mapPath_dict_2[r2_img_index]][3];
+        r2_q.y() = path_2[mapPath_dict_2[r2_img_index]][4];
+        r2_q.z() = path_2[mapPath_dict_2[r2_img_index]][5];
+        r2_q.w() = path_2[mapPath_dict_2[r2_img_index]][6];
 
-        Eigen::Matrix3d R1_origin2node = r1_q.normalized().toRotationMatrix();
-        Eigen::Matrix3d R2_origin2node = r2_q.normalized().toRotationMatrix();
-        Eigen::Vector3d ans_R = (R1_origin2node * rotation_1TO2 * (R2_origin2node.transpose())).eulerAngles(2, 1, 0);
-        ans_R << ans_R.z(), ans_R.y(), ans_R.x();
-        return ans_R;
+        // NOTE クオータニオンの掛け算の方向は左側
+        // Eigen::Matrix3d R2_origin2node = (r2_q.normalized()).toRotationMatrix();
+        Eigen::Quaterniond q_r1_to_r2 = (r2_q.inverse()) * rotation_1TO2 * r1_q;
+        return q_r1_to_r2.normalized();
     }
 
-    Eigen::Vector3d turnout_T(Eigen::Vector3d transfer, int who_detect)
-    {
-        Eigen::Vector3d r1_to_r2;
-        Eigen::Vector3d origin2r1;
-        Eigen::Vector3d origin2r2;
-
-        int r1_img_index, r2_img_index;
-        Eigen::Vector3d transfer_1_to_2;
-        if (who_detect == 1)
-        {
-            r1_img_index = loop_info[0];
-            r2_img_index = loop_info[1];
-            transfer_1_to_2 = transfer;
-        }
-        else
-        {
-            r1_img_index = loop_info[1];
-            r2_img_index = loop_info[0];
-            transfer_1_to_2 = (-1) * transfer;
-        }
-
-        origin2r1 << path_1[r1_img_index][0], path_1[r1_img_index][1], path_1[r1_img_index][2];
-        origin2r2 << path_2[r2_img_index][0], path_2[r2_img_index][1], path_2[r2_img_index][2];
-
-        Eigen::Vector3d ans_t = transfer_1_to_2 - (origin2r2 - origin2r1);
-        return ans_t;
-    }
     // FIXME 前処理が必要
     opengv::transformation_t
     mlpnp(int who_detect, std::vector<Eigen::Vector3d> kp_loc_r1, std::vector<Eigen::Vector3d> kp_loc_r2)

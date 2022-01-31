@@ -255,7 +255,7 @@ void opengv::absolute_pose::modules::mlpnp::mlpnp_gn(
 	g.setZero();
 
 	int it_cnt = 0;
-	e bool stop = false;
+	bool stop = false;
 	const int maxIt = 5;
 	double epsP = 1e-5;
 
