@@ -549,11 +549,11 @@ target_link_libraries(
   opengv
   )
 
-# add_executable(open3d_conversions_ex_sub src/gui/src/gui.cpp)
-# add_dependencies(open3d_conversions_ex_sub ${open3d_conversions_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-# target_link_libraries(open3d_conversions_ex_sub
-# ${catkin_LIBRARIES}
-# ${Open3D_LIBRARIES})
+add_executable(open3d_conversions_ex_sub src/gui/src/gui.cpp)
+add_dependencies(open3d_conversions_ex_sub ${open3d_conversions_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(open3d_conversions_ex_sub
+${catkin_LIBRARIES}
+${Open3D_LIBRARIES})
 
 
 

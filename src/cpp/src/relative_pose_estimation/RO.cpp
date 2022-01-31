@@ -69,7 +69,6 @@ public:
 
     void path1_CB(const nav_msgs::Path::ConstPtr &path)
     {
-        info_index += 1;
         path_1.clear();
         for (auto val : path->poses)
         {
@@ -83,14 +82,14 @@ public:
             pose.push_back(val.pose.orientation.w);
             path_1.push_back(pose);
         }
-        mapPath_dict[info_index] = path_1.size();
+        info_index += 1;
+        mapPath_dict[info_index] = path_1.size() - 1;
 
         // std::vector<double> pose;
     }
 
     void path2_CB(const nav_msgs::Path::ConstPtr &path)
     {
-        info_index_2 += 1;
         path_2.clear();
         for (auto val : path->poses)
         {
@@ -104,7 +103,8 @@ public:
             pose.push_back(val.pose.orientation.w);
             path_2.push_back(pose);
         }
-        mapPath_dict_2[info_index_2] = path_2.size();
+        info_index_2 += 1;
+        mapPath_dict_2[info_index_2] = path_2.size() - 1;
 
         // std::vector<double> pose;
     }
@@ -141,7 +141,7 @@ public:
             Eigen::Vector3d ans_t = turnout_T(t_, who_detect);
             Eigen::Quaterniond ans_r = turnout_R(R_, who_detect);
 
-            std::vector<double> R{ans_r.x(), ans_r.y(), ans_r.z(), ans_r.w()};
+            std::vector<double> R{ans_r.w(), ans_r.x(), ans_r.y(), ans_r.z()};
             std::vector<double> t{ans_t[0], ans_t[1], ans_t[2]};
 
             pose_result.translation = t;
