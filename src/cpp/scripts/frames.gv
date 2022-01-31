@@ -1,12 +1,2 @@
 digraph G {
-"robot2/odom" -> "robot2/base_footprint"[label="Broadcaster: /gazebo\nAverage rate: 30.322 Hz\nMost recent transform: 143.400 ( 0.028 sec old)\nBuffer length: 3.133 sec\n"];
-"robot1/odom" -> "robot1/base_footprint"[label="Broadcaster: /gazebo\nAverage rate: 30.313 Hz\nMost recent transform: 143.414 ( 0.014 sec old)\nBuffer length: 3.134 sec\n"];
-edge [style=invis];
- subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
-"Recorded at time: 143.428"[ shape=plaintext ] ;
- }->"robot2/odom";
-edge [style=invis];
- subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
-"Recorded at time: 143.428"[ shape=plaintext ] ;
- }->"robot1/odom";
-}
+"no tf data recieved"}

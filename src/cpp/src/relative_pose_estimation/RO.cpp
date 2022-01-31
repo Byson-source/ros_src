@@ -36,6 +36,8 @@ private:
     ros::NodeHandle n;
     ros::Subscriber feature_sub;
     ros::Publisher rt_pub;
+    ros::Publisher path_pub1;
+    ros::Publisher path_pub2;
     ros::Subscriber path_sub1;
     // ros::Subscriber path_sub2;
 
@@ -55,6 +57,9 @@ public:
     RO_Estimator(void)
     {
         rt_pub = n.advertise<cpp::RO_Array>("RT_result", 50);
+        path_pub1 = n.advertise<geometry_msgs::PoseStamped>("path_r1", 10);
+        path_pub2 = n.advertise<geometry_msgs::PoseStamped>("path_r2", 10);
+
         feature_sub = n.subscribe("features", 20, &RO_Estimator::RO_CB, this);
         path_sub1 = n.subscribe("robot1/rtabmap/mapPath", 10, &RO_Estimator::path1_CB, this);
         // path_sub2 = n.subscribe("robot2/rtabmap/mapPath", 10, &RO_Estimator::path2_CB, this);
