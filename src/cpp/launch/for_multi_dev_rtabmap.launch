@@ -19,12 +19,10 @@
 
     <arg name="db_recording" default="false"/>
     <!-- true: database record - false: visualization only -->
-    <arg name="from_rosbag" default="true"/>
     <!-- true: published topics come from rosbag -->
     <arg name="visual_odometry" default="true"/>
     <!-- base/rover's frame -->
     <!-- <arg name="rviz_cfg" default="/opt/ros/noetic/share/rviz/20220128.rviz"/> -->
-    <arg name="use_sim_time" default="$(arg from_rosbag)"/>
     <arg if="$(arg db_recording)" name="rtabmap_args" default="--delete_db_on_start"/>
     <arg unless="$(arg db_recording)" name="rtabmap_args" default=""/>
     <!-- TF static transform (base_link to camera_link) + (camera_link to imu_link) -->
@@ -42,14 +40,19 @@
 
     <group ns="rtabmap">
         <!-- RGB-D Synchronisation -->
-        <node name="rgbd_sync" pkg="nodelet" type="nodelet" args="standalone rtabmap_ros/rgbd_sync" output="screen">
+        <node pkg="rtabmap_ros" type="rgbd_sync" name="rgbd_sync">
             <remap from="rgb/image" to="$(arg color_topic)"/>
             <remap from="depth/image" to="$(arg depth_topic)"/>
             <remap from="rgb/camera_info" to="$(arg camera_info_topic)"/>
-            <!-- <param name="approx_sync" type="bool" value="false"/>
+        </node>
+        <!-- <node name="rgbd_sync" pkg="nodelet" type="nodelet" args="standalone rtabmap_ros/rgbd_sync" output="screen">
+            <remap from="rgb/image" to="$(arg color_topic)"/>
+            <remap from="depth/image" to="$(arg depth_topic)"/>
+            <remap from="rgb/camera_info" to="$(arg camera_info_topic)"/> -->
+        <!-- <param name="approx_sync" type="bool" value="false"/>
             <param name="queue_size" type="int" value="100"/>
             <param name="depth_scale" type="double" value="1.0"/> -->
-        </node>
+        <!-- </node> -->
 
         <!-- RGB-D Odometry -->
         <node if="$(arg visual_odometry)" name="rgbd_odometry" pkg="rtabmap_ros" type="rgbd_odometry" output="screen" args="$(arg rtabmap_args)">
@@ -130,7 +133,7 @@
             <param name="database_path" type="string" value="$(arg database_path)"/>
             <!-- Odom input topic -->
             <param name="frame_id" type="string" value="$(arg frame_id)"/>
-            <!-- <param name="odom_frame_id" type="string" value="$(arg odom_frame)"/> -->
+            <param name="odom_frame_id" type="string" value="$(arg odom_frame)"/>
             <!-- Odom frame -->
             <param name="subscribe_depth" type="bool" value="false"/>
             <param name="subscribe_rgbd" type="bool" value="true"/>
