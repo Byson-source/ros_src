@@ -1,12 +1,12 @@
 <launch>
     <!-- <include file="$(find multiple_turtlebots_sim)/launch/multi-bot.launch"/> -->
-    <node pkg="rosbag" type="play" name="rosbag_play1" args="-r 3 /home/ayumi/Documents/RTAB-Map/out1.bag">
+    <node pkg="rosbag" type="play" name="rosbag_play1" args="/home/ayumi/Documents/RTAB-Map/out1.bag">
         <remap from="robot1/base_scan" to="robot1/scan" />
         <remap from="robot1/base_controller/odom" to="robot1/odom" />
         <remap from="robot1/data_throttled_camera_info" to="robot1/camera/rgb/camera_info" />
     </node>
 
-    <node pkg="rosbag" type="play" name="rosbag_play2" args="-r 3 /home/ayumi/Documents/RTAB-Map/out2.bag">
+    <node pkg="rosbag" type="play" name="rosbag_play2" args="/home/ayumi/Documents/RTAB-Map/out2.bag">
         <remap from="robot2/base_scan" to="robot2/scan" />
         <remap from="robot2/base_controller/odom" to="robot2/odom" />
 

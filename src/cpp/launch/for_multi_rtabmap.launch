@@ -1,17 +1,5 @@
 <!-- NOTE I have changed a bit from Pierre's work. I set "Grid/CellSize" to 0.01 -->
 <launch>
-    <!--
-    $ sudo apt install ros-melodic-turtlebot3* ros-melodic-dwa-local-planner
-    To avoid TF warning about leading '/' in frame name, remove it in:
-       - "/opt/ros/melodic/share/turtlebot3_navigation/param/global_costmap_params.yaml"
-       - "/opt/ros/melodic/share/turtlebot3_navigation/param/local_costmap_params.yaml"
-    Example Gazebo:
-    $ export TURTLEBOT3_MODEL=waffle
-    $ roslaunch turtlebot3_gazebo turtlebot3_world.launch
-    $ export TURTLEBOT3_MODEL=waffle
-    $ roslaunch rtabmap_ros demo_turtlebot3_navigation.launch
-  -->
-
     <!-- Arguments -->
 
     <arg name="for_frame" default=""/>

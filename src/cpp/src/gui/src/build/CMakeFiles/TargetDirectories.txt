@@ -1,3 +1,0 @@
-/home/ayumi/catkin_ws/src/cpp/src/gui/src/build/CMakeFiles/rebuild_cache.dir
-/home/ayumi/catkin_ws/src/cpp/src/gui/src/build/CMakeFiles/edit_cache.dir
-/home/ayumi/catkin_ws/src/cpp/src/gui/src/build/CMakeFiles/test.dir

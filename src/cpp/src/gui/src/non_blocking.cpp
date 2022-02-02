@@ -42,24 +42,27 @@ int main(int argc, char **argv)
     vis.AddGeometry(cloud_ptr_1);
     vis.AddGeometry(cloud_ptr_2);
     double threshold{0.05};
-    size_t icp_iteration{100};
+    size_t icp_iteration{10000};
     bool save_image{0};
 
-    Eigen::Translation<double, 3> trans_1(0.0, 1.0, 1.0);
-    Eigen::MatrixXd rot = Eigen::MatrixXd::Identity();
+    Eigen::Translation<double, 3> trans_1(0.0, 0.0, 0.0);
+    Eigen::Quaterniond rot(Eigen::Matrix3d::Identity());
     for (int i{0}; i < icp_iteration; ++i)
     {
-        trans_1.x() += 0.3;
         Eigen::Affine3d affine = trans_1 * rot;
 
         Eigen::Matrix4d transform = affine.matrix();
 
+        std::cout << transform << std::endl;
+
         cloud_ptr_1->Transform(transform);
 
-        vis.UpdateGeometry(*cloud_ptr_1);
+        vis.UpdateGeometry(cloud_ptr_1);
+        vis.UpdateGeometry(cloud_ptr_2);
         vis.PollEvents();
         vis.UpdateRender();
+        trans_1.x() += 0.00001;
         // vis.RemoveGeometry();
     }
-    vis.DestroyWindow();
+    vis.DestroyVisualizerWindow();
 }
