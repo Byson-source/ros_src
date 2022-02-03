@@ -51,15 +51,17 @@ public:
 
     SubscriberExample(void)
     {
-        cloud_sub1 = nh.subscribe("robot1/rtabmap/cloud_map", 10, &SubscriberExample::cloud_cb1, this);
-        cloud_sub2 = nh.subscribe("robot2/rtabmap/cloud_map", 10, &SubscriberExample::cloud_cb2, this);
+        cloud_sub1 = nh.subscribe("robot2/rtabmap/cloud_map", 10, &SubscriberExample::cloud_cb1, this);
+        cloud_sub2 = nh.subscribe("robot1/rtabmap/cloud_map", 10, &SubscriberExample::cloud_cb2, this);
         rt_sub = nh.subscribe("RT_result", 10, &SubscriberExample::cloudAssembler, this);
 
-        path_sub1 = nh.subscribe("robot1/rtabmap/mapPath", 2, &SubscriberExample::pathAssembler1, this);
-        path_sub2 = nh.subscribe("robot2/rtabmap/mapPath", 2, &SubscriberExample::pathAssembler2, this);
+        path_sub1 = nh.subscribe("robot2/rtabmap/mapPath", 2, &SubscriberExample::pathAssembler1, this);
+        path_sub2 = nh.subscribe("robot1/rtabmap/mapPath", 2, &SubscriberExample::pathAssembler2, this);
 
         pcd_1 = pcd_1->VoxelDownSample(0.02);
         pcd_2 = pcd_2->VoxelDownSample(0.02);
+
+        vis_1->CreateVisualizerWindow();
     }
 
     void pathAssembler1(const nav_msgs::Path::ConstPtr &path)
@@ -120,11 +122,9 @@ public:
         Eigen::Translation<double, 3> translation(transform->translation[0], transform->translation[1], transform->translation[2]);
         Eigen::Affine3d affine = translation * rotation;
 
-        check += 1;
+        // check += 1;
         if (check == 1)
         {
-
-            vis_1->CreateVisualizerWindow();
             transformation = affine.matrix();
         }
     }
@@ -168,6 +168,19 @@ public:
                 vis_1->UpdateRender();
                 vis_1->ClearGeometries();
                 vis_1->UpdateGeometry();
+            }
+            else
+            {
+                vis_1->AddGeometry(pcd_2);
+                // vis_1->AddGeometry(line_2);
+
+                vis_1->UpdateGeometry(pcd_2);
+                // vis_1->UpdateGeometry(line_2);
+
+                vis_1->PollEvents();
+                vis_1->UpdateRender();
+                vis_1->UpdateGeometry();
+                vis_1->ClearGeometries();
             }
         }
     }

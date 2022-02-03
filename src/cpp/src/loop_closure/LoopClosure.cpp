@@ -65,7 +65,7 @@ public:
         parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRGBDEnabled(), "false"));
 
         // REVIEW rtabmapのstmの決め方
-        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kMemSTMSize(), "30"));
+        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kMemSTMSize(), "10"));
 
         // UFile::erase(database_path);
         // REVIEW 何故か強制シャットダウンする。.ros/rtabmap.dbを消すと治った？？

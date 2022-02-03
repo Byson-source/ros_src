@@ -1,17 +1,6 @@
 <launch>
-    <node pkg="rosbag" type="play" name="rosbag_play1" args="/home/ayumi/Documents/tohoku_uni/CLOVERs/datasets/field_test/20220201_indoor_test/record_r3.bag">
-        <remap from="/camera/aligned_depth_to_color/camera_info" to="robot1/camera/aligned_depth_to_color/camera_info"/>
-        <remap from="/camera/color/camera_info" to="robot1/camera/color/camera_info"/>
-        <remap from="/camera/color/image_raw" to="robot1/camera/color/image_raw"/>
-        <remap from="/camera/aligned_depth_to_color/image_raw" to="robot1/camera/aligned_depth_to_color/image_raw"/>
-    </node>
 
-    <node pkg="rosbag" type="play" name="rosbag_play2" args="/home/ayumi/Documents/tohoku_uni/CLOVERs/datasets/field_test/20220201_indoor_test/record_b4.bag">
-        <remap from="/camera/aligned_depth_to_color/camera_info" to="robot2/camera/aligned_depth_to_color/camera_info"/>
-        <remap from="/camera/color/camera_info" to="robot2/camera/color/camera_info"/>
-        <remap from="/camera/color/image_raw" to="robot2/camera/color/image_raw"/>
-        <remap from="/camera/aligned_depth_to_color/image_raw" to="robot2/camera/aligned_depth_to_color/image_raw"/>
-    </node>
+
 
     <group ns="robot1">
 
@@ -30,20 +19,11 @@
         </include>
     </group>
 
-
-    <!-- <node pkg="cpp" name="image_extractor" type="image_extractor.py" output="screen" />
-    <node pkg="cpp" name="feature_matchor" type="feature_matching.py" output="screen" />
-    <node pkg="cpp" name="loop_closure_server" type="detection_checker" output="screen" />
-    <node pkg="cpp" name="RO_node" type="RO_estimator" output="screen" /> -->
-    <!-- <node pkg="cpp" name="open3d_conversions_ex_sub" type="open3d_conversions_ex_sub" output="screen" />  -->
-    <!-- <node pkg="cpp" name="loop_closure" type="loop_closure_client" output="screen"/>
-    <node pkg="cpp" name="loop_closure_server" type="detection_checker" output="screen"/> -->
-
-    <!--<node pkg="cpp" name="reprocess" type="reprocess_client_node" output="screen">
-        <param name="robot_num" value="2"/>
-    </node>
-    <node pkg="cpp" name="reprocess_server" type="reprocess_server_node" output="screen"/>
-    <node pkg="cpp" name="gui" type="GUI_node" output="screen"/-->
+    <!-- <node pkg="cpp" name="image_extractor" type="image_extractor.py" output="screen"/>
+    <node pkg="cpp" name="feature_matchor" type="feature_matching.py" output="screen"/>
+    <node pkg="cpp" name="loop_closure_server" type="detection_checker" output="screen"/>
+    <node pkg="cpp" name="RO_node" type="RO_estimator" output="screen"/> -->
+    <!-- <node pkg="cpp" name="open3d_conversions_ex_sub" type="open3d_conversions_ex_sub" output="screen"/> -->
 
 
 </launch>

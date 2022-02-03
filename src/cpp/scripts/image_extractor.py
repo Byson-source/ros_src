@@ -172,8 +172,8 @@ if __name__ == '__main__':
     setup()
     rospy.init_node('image_listener', anonymous=True)
 
-    rgb_topic = "/robot1/camera/rgb/image_raw"
-    rgb_topic2 = "/robot2/camera/rgb/image_raw"
+    rgb_topic = "/robot1/camera/color/image_raw"
+    rgb_topic2 = "/robot2/camera/color/image_raw"
 
     ID_topic = "/robot1/rtabmap/info"
     ID_topic2 = "/robot2/rtabmap/info"

@@ -49,8 +49,8 @@ public:
     {
         // 全ての画像座標を格納
         // NOTE this is pixel size
-        intrinstic_parameter << 525.0, 0.0, 319.5,
-            0.0, 525.0, 239.5,
+        intrinstic_parameter << 617.5604248046, 0.0, 317.55502,
+            0.0, 617.3798828, 244.730865,
             0.0, 0.0, 1.0;
         inv_intrinstic = intrinstic_parameter.inverse();
 

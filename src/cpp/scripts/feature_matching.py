@@ -238,8 +238,8 @@ if __name__ == '__main__':
     # node_name = os.path.basename(sys.argv[0]).split('.')[0]
     rospy.init_node("depth_listener")
     # /////////////////////////////////////////////////////////////////////////
-    depth_topic = "/robot1/camera/depth/image_raw"
-    depth_topic2 = "/robot2/camera/depth/image_raw"
+    depth_topic = "/robot1/camera/aligned_depth_to_color/image_raw"
+    depth_topic2 = "/robot2/camera/aligned_depth_to_color/image_raw"
 
     ID_topic = "/robot1/rtabmap/info"
     ID_topic2 = "/robot2/rtabmap/info"
