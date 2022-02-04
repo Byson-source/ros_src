@@ -111,7 +111,7 @@ public:
 
     void RO_CB(const cpp::FeatureArray::ConstPtr &data)
     {
-        if ((data->r1.size() > 15) && (data->signal == 0))
+        if ((data->r1.size() > 10) && (data->signal == 0))
         // NOTE特徴点が10個以上ないとだめ
         {
 
@@ -129,6 +129,7 @@ public:
                     Eigen::Vector3d kp_loc_r2(data->r2[index - 3], data->r2[index - 2], data->r2[index - 1]);
                     kp_loc_r1_s.push_back(kp_loc_r1);
                     kp_loc_r2_s.push_back(kp_loc_r2);
+                    // NOTE ポイントのカメラ座標
                 }
             }
 

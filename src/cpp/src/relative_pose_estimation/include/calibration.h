@@ -74,22 +74,13 @@ public:
 
         X_s.clear();
         bearingVectors.clear();
-        // kp_loc = kp_loc.cast<float>();
-        // kp_loc_other = kp_loc_other.cast<float>();
         for (long unsigned int i{0}; i < kp_loc.size(); ++i)
         {
+            opengv::point_t X, pixel_;
 
-            Eigen::Vector3d X(kp_loc[i].x() - width / 2, kp_loc[i].y() - height / 2, kp_loc[i].z() / 1000);
-            Eigen::Vector3d pixel_(kp_loc_other[i].x() - width / 2, kp_loc_other[i].y() - height / 2, kp_loc_other[i].z() / 1000);
+            X = img_to_cam_coordinate * kp_loc[i];
+            pixel_ = img_to_cam_coordinate * kp_loc_other[i];
 
-            X = img_to_cam_coordinate * X;
-            pixel_ = img_to_cam_coordinate * pixel_;
-
-            X.y() = X.x() / focal * X.y();
-            X.z() = X.x() / focal * X.z();
-
-            pixel_.y() = pixel_.x() / focal * pixel_.y();
-            pixel_.z() = pixel_.x() / focal * pixel_.z();
             Eigen::Vector3d cam_coord;
             cam_coord = pixel_;
             // bearing vector

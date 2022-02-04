@@ -26,32 +26,32 @@ depth_img2 = 2
 container = {}
 bridge = CvBridge()
 index = 0
+intrinsics = rs2.intrinsics()
 
 
 def depthCB1(depth1, id):
     global depth_img
 
-    cv2_img = bridge.imgmsg_to_cv2(depth1, "16UC1")
+    cv2_img = bridge.imgmsg_to_cv2(depth1, depth1.encoding)
     # FIXME Maybe should change to (640,480)
     cv2_img = cv2.resize(cv2_img, dsize=(640, 480))
 
-    # REVIEW 再開
-    container[depth_img] = np.array(cv2_img, dtype=np.float32)
-
     cv2.imwrite("/home/ayumi/Documents/tohoku_uni/CLOVERs/images/depth/" +
                 str(depth_img)+".png", cv2_img)
+
+    container[depth_img] = cv2_img
     depth_img += 2
 
 
 def depthCB2(depth2, id):
     global depth_img2
 
-    img = bridge.imgmsg_to_cv2(depth2, "16UC1")
+    img = bridge.imgmsg_to_cv2(depth2, depth2.encoding)
     # FIXME Maybe should change to (640,480)
     img = cv2.resize(img, dsize=(640, 480))
-    depth_array = np.array(img, dtype=np.float32)
     # print(depth_array.shape)
-    container[depth_img2] = depth_array
+
+    container[depth_img2] = img
 
     cv2.imwrite("/home/ayumi/Documents/tohoku_uni/CLOVERs/images/depth/" +
                 str(depth_img2)+".png", img)
@@ -60,6 +60,23 @@ def depthCB2(depth2, id):
 
 # Return feature locations
 # TODO パラメーターの妥当性の確認
+
+
+def info_CB(data):
+    global intrinsics
+
+    intrinsics.width = data.width
+    intrinsics.width = data.width
+    intrinsics.height = data.height
+    intrinsics.ppx = data.K[2]
+    intrinsics.ppy = data.K[5]
+    intrinsics.fx = data.K[0]
+    intrinsics.fy = data.K[4]
+    if data.distortion_model == 'plumb_bob':
+        intrinsics.model = rs2.distortion.brown_conrady
+    elif data.distortion_model == 'equidistant':
+        intrinsics.model = rs2.distortion.kannala_brandt4
+    intrinsics.coeffs = [i for i in data.D]
 
 
 def orbmatch(fileName1, fileName2):
@@ -194,26 +211,22 @@ def loop_CB(data):
                 for index in range(len(r1_feature)):
                     if(container[indice1][int(r1_feature[index][1]), int(r1_feature[index][0])] != 0 and
                        container[indice2][int(r2_feature[index][1]), int(r2_feature[index][0])] != 0):
-                        # x
-                        # iterは0から始まる
-                        element["R1"][iter+1].append(int(r1_feature[index][0]))
-                        # y
-                        element["R1"][iter+1].append(int(r1_feature[index][1]))
-                        # depth
-                        element["R1"][iter +
-                                      1].append(int(container[indice1][int(r1_feature[index][1]), int(r1_feature[index][0])]))
-                        # x
-                        element["R2"][iter+1].append(int(r2_feature[index][0]))
-                        # y
-                        element["R2"][iter+1].append(int(r2_feature[index][1]))
-                        # depth
-                        element["R2"][iter +
-                                      1].append(int(container[indice2][int(r2_feature[index][1]), int(r2_feature[index][0])]))
-                        # element["FeaturePair"]["R2Depth"][i].append(container[element[indice2]][val[1],val[0]])
 
-                        # if(int(r1_feature[index][0]) > 320 and int(r1_feature[index][1]) > 240):
-                        #     rospy.loginfo("Boo!")
-                        #     print(element["R1"][iter+1])
+                        #    NOTE camera coordinateをpublishする
+
+                        depth_r1 = container[indice1][int(
+                            r1_feature[index][1]), int(r1_feature[index][0])]
+                        depth_r2 = container[indice2][int(
+                            r2_feature[index][1]), int(r2_feature[index][0])]
+
+                        result_1 = rs2.rs2_deproject_pixel_to_point(
+                            intrinsics, [int(r1_feature[index][0]), int(r1_feature[index][1])], depth_r1)
+                        result_2 = rs2.rs2_deproject_pixel_to_point(
+                            intrinsics, [int(r2_feature[index][0]), int(r2_feature[index][1])], depth_r2)
+
+                        for i in range(3):
+                            element["R1"][iter+1].append(result_1[i])
+                            element["R2"][iter+1].append(result_2[i])
 
                 info.signal = 0
                 info.r1 = element["R1"][iter+1]
@@ -230,6 +243,7 @@ def loop_CB(data):
 if __name__ == '__main__':
     # node_name = os.path.basename(sys.argv[0]).split('.')[0]
     rospy.init_node("depth_listener")
+
     # /////////////////////////////////////////////////////////////////////////
     depth_topic = "/robot1/camera/aligned_depth_to_color/image_raw"
     depth_topic2 = "/robot2/camera/aligned_depth_to_color/image_raw"
@@ -250,6 +264,9 @@ if __name__ == '__main__':
     ts2 = message_filters.ApproximateTimeSynchronizer(
         [depth_sub2, myid_sub2], 10, 0.1, allow_headerless=False)
     ts2.registerCallback(depthCB2)
+
+    cameraInfo_sub = rospy.Subscriber(
+        "/robot1/camera/aligned_depth_to_color/camera_info", CameraInfo, info_CB)
     # /////////////////////////////////////////////////////////////////////////
 
     # /////////////////////////////////////////////////////////////////////////
