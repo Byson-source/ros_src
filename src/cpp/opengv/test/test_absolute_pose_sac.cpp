@@ -45,16 +45,15 @@
 #include "experiment_helpers.hpp"
 #include "time_measurement.hpp"
 
-
 using namespace std;
 using namespace Eigen;
 using namespace opengv;
 
-int main( int argc, char** argv )
+int main(int argc, char **argv)
 {
   //initialize random seed
   initializeRandomSeed();
-  
+
   //set experiment parameters
   double noise = 0.0;
   double outlierFraction = 0.1;
@@ -63,24 +62,24 @@ int main( int argc, char** argv )
   //create a random viewpoint pose
   translation_t position = generateRandomTranslation(2.0);
   rotation_t rotation = generateRandomRotation(0.5);
-  
+
   //create a fake central camera
   translations_t camOffsets;
   rotations_t camRotations;
-  generateCentralCameraSystem( camOffsets, camRotations );
-  
+  generateCentralCameraSystem(camOffsets, camRotations);
+
   //derive correspondences based on random point-cloud
   bearingVectors_t bearingVectors;
   points_t points;
   std::vector<int> camCorrespondences; //unused in the central case!
-  Eigen::MatrixXd gt(3,numberPoints);
+  Eigen::MatrixXd gt(3, numberPoints);
   generateRandom2D3DCorrespondences(
       position, rotation, camOffsets, camRotations, numberPoints, noise, outlierFraction,
-      bearingVectors, points, camCorrespondences, gt );
+      bearingVectors, points, camCorrespondences, gt);
 
   //print the experiment characteristics
   printExperimentCharacteristics(
-      position, rotation, noise, outlierFraction );
+      position, rotation, noise, outlierFraction);
 
   //create a central absolute adapter
   absolute_pose::CentralAbsoluteAdapter adapter(
@@ -92,31 +91,36 @@ int main( int argc, char** argv )
   //The method can be set to KNEIP, GAO or EPNP
   sac::Ransac<sac_problems::absolute_pose::AbsolutePoseSacProblem> ransac;
   std::shared_ptr<
-      sac_problems::absolute_pose::AbsolutePoseSacProblem> absposeproblem_ptr(
-      new sac_problems::absolute_pose::AbsolutePoseSacProblem(
-      adapter,
-      sac_problems::absolute_pose::AbsolutePoseSacProblem::KNEIP));
+      sac_problems::absolute_pose::AbsolutePoseSacProblem>
+      absposeproblem_ptr(
+          new sac_problems::absolute_pose::AbsolutePoseSacProblem(
+              adapter,
+              sac_problems::absolute_pose::AbsolutePoseSacProblem::KNEIP));
   ransac.sac_model_ = absposeproblem_ptr;
-  ransac.threshold_ = 1.0 - cos(atan(sqrt(2.0)*0.5/800.0));
+  ransac.threshold_ = 1.0 - cos(atan(sqrt(2.0) * 0.5 / 800.0));
   ransac.max_iterations_ = 50;
 
   //Run the experiment
   struct timeval tic;
   struct timeval toc;
-  gettimeofday( &tic, 0 );
+  gettimeofday(&tic, 0);
   ransac.computeModel();
-  gettimeofday( &toc, 0 );
-  double ransac_time = TIMETODOUBLE(timeval_minus(toc,tic));
+  gettimeofday(&toc, 0);
+  double ransac_time = TIMETODOUBLE(timeval_minus(toc, tic));
 
   //print the results
   std::cout << "the ransac results is: " << std::endl;
-  std::cout << ransac.model_coefficients_ << std::endl << std::endl;
+  std::cout << ransac.model_coefficients_ << std::endl
+            << std::endl;
   std::cout << "Ransac needed " << ransac.iterations_ << " iterations and ";
-  std::cout << ransac_time << " seconds" << std::endl << std::endl;
+  std::cout << ransac_time << " seconds" << std::endl
+            << std::endl;
   std::cout << "the number of inliers is: " << ransac.inliers_.size();
-  std::cout << std::endl << std::endl;
+  std::cout << std::endl
+            << std::endl;
   std::cout << "the found inliers are: " << std::endl;
-  for(size_t i = 0; i < ransac.inliers_.size(); i++)
+  for (size_t i = 0; i < ransac.inliers_.size(); i++)
     std::cout << ransac.inliers_[i] << " ";
-  std::cout << std::endl << std::endl;
+  std::cout << std::endl
+            << std::endl;
 }

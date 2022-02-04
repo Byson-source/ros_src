@@ -231,6 +231,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   cv_bridge
   image_transport
+  pcl_ros
 )
 ########################################################
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}")
