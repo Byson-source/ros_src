@@ -25,6 +25,9 @@ private:
     ros::Subscriber cloud_sub2;
     ros::Publisher cloud_pub;
 
+    // tf2_ros::TransformBroadcaster dynamic_tr;
+    // ros::Timer timer;
+
     std::vector<double> t;
     std::vector<double> rpy;
     ros::Subscriber rt_sub;
@@ -36,8 +39,8 @@ public:
     SubscriberExample(void)
     {
         cloud_sub2 = nh.subscribe("robot2/rtabmap/cloud_map", 10, &SubscriberExample::cloud_cb2, this);
-        // cloud_sub2 = nh.subscribe("robot2/rtabmap/cloud_map", 10, &SubscriberExample::cloud_cb2, this);
         rt_sub = nh.subscribe("RT_result", 10, &SubscriberExample::cloudAssembler, this);
+
         cloud_pub = nh.advertise<sensor_msgs::PointCloud2>("transformed_cloud", 10);
 
         // path_sub1 = nh.subscribe("robot2/rtabmap/mapPath", 2, &SubscriberExample::pathAssembler1, this);
@@ -53,12 +56,13 @@ public:
         status = 1;
     }
 
-    void cloud_cb2(const sensor_msgs::PointCloud2::ConstPtr &cloud_data)
+    void cloud_cb2(sensor_msgs::PointCloud2 cloud_data)
     {
         if (status == 1)
         {
             sensor_msgs::PointCloud2 pcl2_transformed;
-            pcl_ros::transformPointCloud(transformation.cast<double>(), cloud_data, pcl2_transformed);
+            pcl_ros::transformPointCloud(transformation.cast<float>(), cloud_data, pcl2_transformed);
+            pcl2_transformed.header.frame_id = "robot1/map";
             cloud_pub.publish(pcl2_transformed);
         }
     }

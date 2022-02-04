@@ -136,18 +136,6 @@ def orbmatch(fileName1, fileName2):
                 cv2.imwrite(
                     "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/feature_match/"+str(fileName1)+"->"+str(fileName2)+".jpg", img3)
 
-            # for val in loc1:
-            #     if(val[0] > 320 or val[1] > 240):
-            #         rospy.loginfo("File num is "+str(fileName1))
-            #         rospy.loginfo("Boo!")
-            #         print(val)
-            #         img_rect = cv2.circle(
-            #             img1, (int(val[0]), int(val[1])), 3, (255, 0, 255), thickness=1)
-            #         cv2.imwrite(
-            #             "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/test/"+str(fileName1)+".jpg", img_rect)
-
-            # loc1とloc2がRANSACでふるい分けられた特徴点の座標
-            # print(loc1[0][0])
             return loc1, loc2, 1
 
     return [], [], 0

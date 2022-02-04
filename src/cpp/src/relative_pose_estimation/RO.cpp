@@ -111,7 +111,7 @@ public:
 
     void RO_CB(const cpp::FeatureArray::ConstPtr &data)
     {
-        if ((data->r1.size() > 27) && (data->signal == 0))
+        if ((data->r1.size() > 15) && (data->signal == 0))
         // NOTE特徴点が10個以上ないとだめ
         {
 
@@ -134,8 +134,17 @@ public:
 
             opengv::transformation_t result = RO_Estimator::mlpnp(who_detect, kp_loc_r1_s, kp_loc_r2_s);
 
+            std::cout << result << std::endl;
+            std::cout << "-------------------------" << std::endl;
+
             Eigen::Matrix3d R_ = result.block(0, 0, 3, 3);
+            Eigen::Vector3d rpy = R_.eulerAngles(0, 1, 2);
             Eigen::Vector3d t_ = result.block(0, 3, 3, 1);
+
+            std::cout << t_ << std::endl;
+            std::cout << "-------------------------" << std::endl;
+            std::cout << rpy << std::endl;
+            std::cout << "=============================" << std::endl;
 
             cpp::RO_Array pose_result;
             Eigen::Vector3d ans_t = turnout_T(t_, who_detect);
