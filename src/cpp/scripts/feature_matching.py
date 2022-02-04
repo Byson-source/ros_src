@@ -31,25 +31,30 @@ index = 0
 def depthCB1(depth1, id):
     global depth_img
 
-    cv2_img = bridge.imgmsg_to_cv2(depth1, "passthrough")
+    cv2_img = bridge.imgmsg_to_cv2(depth1, "16UC1")
     # FIXME Maybe should change to (640,480)
     cv2_img = cv2.resize(cv2_img, dsize=(640, 480))
 
     # REVIEW 再開
     container[depth_img] = np.array(cv2_img, dtype=np.float32)
 
+    cv2.imwrite("/home/ayumi/Documents/tohoku_uni/CLOVERs/images/depth/" +
+                str(depth_img)+".png", cv2_img)
     depth_img += 2
 
 
 def depthCB2(depth2, id):
     global depth_img2
 
-    img = bridge.imgmsg_to_cv2(depth2, "passthrough")
+    img = bridge.imgmsg_to_cv2(depth2, "16UC1")
     # FIXME Maybe should change to (640,480)
     img = cv2.resize(img, dsize=(640, 480))
     depth_array = np.array(img, dtype=np.float32)
     # print(depth_array.shape)
     container[depth_img2] = depth_array
+
+    cv2.imwrite("/home/ayumi/Documents/tohoku_uni/CLOVERs/images/depth/" +
+                str(depth_img2)+".png", img)
 
     depth_img2 += 2
 
@@ -61,10 +66,10 @@ def orbmatch(fileName1, fileName2):
     global index
     index += 1
     img1 = cv2.imread(rgb_path+str(fileName1)+".jpg")
-    img2 = cv2.imread(rgb_path+str(fileName2)+".jpg")
+    img2 = cv2.imread(rgb_path+str(fileName2-4)+".jpg")
 
     # ORB検出器生成
-    orb = cv2.ORB_create(1000)
+    orb = cv2.ORB_create(3000)
 
     kp1, des1 = orb.detectAndCompute(img1, None)
     kp2, des2 = orb.detectAndCompute(img2, None)
@@ -87,7 +92,7 @@ def orbmatch(fileName1, fileName2):
         rospy.loginfo("Can't detect enough features...")
     else:
         # マッチング結果を描画
-        ratio_thresh = 0.7
+        ratio_thresh = 0.8
         good_matches = []
         for mt in knn_matches:
 
@@ -134,7 +139,7 @@ def orbmatch(fileName1, fileName2):
                 # img_rect = cv2.circle(
                 #     img1, (int(loc1[0][0][0]), int(loc1[0][0][1])), 3, (255, 0, 255), thickness=1)
                 cv2.imwrite(
-                    "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/feature_match/"+str(fileName1)+"->"+str(fileName2)+".jpg", img3)
+                    "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/feature_match/"+str(fileName1)+"->"+str(fileName2-4)+".jpg", img3)
 
             return loc1, loc2, 1
 

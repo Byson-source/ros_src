@@ -17,13 +17,10 @@
 #include "experiment_helpers.hpp"
 #include "random_generators.hpp"
 #include <opengv/math/cayley.hpp>
-#include <librealsense2/rs.hpp>
 
 class Calibration
 {
 private:
-    rs2_intrinsics intr;
-
     // float coeff[5];
 
     Eigen::Matrix3d intrinstic_parameter;
@@ -52,14 +49,6 @@ private:
 public:
     Calibration(void)
     {
-        for (int i{0}; i < 5; ++i)
-            intr.coeffs[i] = 0;
-        intr.fx = 617.56042;
-        intr.fy = 617.3798828;
-        intr.height = 480;
-        intr.width = 640;
-        intr.ppx = 317.55502;
-        intr.ppy = 244.730865;
         // 全ての画像座標を格納
         // NOTE this is pixel size
 
@@ -89,14 +78,6 @@ public:
         // kp_loc_other = kp_loc_other.cast<float>();
         for (long unsigned int i{0}; i < kp_loc.size(); ++i)
         {
-            float upixel[2]{kp_loc[i].cast<float>().x(), kp_loc[i].cast<float>().y()};
-            float upoint[3]; // From point (in 3D)
-
-            float vpixel[2]{kp_loc_other[i].cast<float>().x(), kp_loc_other[i].cast<float>().y()}; // To pixel
-            float vpoint[3];
-
-            rs2_deproject_pixel_to_point(upoint, &intr, upixel, kp_loc[i].cast<float>().z());
-            rs2_deproject_pixel_to_point(vpoint, &intr, vpixel, kp_loc_other[i].cast<float>().z());
 
             Eigen::Vector3d X(kp_loc[i].x() - width / 2, kp_loc[i].y() - height / 2, kp_loc[i].z() / 1000);
             Eigen::Vector3d pixel_(kp_loc_other[i].x() - width / 2, kp_loc_other[i].y() - height / 2, kp_loc_other[i].z() / 1000);
