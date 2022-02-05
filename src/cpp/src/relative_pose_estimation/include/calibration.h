@@ -12,11 +12,6 @@
 #include <opencv2/xfeatures2d.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/eigen.hpp>
-#include <opengv/absolute_pose/methods.hpp>
-#include <opengv/math/cayley.hpp>
-#include "experiment_helpers.hpp"
-#include "random_generators.hpp"
-#include <opengv/math/cayley.hpp>
 
 class Calibration
 {
@@ -89,30 +84,15 @@ public:
             // for bearing vector
             bearingVectors.push_back(pixel_);
             cam_coords.push_back(cam_coord);
+
+            if (i < 3)
+            {
+                std::cout << X << std::endl;
+                std::cout << cam_coord << std::endl;
+            }
         }
         return X_s;
     }
     // FIXME
-
-    opengv::bearingVectors_t bearing_v(void)
-    {
-
-        return bearingVectors;
-    }
-
-    // bearing vectorの共分散!
-
-    opengv::cov3_mats_t v_cov(void)
-    {
-        vcovs.clear();
-        for (long unsigned int i{0}; i < cam_coords.size(); ++i)
-        {
-            Eigen::Matrix3d jacobian = 1 / cam_coords[i].norm() * (Eigen::Matrix3d::Identity() - bearingVectors[i] * bearingVectors[i].transpose());
-            opengv::cov3_mat_t vcov = jacobian * observe_cam_cov * jacobian.transpose();
-            // ↑論文参照！
-            vcovs.push_back(vcov);
-        }
-        return vcovs;
-    }
 };
 #endif

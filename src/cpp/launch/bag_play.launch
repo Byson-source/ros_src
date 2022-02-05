@@ -1,6 +1,6 @@
 <launch>
 
-    <node pkg="rosbag" type="play" name="rosbag_play1" args="/home/ayumi/Documents/tohoku_uni/CLOVERs/datasets/field_test/20220203_indoor_test/bags/record_y3.bag">
+    <node pkg="rosbag" type="play" name="rosbag_play1" args="/home/ayumi/Documents/tohoku_uni/CLOVERs/datasets/field_test/20220203_indoor_test/bags/record_y1.bag">
         <remap from="/camera/aligned_depth_to_color/camera_info" to="robot1/camera/aligned_depth_to_color/camera_info"/>
         <remap from="/camera/color/camera_info" to="robot1/camera/color/camera_info"/>
         <remap from="/camera/color/image_raw" to="robot1/camera/color/image_raw"/>

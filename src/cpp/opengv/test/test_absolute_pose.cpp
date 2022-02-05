@@ -40,7 +40,6 @@ int main(int argc, char **argv)
   // NOTE　特徴点の数だけ、分散を加味する
   for (int i{0}; i < 100; ++i)
     emptyCovariances.push_back(test_cov.Identity() * 1.2);
-  std::cout << test_cov.Identity() * 2 << std::endl;
 
   //create a fake central camera
   translations_t camOffsets;

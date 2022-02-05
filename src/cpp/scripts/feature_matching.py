@@ -83,7 +83,7 @@ def orbmatch(fileName1, fileName2):
     global index
     index += 1
     img1 = cv2.imread(rgb_path+str(fileName1)+".jpg")
-    img2 = cv2.imread(rgb_path+str(fileName2-4)+".jpg")
+    img2 = cv2.imread(rgb_path+str(fileName2)+".jpg")
 
     # ORB検出器生成
     orb = cv2.ORB_create(3000)
@@ -156,7 +156,7 @@ def orbmatch(fileName1, fileName2):
                 # img_rect = cv2.circle(
                 #     img1, (int(loc1[0][0][0]), int(loc1[0][0][1])), 3, (255, 0, 255), thickness=1)
                 cv2.imwrite(
-                    "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/feature_match/"+str(fileName1)+"->"+str(fileName2-4)+".jpg", img3)
+                    "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/feature_match/"+str(fileName1)+"->"+str(fileName2)+".jpg", img3)
 
             return loc1, loc2, 1
 
@@ -203,7 +203,7 @@ def loop_CB(data):
                 indice2, indice1 = data.r2_index[iter], data.r2_value[iter]
                 info.index2value = [indice2, indice1]
                 info.who_detect = 2
-
+            r1_coord, r2_coord = [], []
             # NOTE feature iterations
 
             if(good):
@@ -224,6 +224,11 @@ def loop_CB(data):
                         result_2 = rs2.rs2_deproject_pixel_to_point(
                             intrinsics, [int(r2_feature[index][0]), int(r2_feature[index][1])], depth_r2)
 
+                        r1_coord.append(int(r1_feature[index][0]))
+                        r1_coord.append(int(r1_feature[index][1]))
+                        r2_coord.append(int(r2_feature[index][0]))
+                        r2_coord.append(int(r2_feature[index][1]))
+
                         for i in range(3):
                             element["R1"][iter+1].append(result_1[i])
                             element["R2"][iter+1].append(result_2[i])
@@ -231,6 +236,9 @@ def loop_CB(data):
                 info.signal = 0
                 info.r1 = element["R1"][iter+1]
                 info.r2 = element["R2"][iter+1]
+
+                info.r1_imgcoord = r1_coord
+                info.r2_imgcoord = r2_coord
 
                 feature_pub.publish(info)
         # Loop sequence終了
