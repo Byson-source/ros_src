@@ -9,7 +9,7 @@ import numpy as np
 import pyrealsense2 as rs2
 import os
 from rtabmap_ros.msg import Info
-from std_msgs.msg import Int32
+from std_msgs.msg import Float32MultiArray
 from cpp.msg import MultiArray
 from cpp.msg import FeatureArray
 # NOTE 例えばr12の場合、r1がloopを検知した画像ペアのうち、r2が撮った写真上の特徴点の情報を格納している
@@ -22,12 +22,15 @@ import cv2
 # if (not hasattr(rs2, 'intrinsics')):
 #     import pyrealsense2.pyrealsense2 as rs2
 rgb_path = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/all_rgb/"
+home = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/"
 depth_img = 1
 depth_img2 = 2
 container = {}
 bridge = CvBridge()
 index = 0
 intrinsics = rs2.intrinsics()
+
+pinhole_camera_intrinsic=o3d.io.read_pinhole_camera_intrinsic("/home/ayumi/Open3D/examples/test_data/realsense.json")
 
 
 def depthCB1(depth1, id):
@@ -170,17 +173,23 @@ def loop_CB(data):
                  "R2": {"R1": {}, "R2": {}}}
     # NOTE {"R1":{1:[x1,y1,d1,x2,y2,d2,...],2:...} ,"R2":{1:[x1,y1,d1,x2,y2,d2,...],2:[]...}}
     # NOTE R1とR2
+    referred, referred_hyp = 0, 0
     for index, element in loop_dict.items():
+        print(index)
         i = 0
-        referred_index = 0
 
         # 各検知の写真の枚数
         if index == "R1":
 
             element["num"] = len(data.r1_index)
+            if element["num"] > 0:
+                referred = data.r1_index[int(element["num"]/2)]
+                referred_hyp = data.r1_value[int(element["num"]/2)]
         else:
             element["num"] = len(data.r2_index)
-
+            if element["num"] > 0:
+                referred = data.r2_index[int(element["num"]/2)]
+                referred_hyp = data.r2_value[int(element["num"]/2)]
         # NOTE 1ペア毎にpublishする
 
         for iter in range(element["num"]):
@@ -205,9 +214,10 @@ def loop_CB(data):
                 indice2, indice1 = data.r2_index[iter], data.r2_value[iter]
                 info.index2value = [indice2, indice1]
                 info.who_detect = 2
+
             r1_coord, r2_coord = [], []
             # NOTE feature iterations
-
+            # NOTE loopの画像だけで、BAを行うのか、他の画像も巻き込むのか
             if(good):
                 # rospy.loginfo("This is No."+str(indice1))
                 for index in range(len(r1_feature)):
@@ -246,11 +256,42 @@ def loop_CB(data):
 
                 feature_pub.publish(info)
         # Loop sequence終了
-        if index == "R2":
-            info2 = FeatureArray()
-            info2.signal = 1
-            feature_pub.publish(info2)
 
+    source_color = o3d.io.read_image(
+        home+"all_rgb/"+str(referred)+".jpg")
+    source_depth = o3d.io.read_image(
+        home+"depth/"+str(referred)+".png")
+    target_color = o3d.io.read_image(
+        home+"all_rgb/"+str(referred_hyp)+".jpg")
+    target_depth = o3d.io.read_image(
+        home+"depth/"+str(referred_hyp)+".png")
+
+    source_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
+        source_color, source_depth)
+    target_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
+        target_color, target_depth)
+
+    option = o3d.pipelines.odometry.OdometryOption()
+    # option.max_depth=10
+    odo_init = np.identity(4)
+
+    [success_hybrid_term, trans_hybrid_term,
+    info] = o3d.pipelines.odometry.compute_rgbd_odometry(
+    source_rgbd_image, target_rgbd_image,
+    pinhole_camera_intrinsic, odo_init,
+    o3d.pipelines.odometry.RGBDOdometryJacobianFromHybridTerm(), option)
+
+    odom_result=[]
+
+    if not success_hybrid_term:
+        rospy.loginfo("Can not compute RGBD Odometry...")
+    else:
+        print(trans_hybrid_term)
+        for value in trans_hybrid_term:
+            odom_result=[value_ for value_ in value]
+        answer=Float32MultiArray()
+        answer.data=odom_result
+        odometry_pub.publish(answer)
 
 if __name__ == '__main__':
     # node_name = os.path.basename(sys.argv[0]).split('.')[0]
@@ -284,5 +325,6 @@ if __name__ == '__main__':
     # /////////////////////////////////////////////////////////////////////////
     loop_sub = rospy.Subscriber("result", MultiArray, loop_CB)
     feature_pub = rospy.Publisher("features", FeatureArray, queue_size=10)
+    odometry_pub=rospy.Publisher("odometry_result",Float32MultiArray,queue_size=10)
 
     rospy.spin()

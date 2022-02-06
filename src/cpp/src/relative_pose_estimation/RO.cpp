@@ -148,7 +148,6 @@ public:
                 }
             }
             Eigen::Matrix4d result;
-            std::cout << who_detect << std::endl;
             if (who_detect == 1)
                 result = RO_Estimator::pnp(kp_loc_r1_s, img_coord_2);
             else
@@ -159,9 +158,9 @@ public:
             Eigen::Matrix3d R_ = result.block(0, 0, 3, 3);
             Eigen::Vector3d rpy = R_.eulerAngles(0, 1, 2);
             Eigen::Vector3d t_ = result.block(0, 3, 3, 1);
-            std::cout << "=============================" << std::endl;
-            std::cout << t_ << std::endl;
-            std::cout << std::endl;
+            // std::cout << "=============================" << std::endl;
+            // std::cout << t_ << std::endl;
+            // std::cout << std::endl;
 
             cpp::RO_Array pose_result;
             Eigen::Vector3d ans_t = turnout_T(t_, who_detect);
@@ -266,6 +265,9 @@ public:
         Eigen::Matrix3d rotation;
         cv::cv2eigen(rotation_vector, rotation);
         cv::cv2eigen(translation_vector, translation);
+
+        rotation = rotation.transpose();
+        translation = rotation * (-translation);
 
         Eigen::Matrix4d transformation;
         transformation.block(0, 0, 3, 3) = rotation;
