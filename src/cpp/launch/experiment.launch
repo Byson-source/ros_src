@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="rosbag" type="play" name="rosbag_play1" args="--clock /home/ayumi/Documents/tohoku_uni/CLOVERs/datasets/field_test/20220128_indoor_test/bag/backup/record_r1.bag"/>
+    <include file="$(find cpp)/launch/dev_clover_rtabmap_record.launch"/>
+
+</launch>

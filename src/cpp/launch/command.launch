@@ -1,42 +1,41 @@
 <launch>
-    <group ns="front_of_clover2">
-   
-     <include file="$(find teleop_twist_joy)/launch/teleop.launch">
-       <remap from="/cmd_vel" to="teleop/cmd_vel"/>
-       <param name="enable_button" value="1"/>
-       </include>
-   
-   
-     <node pkg="clover_driver" type="cmd_vel_mux" name="cmd_vel_mux" clear_params="true" output="screen" respawn="true">
-     <param name="block_duration" type="int" value="4"/>
-     <!-- INPUT TOPICS -->
-     <remap from="teleop/cmd_vel" to="teleop/cmd_vel" />
-     <remap from="move_base/cmd_vel" to="move_base/cmd_vel" />
-     <!-- OUTPUT TOPICS -->
-     <remap from="cmd_vel" to="cmd_vel" />
-     </node>
-   
-   
-    </group>
-   
-   <group ns="back_of_clover2">
-   
-     <include file="$(find teleop_twist_joy)/launch/teleop.launch">
-        <param name="enable_button" value="1"/>
-    </include>
-        
-   
-     <node pkg="clover_driver" type="cmd_vel_mux" name="cmd_vel_mux" clear_params="true" output="screen" respawn="true">
-     <param name="block_duration" type="int" value="4"/>
-     <!-- INPUT TOPICS -->
-     <remap from="teleop/cmd_vel" to="teleop/cmd_vel" />
-     <remap from="move_base/cmd_vel" to="move_base/cmd_vel" />
-     <!-- OUTPUT TOPICS -->
-     <remap from="cmd_vel" to="cmd_vel" />
-     </node>
-   
-   
-    </group>
-   
-   </launch>
-   
+       <group ns="front_of_clover2">
+
+              <include file="$(find teleop_twist_joy)/launch/teleop.launch">
+
+                     <param name="enable_button" value="1"/>
+              </include>
+
+
+              <node pkg="clover_driver" type="cmd_vel_mux" name="cmd_vel_mux" clear_params="true" output="screen" respawn="true">
+                     <param name="block_duration" type="int" value="4"/>
+                     <!-- INPUT TOPICS -->
+                     <remap from="teleop/cmd_vel" to="teleop/cmd_vel" />
+                     <remap from="move_base/cmd_vel" to="move_base/cmd_vel" />
+                     <!-- OUTPUT TOPICS -->
+                     <remap from="cmd_vel" to="cmd_vel" />
+              </node>
+
+
+       </group>
+
+       <group ns="back_of_clover2">
+
+              <include file="$(find teleop_twist_joy)/launch/teleop.launch">
+                     <param name="enable_button" value="1"/>
+              </include>
+
+
+              <node pkg="clover_driver" type="cmd_vel_mux" name="cmd_vel_mux" clear_params="true" output="screen" respawn="true">
+                     <param name="block_duration" type="int" value="4"/>
+                     <!-- INPUT TOPICS -->
+                     <remap from="teleop/cmd_vel" to="teleop/cmd_vel" />
+                     <remap from="move_base/cmd_vel" to="move_base/cmd_vel" />
+                     <!-- OUTPUT TOPICS -->
+                     <remap from="cmd_vel" to="cmd_vel" />
+              </node>
+
+
+       </group>
+
+</launch>

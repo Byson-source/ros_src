@@ -9,13 +9,13 @@
 
 int main(int argc, char **argv)
 {
-    using namespace open3d;
+    using namespace std;
 
-    utility::SetVerbosityLevel(utility::VerbosityLevel::Debug);
-    auto cloud_ptr_1 = std::make_shared<geometry::PointCloud>();
-    auto cloud_ptr_2 = std::make_shared<geometry::PointCloud>();
-    io::ReadPointCloud("/home/ayumi/Open3D/examples/test_data/ICP/cloud_bin_0.pcd", *cloud_ptr_1);
-    io::ReadPointCloud("/home/ayumi/Open3D/examples/test_data/ICP/cloud_bin_1.pcd", *cloud_ptr_2);
+    open3d::utility::SetVerbosityLevel(open3d::utility::VerbosityLevel::Debug);
+    auto cloud_ptr_1 = std::make_shared<open3d::geometry::PointCloud>();
+    auto cloud_ptr_2 = std::make_shared<open3d::geometry::PointCloud>();
+    open3d::io::ReadPointCloud("/home/ayumi/Open3D/examples/test_data/ICP/cloud_bin_0.pcd", *cloud_ptr_1);
+    open3d::io::ReadPointCloud("/home/ayumi/Open3D/examples/test_data/ICP/cloud_bin_1.pcd", *cloud_ptr_2);
 
     cloud_ptr_1 = cloud_ptr_1->VoxelDownSample(0.02);
     cloud_ptr_2 = cloud_ptr_2->VoxelDownSample(0.02);
@@ -37,30 +37,32 @@ int main(int argc, char **argv)
     cloud_ptr_1->Transform(flip);
     cloud_ptr_2->Transform(flip);
 
-    visualization::Visualizer vis;
+    open3d::visualization::Visualizer vis;
     vis.CreateVisualizerWindow();
     vis.AddGeometry(cloud_ptr_1);
     vis.AddGeometry(cloud_ptr_2);
     double threshold{0.05};
-    size_t icp_iteration{100};
+    size_t icp_iteration{10000};
     bool save_image{0};
 
-    Eigen::Translation<double, 3> trans_(0.0, 1.0, 1.0);
-    Eigen::Quaterniond rot = Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitX()) *
-                             Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitY()) *
-                             Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitZ());
+    Eigen::Translation<double, 3> trans_1(0.0, 0.0, 0.0);
+    Eigen::Quaterniond rot(Eigen::Matrix3d::Identity());
     for (int i{0}; i < icp_iteration; ++i)
     {
-        trans_.x() += 0.3;
-        Eigen::Affine3d affine = trans_ * rot;
+        Eigen::Affine3d affine = trans_1 * rot;
 
         Eigen::Matrix4d transform = affine.matrix();
 
-        // cloud_ptr_1->Transform(transform);
+        std::cout << transform << std::endl;
+
+        cloud_ptr_1->Transform(transform);
 
         vis.UpdateGeometry(cloud_ptr_1);
+        vis.UpdateGeometry(cloud_ptr_2);
         vis.PollEvents();
         vis.UpdateRender();
+        trans_1.x() += 0.00001;
+        // vis.RemoveGeometry();
     }
     vis.DestroyVisualizerWindow();
 }

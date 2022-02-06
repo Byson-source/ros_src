@@ -12,15 +12,12 @@
 #include <opencv2/xfeatures2d.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/eigen.hpp>
-#include <opengv/absolute_pose/methods.hpp>
-#include <opengv/math/cayley.hpp>
-#include "experiment_helpers.hpp"
-#include "random_generators.hpp"
-#include <opengv/math/cayley.hpp>
 
 class Calibration
 {
 private:
+    // float coeff[5];
+
     Eigen::Matrix3d intrinstic_parameter;
     Eigen::Matrix3d inv_intrinstic;
     Eigen::Matrix3d img_to_cam_coordinate;
@@ -28,7 +25,7 @@ private:
     opengv::points_t X_s;
     std::vector<Eigen::Vector3d> cam_coords;
 
-    double focal{525.0};
+    double focal{617.4};
     double height{480};
     double width{640};
 
@@ -49,8 +46,9 @@ public:
     {
         // 全ての画像座標を格納
         // NOTE this is pixel size
-        intrinstic_parameter << 525.0, 0.0, 319.5,
-            0.0, 525.0, 239.5,
+
+        intrinstic_parameter << 617.5604248046, 0.0, 317.55502,
+            0.0, 617.3798828, 244.730865,
             0.0, 0.0, 1.0;
         inv_intrinstic = intrinstic_parameter.inverse();
 
@@ -68,54 +66,33 @@ public:
                              std::vector<Eigen::Vector3d> kp_loc_other)
     {
         // 世界座標から見た点の座標を求める
+
         X_s.clear();
         bearingVectors.clear();
         for (long unsigned int i{0}; i < kp_loc.size(); ++i)
         {
-            Eigen::Vector3d X(kp_loc[i].x() - width / 2, kp_loc[i].y() - height / 2, kp_loc[i].z() / 1000);
-            Eigen::Vector3d pixel_(kp_loc_other[i].x() - width / 2, kp_loc_other[i].y() - height / 2, kp_loc_other[i].z() / 1000);
+            opengv::point_t X, pixel_;
 
-            X = img_to_cam_coordinate * X;
-            pixel_ = img_to_cam_coordinate * pixel_;
+            X = img_to_cam_coordinate * kp_loc[i];
+            pixel_ = img_to_cam_coordinate * kp_loc_other[i];
 
-            X.y() = X.x() / focal * X.y();
-            X.z() = X.x() / focal * X.z();
-
-            pixel_.y() = pixel_.x() / focal * pixel_.y();
-            pixel_.z() = pixel_.x() / focal * pixel_.z();
             Eigen::Vector3d cam_coord;
             cam_coord = pixel_;
             // bearing vector
             pixel_ = cam_coord.normalized();
-
             X_s.push_back(X);
             // for bearing vector
             bearingVectors.push_back(pixel_);
             cam_coords.push_back(cam_coord);
+
+            if (i < 3)
+            {
+                std::cout << X << std::endl;
+                std::cout << cam_coord << std::endl;
+            }
         }
         return X_s;
     }
     // FIXME
-
-    opengv::bearingVectors_t bearing_v(void)
-    {
-
-        return bearingVectors;
-    }
-
-    // bearing vectorの共分散!
-
-    opengv::cov3_mats_t v_cov(void)
-    {
-        vcovs.clear();
-        for (long unsigned int i{0}; i < cam_coords.size(); ++i)
-        {
-            Eigen::Matrix3d jacobian = 1 / cam_coords[i].norm() * (Eigen::Matrix3d::Identity() - bearingVectors[i] * bearingVectors[i].transpose());
-            opengv::cov3_mat_t vcov = jacobian * observe_cam_cov * jacobian.transpose();
-            // ↑論文参照！
-            vcovs.push_back(vcov);
-        }
-        return vcovs;
-    }
 };
 #endif

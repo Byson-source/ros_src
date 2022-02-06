@@ -130,6 +130,7 @@ def setup():
     os.mkdir(path+"/sorted_rgb/")
     os.mkdir(path+"/feature_match/")
     os.mkdir(path+"/test/")
+    os.mkdir(path+"/depth/")
 
 
 def commandCB(event):
@@ -172,8 +173,8 @@ if __name__ == '__main__':
     setup()
     rospy.init_node('image_listener', anonymous=True)
 
-    rgb_topic = "/robot1/camera/rgb/image_raw"
-    rgb_topic2 = "/robot2/camera/rgb/image_raw"
+    rgb_topic = "/robot1/camera/color/image_raw"
+    rgb_topic2 = "/robot2/camera/color/image_raw"
 
     ID_topic = "/robot1/rtabmap/info"
     ID_topic2 = "/robot2/rtabmap/info"
@@ -201,9 +202,9 @@ if __name__ == '__main__':
     # rospy.Subscriber(image_topic, Image, rgb_callback)
 
     # NOTE 5秒に一度detection nodeを呼び込む
-    while img_number < 7:
+    while img_number < 8:
         pass
-    rospy.Timer(rospy.Duration(7), commandCB)
+    rospy.Timer(rospy.Duration(3), commandCB)
 
     # REVIEW rospy spinが出ている時点でrate.sleepを用いて定時でpublishすることは不可能になる.
     rospy.spin()

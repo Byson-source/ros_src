@@ -19,7 +19,7 @@
 
 namespace fs = std::filesystem;
 
-//detector, dir_changer,rest_commander
+// detector, dir_changer,rest_commander
 
 class Loop_Closure
 {
@@ -61,11 +61,11 @@ public:
 
         rtabmap.setTimeThreshold(700.0f); // Time threshold : 700 ms, 0 ms means no limit
 
-        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRtabmapLoopThr(), "0.17"));
+        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRtabmapLoopThr(), "0.11"));
         parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRGBDEnabled(), "false"));
 
         // REVIEW rtabmapのstmの決め方
-        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kMemSTMSize(), "30"));
+        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kMemSTMSize(), "10"));
 
         // UFile::erase(database_path);
         // REVIEW 何故か強制シャットダウンする。.ros/rtabmap.dbを消すと治った？？
@@ -98,19 +98,14 @@ public:
         if ((who_detect[1]["index"].size() > 0) || (who_detect[2]["index"].size() > 0))
         {
             cpp::MultiArray result;
+
             std::vector<int> result_index;
             std::vector<int> result_val;
-
             for (auto item : who_detect)
             {
 
-                // result_index.resize(item.second["index"].size());
-                // result_val.resize(item.second["index"].size());
-
                 for (int iter{0}; iter < item.second["index"].size(); ++iter)
                 {
-                    // result_index[iter] = item.second["index"][iter];
-                    // result_val[iter] = item.second["LoopID"][iter];
                     result_index.push_back(item.second["index"][iter]);
                     result_val.push_back(item.second["LoopID"][iter]);
                 }
@@ -125,6 +120,8 @@ public:
                     result.r2_index = result_index;
                     result.r2_value = result_val;
                 }
+                result_index.clear();
+                result_val.clear();
             }
             loop_pub.publish(result);
         }
