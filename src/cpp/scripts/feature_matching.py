@@ -27,7 +27,6 @@ depth_img = 1
 depth_img2 = 2
 container = {}
 bridge = CvBridge()
-index = 0
 intrinsics = rs2.intrinsics()
 
 pinhole_camera_intrinsic=o3d.io.read_pinhole_camera_intrinsic("/home/ayumi/Open3D/examples/test_data/realsense.json")
@@ -84,8 +83,6 @@ def info_CB(data):
 
 
 def orbmatch(fileName1, fileName2):
-    global index
-    index += 1
     img1 = cv2.imread(rgb_path+str(fileName1)+".jpg")
     img2 = cv2.imread(rgb_path+str(fileName2)+".jpg")
 
@@ -146,11 +143,11 @@ def orbmatch(fileName1, fileName2):
             mask = mask.ravel().tolist()
             loc1, loc2, true_mask = [], [], []
 
-            for index, element in enumerate(mask):
+            for index_, element in enumerate(mask):
                 if element == 1:
-                    true_mask.append(good_matches[index])
-                    loc1.append(kp1_loc[index])
-                    loc2.append(kp2_loc[index])
+                    true_mask.append(good_matches[index_])
+                    loc1.append(kp1_loc[index_])
+                    loc2.append(kp2_loc[index_])
             img_matches = np.empty(
                 (max(img1.shape[0], img2.shape[0]), img1.shape[1]+img2.shape[1], 3), dtype=np.uint8)
             img3 = cv2.drawMatches(img1, kp1, img2, kp2, true_mask, img_matches,
@@ -175,7 +172,6 @@ def loop_CB(data):
     # NOTE R1とR2
     referred, referred_hyp = 0, 0
     for index, element in loop_dict.items():
-        print(index)
         i = 0
 
         # 各検知の写真の枚数
@@ -220,27 +216,27 @@ def loop_CB(data):
             # NOTE loopの画像だけで、BAを行うのか、他の画像も巻き込むのか
             if(good):
                 # rospy.loginfo("This is No."+str(indice1))
-                for index in range(len(r1_feature)):
-                    if(container[indice1][int(r1_feature[index][1]), int(r1_feature[index][0])] != 0 and
-                       container[indice2][int(r2_feature[index][1]), int(r2_feature[index][0])] != 0):
+                for point in range(len(r1_feature)):
+                    if(container[indice1][int(r1_feature[point][1]), int(r1_feature[point][0])] != 0 and
+                       container[indice2][int(r2_feature[point][1]), int(r2_feature[point][0])] != 0):
 
                         #    NOTE camera coordinateをpublishする
 
                         depth_r1 = container[indice1][int(
-                            r1_feature[index][1]), int(r1_feature[index][0])]
+                            r1_feature[point][1]), int(r1_feature[point][0])]
                         depth_r2 = container[indice2][int(
-                            r2_feature[index][1]), int(r2_feature[index][0])]
+                            r2_feature[point][1]), int(r2_feature[point][0])]
 
                         result_1 = rs2.rs2_deproject_pixel_to_point(
-                            intrinsics, [int(r1_feature[index][0]), int(r1_feature[index][1])], depth_r1)
+                            intrinsics, [int(r1_feature[point][0]), int(r1_feature[point][1])], depth_r1)
                         result_2 = rs2.rs2_deproject_pixel_to_point(
-                            intrinsics, [int(r2_feature[index][0]), int(r2_feature[index][1])], depth_r2)
+                            intrinsics, [int(r2_feature[point][0]), int(r2_feature[point][1])], depth_r2)
 
-                        r1_coord.append(int(r1_feature[index][0]))
-                        r1_coord.append(int(r1_feature[index][1]))
+                        r1_coord.append(int(r1_feature[point][0]))
+                        r1_coord.append(int(r1_feature[point][1]))
                         r1_coord.append(0)
-                        r2_coord.append(int(r2_feature[index][0]))
-                        r2_coord.append(int(r2_feature[index][1]))
+                        r2_coord.append(int(r2_feature[point][0]))
+                        r2_coord.append(int(r2_feature[point][1]))
                         r2_coord.append(0)
 
                         for k in range(3):
@@ -286,9 +282,9 @@ def loop_CB(data):
     if not success_hybrid_term:
         rospy.loginfo("Can not compute RGBD Odometry...")
     else:
-        print(trans_hybrid_term)
         for value in trans_hybrid_term:
             odom_result=[value_ for value_ in value]
+
         answer=Float32MultiArray()
         answer.data=odom_result
         odometry_pub.publish(answer)
