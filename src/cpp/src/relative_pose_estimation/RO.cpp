@@ -26,15 +26,18 @@
 #include "nav_msgs/Path.h"
 #include "geometry_msgs/PoseStamped.h"
 #include "geometry_msgs/Point.h"
+#include <cpp/HomogeneousArray.h>
 
 class RO_Estimator
 {
 private:
     ros::NodeHandle n;
     ros::Subscriber feature_sub;
-    ros::Publisher rt_pub;
     ros::Subscriber path_sub1;
     ros::Subscriber path_sub2;
+    ros::Subscriber transformation_sub;
+    ros::Publisher BA_pub;
+    ros::Publisher rt_pub;
 
     tf::TransformListener listener;
 
@@ -45,12 +48,15 @@ private:
 
     std::map<int, int> mapPath_dict;
     std::map<int, int> mapPath_dict_2;
+    std::map<std::string, std::map<std::string, std::vector<Eigen::Vector3d>>> feature_dict;
+    // NOTE {"R1":{"3d":[[x1,y1,z1],[x2,y2...]],"2d":[[x1,y1,0],[x2,y2,0],....]}}...}
     int info_index{0};
     int info_index_2{0};
 
-    Eigen::Matrix3d intrinsic_parameter;
-    Eigen::Matrix4d img_to_cam_coordinate;
-    cv::Mat camera_parameter;
+    Eigen::Matrix4d transformation_result;
+    // Eigen::Matrix3d intrinsic_parameter;
+    // Eigen::Matrix4d img_to_cam_coordinate;
+    // cv::Mat camera_parameter;
 
     // NOTE node_map...{time;{1:[]}
     // points location
@@ -59,20 +65,26 @@ public:
     RO_Estimator(void)
     {
         rt_pub = n.advertise<cpp::RO_Array>("RT_result", 50);
+        // BA_pub = n.advertise
 
         feature_sub = n.subscribe("features", 20, &RO_Estimator::RO_CB, this);
         path_sub1 = n.subscribe("robot1/rtabmap/mapPath", 10, &RO_Estimator::path1_CB, this);
         path_sub2 = n.subscribe("robot2/rtabmap/mapPath", 10, &RO_Estimator::path2_CB, this);
+        transformation_sub = n.subscribe("odometry_result", 10, &RO_Estimator::odom_CB, this);
         // from robot/map to robot/base_footprint
+        // intrinsic_parameter
+        //     << 617.5604248046,
+        //     0.0, 317.55502,
+        //     0.0, 617.3798828, 244.730865,
+        //     0.0, 0.0, 1.0;
 
-        intrinsic_parameter << 617.5604248046, 0.0, 317.55502,
-            0.0, 617.3798828, 244.730865,
-            0.0, 0.0, 1.0;
+        std::map<std::string, std::vector<Eigen::Vector3d>> correspondence_2d3d;
+        feature_dict["R1"] = correspondence_2d3d;
+        feature_dict["R2"] = correspondence_2d3d;
 
-        img_to_cam_coordinate << 0.0, 0.0, 1.0,
-            -1.0, 0.0, 0.0,
-            0.0, -1.0, 0.0;
-        cv::eigen2cv(intrinsic_parameter, camera_parameter);
+        // img_to_cam_coordinate << 0.0, 0.0, 1.0,
+        //     -1.0, 0.0, 0.0,
+        //     0.0, -1.0, 0.0;
     }
 
     void path1_CB(const nav_msgs::Path::ConstPtr &path)
@@ -117,6 +129,37 @@ public:
         // std::vector<double> pose;
     }
 
+    void odom_CB(const cpp::HomogeneousArray::ConstPtr &data)
+    {
+        int number{0};
+        for (int row{0}; row < 4; ++row)
+        {
+            for (int column{0}; column < 4; ++column)
+            {
+                number += 1;
+                transformation_result(row, column) = data->data[number];
+            }
+        }
+
+        Eigen::Vector3d transfer_;
+        Eigen::Matrix3d rotation_;
+        transfer_ = transformation_result.block(3, 0, 3, 1);
+        rotation_ = transformation_result.block(0, 0, 3, 3);
+
+        cpp::RO_Array pose_result;
+        int who_detect = data->who_detect;
+        Eigen::Vector3d ans_t = turnout_T(transfer_, who_detect);
+        Eigen::Quaterniond ans_r = turnout_R(rotation_, who_detect);
+
+        std::vector<double> R{ans_r.w(), ans_r.x(), ans_r.y(), ans_r.z()};
+        std::vector<double> t{ans_t[0], ans_t[1], ans_t[2]};
+
+        pose_result.translation = t;
+        pose_result.euler = R;
+
+        rt_pub.publish(pose_result);
+    }
+
     void RO_CB(const cpp::FeatureArray::ConstPtr &data)
     {
         if ((data->r1.size() > 30) && (data->signal == 0))
@@ -125,54 +168,59 @@ public:
 
             int who_detect = data->who_detect;
             loop_info = data->index2value;
-            std::vector<cv::Point2d> img_coord_1;
-            std::vector<cv::Point2d> img_coord_2;
+            std::vector<Eigen::Vector3d> img_coord_1;
+            std::vector<Eigen::Vector3d> img_coord_2;
 
-            std::vector<cv::Point3d> kp_loc_r1_s;
-            std::vector<cv::Point3d> kp_loc_r2_s;
+            std::vector<Eigen::Vector3d> kp_loc_r1_s;
+            std::vector<Eigen::Vector3d> kp_loc_r2_s;
 
             for (size_t index{1}; index < data->r1.size() + 1; ++index)
             {
                 // ３つ目の要素に差し掛かった時
                 if (index % 3 == 0)
                 {
-                    cv::Point3d kp_loc_r1(data->r1[index - 3], data->r1[index - 2], data->r1[index - 1]);
-                    cv::Point3d kp_loc_r2(data->r2[index - 3], data->r2[index - 2], data->r2[index - 1]);
+                    Eigen::Vector3d kp_loc_r1(data->r1[index - 3], data->r1[index - 2], data->r1[index - 1]);
+                    Eigen::Vector3d kp_loc_r2(data->r2[index - 3], data->r2[index - 2], data->r2[index - 1]);
                     kp_loc_r1_s.push_back(kp_loc_r1);
                     kp_loc_r2_s.push_back(kp_loc_r2);
                     // NOTE ポイントのカメラ座標
-                    cv::Point2d r1_coord(data->r1_imgcoord[index - 3], data->r1_imgcoord[index - 2]);
-                    cv::Point2d r2_coord(data->r2_imgcoord[index - 3], data->r2_imgcoord[index - 2]);
+                    Eigen::Vector3d r1_coord(data->r1_imgcoord[index - 3], data->r1_imgcoord[index - 2], 0);
+                    Eigen::Vector3d r2_coord(data->r2_imgcoord[index - 3], data->r2_imgcoord[index - 2], 0);
                     img_coord_1.push_back(r1_coord);
                     img_coord_2.push_back(r2_coord);
                 }
             }
-            Eigen::Matrix4d result;
-            if (who_detect == 1)
-                result = RO_Estimator::pnp(kp_loc_r1_s, img_coord_2);
-            else
-                result = RO_Estimator::pnp(kp_loc_r2_s, img_coord_1);
+
+            // if (who_detect == 1)
+            // {
+            //     feature_dict["R1"]["3d"].push_back(kp_loc_)
+            // }
+
+            // if (who_detect == 1)
+            //     result = RO_Estimator::pnp(kp_loc_r1_s, img_coord_2);
+            // else
+            //     result = RO_Estimator::pnp(kp_loc_r2_s, img_coord_1);
 
             // Eigen::Matrix4   d result = RO_Estimator::pnp(who_detect, kp_loc_r1_s, kp_loc_r2_s);
 
-            Eigen::Matrix3d R_ = result.block(0, 0, 3, 3);
-            Eigen::Vector3d rpy = R_.eulerAngles(0, 1, 2);
-            Eigen::Vector3d t_ = result.block(0, 3, 3, 1);
+            // Eigen::Matrix3d R_ = result.block(0, 0, 3, 3);
+            // Eigen::Vector3d rpy = R_.eulerAngles(0, 1, 2);
+            // Eigen::Vector3d t_ = result.block(0, 3, 3, 1);
             // std::cout << "=============================" << std::endl;
             // std::cout << t_ << std::endl;
             // std::cout << std::endl;
 
-            cpp::RO_Array pose_result;
-            Eigen::Vector3d ans_t = turnout_T(t_, who_detect);
-            Eigen::Quaterniond ans_r = turnout_R(R_, who_detect);
+            // cpp::RO_Array pose_result;
+            // Eigen::Vector3d ans_t = turnout_T(t_, who_detect);
+            // Eigen::Quaterniond ans_r = turnout_R(R_, who_detect);
 
-            std::vector<double> R{ans_r.w(), ans_r.x(), ans_r.y(), ans_r.z()};
-            std::vector<double> t{ans_t[0], ans_t[1], ans_t[2]};
+            // std::vector<double> R{ans_r.w(), ans_r.x(), ans_r.y(), ans_r.z()};
+            // std::vector<double> t{ans_t[0], ans_t[1], ans_t[2]};
 
-            pose_result.translation = t;
-            pose_result.euler = R;
+            // pose_result.translation = t;
+            // pose_result.euler = R;
 
-            rt_pub.publish(pose_result);
+            // rt_pub.publish(pose_result);
         }
         else
         {
@@ -248,37 +296,33 @@ public:
     }
 
     // FIXME 前処理が必要
-    Eigen::Matrix4d pnp(std::vector<cv::Point3d> kp_loc,
-                        std::vector<cv::Point2d> coord)
-    {
-        // bearing vectors
-        // 3Dポイント集
-        std::cout << loop_info[0] << "->" << loop_info[1] << std::endl;
+    // Eigen::Matrix4d pnp(std::vector<cv::Point3d> kp_loc,
+    //                     std::vector<cv::Point2d> coord)
+    // {
+    //     // bearing vectors
+    //     // 3Dポイント集
+    //     std::cout << loop_info[0] << "->" << loop_info[1] << std::endl;
 
-        cv::Mat rotation_vector;
-        cv::Mat translation_vector;
-        cv::Mat dist_coeffs = cv::Mat::zeros(4, 1, cv::DataType<double>::type);
+    //     cv::Mat rotation_vector;
+    //     cv::Mat translation_vector;
+    //     cv::Mat dist_coeffs = cv::Mat::zeros(4, 1, cv::DataType<double>::type);
 
-        cv::solvePnP(kp_loc, coord, camera_parameter, dist_coeffs, rotation_vector, translation_vector);
+    //     cv::solvePnP(kp_loc, coord, camera_parameter, dist_coeffs, rotation_vector, translation_vector);
 
-        Eigen::Vector3d translation;
-        Eigen::Matrix3d rotation;
-        cv::cv2eigen(rotation_vector, rotation);
-        cv::cv2eigen(translation_vector, translation);
+    //     Eigen::Vector3d translation;
+    //     Eigen::Matrix3d rotation;
+    //     cv::cv2eigen(rotation_vector, rotation);
+    //     cv::cv2eigen(translation_vector, translation);
 
-        rotation = rotation.transpose();
-        translation = rotation * (-translation);
+    //     rotation = rotation.transpose();
+    //     translation = rotation * (-translation);
 
-        Eigen::Matrix4d transformation;
-        transformation.block(0, 0, 3, 3) = rotation;
-        transformation.block(0, 3, 3, 1) = translation;
-        //     Eigen::Vector3d translation;
-        // Eigen::Matrix3d rotation;
-        // cv::cv2eigen(rotation_vector, rotation);
-        // cv::cv2eigen(translation_vector, translation);
+    //     Eigen::Matrix4d transformation;
+    //     transformation.block(0, 0, 3, 3) = rotation;
+    //     transformation.block(0, 3, 3, 1) = translation;
 
-        return transformation;
-    }
+    //     return transformation;
+    // }
 };
 
 int main(int argc, char **argv)

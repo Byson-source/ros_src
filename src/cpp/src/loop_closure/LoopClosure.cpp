@@ -78,18 +78,18 @@ public:
         // loop起動
         confirm = n.subscribe("loop_start", 1000, &Loop_Closure::confirm_CB, this);
 
-        std::map<std::string, std::vector<int>> R1_info;
-        std::map<std::string, std::vector<int>> R2_info;
+        std::map<std::string, std::vector<int>> R_info;
+        // std::map<std::string, std::vector<int>> R2_info;
 
-        who_detect[1] = R1_info;
-        who_detect[2] = R2_info;
+        who_detect[1] = R_info;
+        who_detect[2] = R_info;
 
-        std::map<std::string, std::vector<int>> R1_loop;
-        std::map<std::string, std::vector<int>> R2_loop;
+        std::map<std::string, std::vector<int>> R_loop;
+        // std::map<std::string, std::vector<int>> R2_loop;
 
-        all_loop[1] = R1_loop;
+        all_loop[1] = R_loop;
         all_loop[1]["index"].push_back(-1);
-        all_loop[2] = R2_loop;
+        all_loop[2] = R_loop;
         all_loop[2]["index"].push_back(-1);
     }
 

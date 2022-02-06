@@ -9,9 +9,9 @@ import numpy as np
 import pyrealsense2 as rs2
 import os
 from rtabmap_ros.msg import Info
-from std_msgs.msg import Float32MultiArray
 from cpp.msg import MultiArray
 from cpp.msg import FeatureArray
+from cpp.msg import HomogeneousArray
 # NOTE 例えばr12の場合、r1がloopを検知した画像ペアのうち、r2が撮った写真上の特徴点の情報を格納している
 # NOTE 写真一枚ごと
 # NOTE [x1,y1,depth1,x2,y2,depth2...]
@@ -170,8 +170,8 @@ def loop_CB(data):
                  "R2": {"R1": {}, "R2": {}}}
     # NOTE {"R1":{1:[x1,y1,d1,x2,y2,d2,...],2:...} ,"R2":{1:[x1,y1,d1,x2,y2,d2,...],2:[]...}}
     # NOTE R1とR2
-    referred, referred_hyp = 0, 0
     for index, element in loop_dict.items():
+        referred, referred_hyp = 0, 0
         i = 0
 
         # 各検知の写真の枚数
@@ -194,6 +194,7 @@ def loop_CB(data):
             indice1, indice2, good = 0, 0, 0
             r1_feature, r2_feature = [], []
 
+            answer=HomogeneousArray()
             info = FeatureArray()
             if index == "R1":
                 # filter
@@ -203,6 +204,7 @@ def loop_CB(data):
                 indice1, indice2 = data.r1_index[iter], data.r1_value[iter]
                 info.index2value = [indice1, indice2]
                 info.who_detect = 1
+                answer.who_detect=1
             else:
                 r2_feature, r1_feature, good = orbmatch(
                     data.r2_index[iter], data.r2_value[iter])
@@ -210,6 +212,7 @@ def loop_CB(data):
                 indice2, indice1 = data.r2_index[iter], data.r2_value[iter]
                 info.index2value = [indice2, indice1]
                 info.who_detect = 2
+                answer.who_detect=2
 
             r1_coord, r2_coord = [], []
             # NOTE feature iterations
@@ -253,41 +256,39 @@ def loop_CB(data):
                 feature_pub.publish(info)
         # Loop sequence終了
 
-    source_color = o3d.io.read_image(
-        home+"all_rgb/"+str(referred)+".jpg")
-    source_depth = o3d.io.read_image(
-        home+"depth/"+str(referred)+".png")
-    target_color = o3d.io.read_image(
-        home+"all_rgb/"+str(referred_hyp)+".jpg")
-    target_depth = o3d.io.read_image(
-        home+"depth/"+str(referred_hyp)+".png")
+        source_color = o3d.io.read_image(
+            home+"all_rgb/"+str(referred)+".jpg")
+        source_depth = o3d.io.read_image(
+            home+"depth/"+str(referred)+".png")
+        target_color = o3d.io.read_image(
+            home+"all_rgb/"+str(referred_hyp)+".jpg")
+        target_depth = o3d.io.read_image(
+            home+"depth/"+str(referred_hyp)+".png")
 
-    source_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
-        source_color, source_depth)
-    target_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
-        target_color, target_depth)
+        source_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
+            source_color, source_depth)
+        target_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
+            target_color, target_depth)
 
-    option = o3d.pipelines.odometry.OdometryOption()
-    # option.max_depth=10
-    odo_init = np.identity(4)
+        option = o3d.pipelines.odometry.OdometryOption()
+        # option.max_depth=10
+        odo_init = np.identity(4)
 
-    [success_hybrid_term, trans_hybrid_term,
-    info] = o3d.pipelines.odometry.compute_rgbd_odometry(
-    source_rgbd_image, target_rgbd_image,
-    pinhole_camera_intrinsic, odo_init,
-    o3d.pipelines.odometry.RGBDOdometryJacobianFromHybridTerm(), option)
+        [success_hybrid_term, trans_hybrid_term,
+        info] = o3d.pipelines.odometry.compute_rgbd_odometry(
+        source_rgbd_image, target_rgbd_image,
+        pinhole_camera_intrinsic, odo_init,
+        o3d.pipelines.odometry.RGBDOdometryJacobianFromHybridTerm(), option)
 
-    odom_result=[]
+        odom_result=[]
 
-    if not success_hybrid_term:
-        rospy.loginfo("Can not compute RGBD Odometry...")
-    else:
-        for value in trans_hybrid_term:
-            odom_result=[value_ for value_ in value]
-
-        answer=Float32MultiArray()
-        answer.data=odom_result
-        odometry_pub.publish(answer)
+        if not success_hybrid_term:
+            rospy.loginfo("Can not compute RGBD Odometry...")
+        else:
+            for value in trans_hybrid_term:
+                odom_result=[value_ for value_ in value]
+            answer.data=odom_result
+            odometry_pub.publish(answer)
 
 if __name__ == '__main__':
     # node_name = os.path.basename(sys.argv[0]).split('.')[0]

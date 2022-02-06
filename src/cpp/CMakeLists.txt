@@ -343,6 +343,7 @@ add_message_files(
   MultiArray.msg
   FeatureArray.msg
   RO_Array.msg
+  HomogeneousArray.msg
   # IoTSensor.msg
 )
 ## Generate services in the 'srv' folder
