@@ -1,4 +1,5 @@
 import rospy
+import open3d as o3d
 from sensor_msgs.msg import Image as msg_Image
 from sensor_msgs.msg import CameraInfo
 from cv_bridge import CvBridge, CvBridgeError
@@ -171,6 +172,7 @@ def loop_CB(data):
     # NOTE R1とR2
     for index, element in loop_dict.items():
         i = 0
+        referred_index = 0
 
         # 各検知の写真の枚数
         if index == "R1":
@@ -226,12 +228,14 @@ def loop_CB(data):
 
                         r1_coord.append(int(r1_feature[index][0]))
                         r1_coord.append(int(r1_feature[index][1]))
+                        r1_coord.append(0)
                         r2_coord.append(int(r2_feature[index][0]))
                         r2_coord.append(int(r2_feature[index][1]))
+                        r2_coord.append(0)
 
-                        for i in range(3):
-                            element["R1"][iter+1].append(result_1[i])
-                            element["R2"][iter+1].append(result_2[i])
+                        for k in range(3):
+                            element["R1"][iter+1].append(result_1[k])
+                            element["R2"][iter+1].append(result_2[k])
 
                 info.signal = 0
                 info.r1 = element["R1"][iter+1]

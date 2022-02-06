@@ -123,9 +123,6 @@ public:
         // NOTE特徴点が10個以上ないとだめ
         {
 
-            std::cout << "The number is ..." << std::endl;
-            std::cout << data->r1.size() << std::endl;
-
             int who_detect = data->who_detect;
             loop_info = data->index2value;
             std::vector<cv::Point2d> img_coord_1;
@@ -144,19 +141,20 @@ public:
                     kp_loc_r1_s.push_back(kp_loc_r1);
                     kp_loc_r2_s.push_back(kp_loc_r2);
                     // NOTE ポイントのカメラ座標
-                    cv::Point2d r1_coord(data->r1_imgcoord[index - 1], data->r1_imgcoord[index - 2]);
-                    cv::Point2d r2_coord(data->r2_imgcoord[index - 1], data->r2_imgcoord[index - 2]);
+                    cv::Point2d r1_coord(data->r1_imgcoord[index - 3], data->r1_imgcoord[index - 2]);
+                    cv::Point2d r2_coord(data->r2_imgcoord[index - 3], data->r2_imgcoord[index - 2]);
                     img_coord_1.push_back(r1_coord);
                     img_coord_2.push_back(r2_coord);
                 }
             }
             Eigen::Matrix4d result;
+            std::cout << who_detect << std::endl;
             if (who_detect == 1)
                 result = RO_Estimator::pnp(kp_loc_r1_s, img_coord_2);
             else
                 result = RO_Estimator::pnp(kp_loc_r2_s, img_coord_1);
 
-            // Eigen::Matrix4d result = RO_Estimator::pnp(who_detect, kp_loc_r1_s, kp_loc_r2_s);
+            // Eigen::Matrix4   d result = RO_Estimator::pnp(who_detect, kp_loc_r1_s, kp_loc_r2_s);
 
             Eigen::Matrix3d R_ = result.block(0, 0, 3, 3);
             Eigen::Vector3d rpy = R_.eulerAngles(0, 1, 2);

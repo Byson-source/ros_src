@@ -1,7 +1,4 @@
 <launch>
-
-
-
     <group ns="robot1">
 
         <include file="$(find cpp)/launch/for_multi_dev_rtabmap.launch">
