@@ -71,12 +71,6 @@ public:
         path_sub1 = n.subscribe("robot1/rtabmap/mapPath", 10, &RO_Estimator::path1_CB, this);
         path_sub2 = n.subscribe("robot2/rtabmap/mapPath", 10, &RO_Estimator::path2_CB, this);
         transformation_sub = n.subscribe("odometry_result", 10, &RO_Estimator::odom_CB, this);
-        // from robot/map to robot/base_footprint
-        // intrinsic_parameter
-        //     << 617.5604248046,
-        //     0.0, 317.55502,
-        //     0.0, 617.3798828, 244.730865,
-        //     0.0, 0.0, 1.0;
 
         std::map<std::string, std::vector<Eigen::Vector3d>> correspondence_2d3d;
         feature_dict["R1"] = correspondence_2d3d;
@@ -129,17 +123,16 @@ public:
         // std::vector<double> pose;
     }
 
-    void odom_CB(const cpp::HomogeneousArray::ConstPtr &data)
+    void odom_CB(const cpp::HomogeneousArray::ConstPtr &data_)
     {
         int number{0};
-        for (int row{0}; row < 4; ++row)
-        {
-            for (int column{0}; column < 4; ++column)
-            {
-                number += 1;
-                transformation_result(row, column) = data->data[number];
-            }
-        }
+
+        transformation_result << data_->data[0], data_->data[1], data_->data[2], data_->data[3],
+            data_->data[4], data_->data[5], data_->data[6], data_->data[7],
+            data_->data[8], data_->data[9], data_->data[10], data_->data[11],
+            0, 0, 0, 1;
+
+        std::cout << transformation_result << std::endl;
 
         Eigen::Vector3d transfer_;
         Eigen::Matrix3d rotation_;
@@ -147,7 +140,7 @@ public:
         rotation_ = transformation_result.block(0, 0, 3, 3);
 
         cpp::RO_Array pose_result;
-        int who_detect = data->who_detect;
+        int who_detect = data_->who_detect;
         Eigen::Vector3d ans_t = turnout_T(transfer_, who_detect);
         Eigen::Quaterniond ans_r = turnout_R(rotation_, who_detect);
 

@@ -256,39 +256,45 @@ def loop_CB(data):
                 feature_pub.publish(info)
         # Loop sequence終了
 
-        source_color = o3d.io.read_image(
-            home+"all_rgb/"+str(referred)+".jpg")
-        source_depth = o3d.io.read_image(
-            home+"depth/"+str(referred)+".png")
-        target_color = o3d.io.read_image(
-            home+"all_rgb/"+str(referred_hyp)+".jpg")
-        target_depth = o3d.io.read_image(
-            home+"depth/"+str(referred_hyp)+".png")
+        if element["num"]>0:
 
-        source_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
-            source_color, source_depth)
-        target_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
-            target_color, target_depth)
+            print("referred is"+str(referred))
+            print("referred_hyp is "+str(referred_hyp))
+            source_color = o3d.io.read_image(
+                home+"all_rgb/"+str(referred)+".jpg")
+            source_depth = o3d.io.read_image(
+                home+"depth/"+str(referred)+".png")
+            target_color = o3d.io.read_image(
+                home+"all_rgb/"+str(referred_hyp)+".jpg")
+            target_depth = o3d.io.read_image(
+                home+"depth/"+str(referred_hyp)+".png")
 
-        option = o3d.pipelines.odometry.OdometryOption()
-        # option.max_depth=10
-        odo_init = np.identity(4)
+            source_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
+                source_color, source_depth)
+            target_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
+                target_color, target_depth)
 
-        [success_hybrid_term, trans_hybrid_term,
-        info] = o3d.pipelines.odometry.compute_rgbd_odometry(
-        source_rgbd_image, target_rgbd_image,
-        pinhole_camera_intrinsic, odo_init,
-        o3d.pipelines.odometry.RGBDOdometryJacobianFromHybridTerm(), option)
+            option = o3d.pipelines.odometry.OdometryOption()
+            # option.max_depth=10
+            odo_init = np.identity(4)
 
-        odom_result=[]
+            [success_hybrid_term, trans_hybrid_term,
+            info] = o3d.pipelines.odometry.compute_rgbd_odometry(
+            source_rgbd_image, target_rgbd_image,
+            pinhole_camera_intrinsic, odo_init,
+            o3d.pipelines.odometry.RGBDOdometryJacobianFromHybridTerm(), option)
 
-        if not success_hybrid_term:
-            rospy.loginfo("Can not compute RGBD Odometry...")
-        else:
-            for value in trans_hybrid_term:
-                odom_result=[value_ for value_ in value]
-            answer.data=odom_result
-            odometry_pub.publish(answer)
+            odom_result=[]
+
+            if not success_hybrid_term:
+                rospy.loginfo("Can not compute RGBD Odometry...")
+            else:
+                print(trans_hybrid_term)
+                for value in trans_hybrid_term:
+                    for value_ in value:
+                        odom_result.append(value_)
+                answer.data=odom_result
+                odometry_pub.publish(answer)
 
 if __name__ == '__main__':
     # node_name = os.path.basename(sys.argv[0]).split('.')[0]
@@ -322,6 +328,6 @@ if __name__ == '__main__':
     # /////////////////////////////////////////////////////////////////////////
     loop_sub = rospy.Subscriber("result", MultiArray, loop_CB)
     feature_pub = rospy.Publisher("features", FeatureArray, queue_size=10)
-    odometry_pub=rospy.Publisher("odometry_result",Float32MultiArray,queue_size=10)
+    odometry_pub=rospy.Publisher("odometry_result",HomogeneousArray,queue_size=10)
 
     rospy.spin()

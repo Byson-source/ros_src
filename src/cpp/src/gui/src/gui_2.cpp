@@ -53,6 +53,10 @@ public:
         Eigen::Translation<double, 3> translation(transform->translation[0], transform->translation[1], transform->translation[2]);
         Eigen::Affine3d affine = translation * rotation;
         transformation = affine.matrix();
+        // Eigen::Matrix3d rotation_test = transformation.block(0, 0, 3, 3);
+
+        // Eigen::Vector3d euler = rotation_test.eulerAngles(0, 1, 2);
+        // std::cout << euler << std::endl;
         status = 1;
     }
 
