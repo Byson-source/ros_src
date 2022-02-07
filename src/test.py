@@ -1,10 +1,20 @@
-loop_dict = {"R1": {"R1": {}, "R2": {}}, "R2": {"R1": {}, "R2": {}}}
-test_dict = {"a": {}, "b": [], "c": 1}
-print(test_dict["b"])
-test_dict["b"].append("c")
+# list_=[[1,2],[2,3],[3,5]]
+# list__=[[1,2],[2,3],[3,5]]
+# list_2=[[1,2],[2,3],[3,7]]
+# print(list_.index([1,2]))
+# list_=set(map(tuple,list_))
+# list_2=set(map(tuple,list_2))
+# merged=list_ & list_2
+# merged=list(merged)
 
-secs_tf_dict = {"camera_depth_frame": [], "camera_aligned_depth_to_color_frame": [], "base_link": [],
-                "camera_link": {"camera_color_frame": [], "camera_aligned_depth_to_color_frame": [], "camera_depth_frame": []}}
-secs_tf_dict["camera_depth_frame"].append("q")
-a = "erw"
-print(a[1:])
+# print(list(merged[0]) == list__[1])
+# print(merged[0])
+
+def test(a):
+    if a>0:
+        return a,0
+    else:
+        return a
+
+a,b=test(1)
+c=test(-1)

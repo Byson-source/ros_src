@@ -82,8 +82,8 @@ def info_CB(data):
     elif data.distortion_model == 'equidistant':
         intrinsics.model = rs2.distortion.kannala_brandt4
     intrinsics.coeffs = [i for i in data.D]
-    
-def orbmatch(fileName1, fileName2):
+
+def orbmatch(fileName1, fileName2,previous_features=None):
     img1 = cv2.imread(rgb_path+str(fileName1)+".jpg")
     img2 = cv2.imread(rgb_path+str(fileName2)+".jpg")
 
@@ -142,27 +142,60 @@ def orbmatch(fileName1, fileName2):
             rospy.loginfo("Not enough features...")
         else:
             mask = mask.ravel().tolist()
-            loc1, loc2, true_mask = [], [], []
-
+            loc1_, loc2_, true_mask = [],[], []
+            detection_index=0
             for index_, element in enumerate(mask):
                 if element == 1:
                     true_mask.append(good_matches[index_])
-                    loc1.append(kp1_loc[index_])
-                    loc2.append(kp2_loc[index_])
+                    loc1_.append(int(kp1_loc[index_]))
+                    loc2_.append(int(kp2_loc[index_]))
+                    # loc1[detection_index]=loc1_[-1]
+                    # loc2[detection_index]=loc2_[-1]
+                    detection_index+=1
+
             img_matches = np.empty(
                 (max(img1.shape[0], img2.shape[0]), img1.shape[1]+img2.shape[1], 3), dtype=np.uint8)
             img3 = cv2.drawMatches(img1, kp1, img2, kp2, true_mask, img_matches,
                                    flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
 
-            if(len(loc1) > 9):
-                # img_rect = cv2.circle(
-                #     img1, (int(loc1[0][0][0]), int(loc1[0][0][1])), 3, (255, 0, 255), thickness=1)
-                cv2.imwrite(
-                    "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/feature_match/"+str(fileName1)+"->"+str(fileName2)+".jpg", img3)
+            if not previous_features is None:
+                loc1_=set(map(tuple,loc1_))
 
-            return loc1, loc2, 1
+                merged=loc1_ & previous_features
+                merged=list(merged)
+
+                merged_=[]
+
+                for coordinate in merged:
+                    merged_.append(loc2_[loc2_.index(list(coordinate))])
+            
+                return merged,merged_,
+                    
+            else:
+                return loc2_
 
     return [], [], 0
+
+def derive_duplicated_features(indexes,values):
+    prev_features,prev=[],[]
+    first_features,second_features=[],[]
+
+    for iteration in range(len(indexes)):
+        if iteration==0:
+            prev_features=orbmatch(indexes[0],values[0])
+        elif iteration==len(indexes)-1:
+            first_features,second_features=orbmatch(indexes[iteration],values[iteration],prev_features)
+            return first_features,second_features
+        else:
+            prev_features_,prev_=prev_features,prev
+
+            prev,prev_features=orbmatch(indexes[iteration],values[iteration],prev_features)
+            if len(prev_features)==0:
+                if iteration==1:
+                    return [],[]
+                else:
+                    return prev_,prev_features_
+
 
 
 def loop_CB(data):
