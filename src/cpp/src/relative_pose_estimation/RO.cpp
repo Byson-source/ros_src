@@ -1,6 +1,15 @@
+#include <gtsam/geometry/Point2.h>
+#include <gtsam/geometry/Pose2.h>
+#include <gtsam/inference/Symbol.h>
+#include <gtsam/slam/ProjectionFactor.h>
+#include <gtsam/slam/BetweenFactor.h>
+#include <gtsam/sam/BearingRangeFactor.h>
+#include <gtsam/nonlinear/NonlinearFactorGraph.h>
+#include <gtsam/nonlinear/DoglegOptimizer.h>
+#include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
+#include <gtsam/nonlinear/Marginals.h>
+#include <gtsam/nonlinear/Values.h>
 
-// TODO 各ノードのposeを受けとり、t=0どうしのR,tを逆算すること、また、共分散行列も
-// TODO かさみ付き平均を適用して最適なR,tも求める
 #include <iostream>
 #include <iomanip>
 #include <Eigen/Core>

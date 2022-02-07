@@ -1,217 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(cpp)
-
-set(OPENGV_IMPORT 1)
-
-IF(OPENGV_IMPORT)
-  set (OPENGV_VERSION_MAJOR 1)
-  set (OPENGV_VERSION_MINOR 0)
-
-  set(CMAKE_MODULE_PATH
-    ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/opengv/cmake)
-
-  # ==============================================================================
-  # Check and enable C++11 support if available
-  # ==============================================================================
-
-  include(CXX11)
-  check_for_cxx11_compiler(CXX11_COMPILER)
-  # If a C++11 compiler is available, then set the appropriate flags
-  IF(CXX11_COMPILER)
-    enable_cxx11()
-  ENDIF(CXX11_COMPILER)
-
-  # Set the build type.  Options are:
-  #
-  #  None (CMAKE_C_FLAGS or CMAKE_CXX_FLAGS used)
-  #  Debug (CMAKE_C_FLAGS_DEBUG or CMAKE_CXX_FLAGS_DEBUG)
-  #  Release (CMAKE_C_FLAGS_RELEASE or CMAKE_CXX_FLAGS_RELEASE)
-  #  RelWithDebInfo (CMAKE_C_FLAGS_RELWITHDEBINFO or CMAKE_CXX_FLAGS_RELWITHDEBINFO
-  #  MinSizeRel (CMAKE_C_FLAGS_MINSIZEREL or CMAKE_CXX_FLAGS_MINSIZEREL)
-
-  set(CMAKE_BUILD_TYPE Release)
-
-  #set the default path for built executables to the "bin" directory
-  set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/opengv/bin)
-  #set the default path for built libraries to the "lib" directory
-  set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/opengv/lib)
-
-  OPTION(BUILD_TESTS "Build tests" OFF)
-  OPTION(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-  OPTION(BUILD_PYTHON "Build Python extension" OFF)
-  OPTION(BUILD_POSITION_INDEPENDENT_CODE "Build position independent code (-fPIC)" ON)
-  OPTION(INSTALL_OPENGV "Install OpenGV on the system" OFF)
-
-  IF(WIN32)
-  add_definitions (-bigobj -W0 -MP -Zm10)
-  ELSE()
-  add_definitions (-Wall -march=native -O3 ) 
-  IF(BUILD_POSITION_INDEPENDENT_CODE)
-    add_definitions( -fPIC )
-  ENDIF()
-  ENDIF()
-
-
-
-
-  # get eigen (under windows)
-  IF(WIN32)
-    set(ADDITIONAL_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/third_party
-                                ${PROJECT_SOURCE_DIR}/third_party/eigen3
-                                ${PROJECT_SOURCE_DIR}/third_party/eigen3/unsupported )
-  ELSE()
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/opengv/modules/")
-    find_package(Eigen REQUIRED)
-    set(ADDITIONAL_INCLUDE_DIRS ${EIGEN_INCLUDE_DIRS} ${EIGEN_INCLUDE_DIR}/unsupported )
-  ENDIF()
-
-  include_directories(${ADDITIONAL_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/opengv/include)
-
-  set( OPENGV_SOURCE_FILES
-      opengv/src/absolute_pose/modules/main.cpp
-      opengv/src/absolute_pose/modules/gp3p/code.cpp
-      opengv/src/absolute_pose/modules/gp3p/init.cpp
-      opengv/src/absolute_pose/modules/gp3p/reductors.cpp
-      opengv/src/absolute_pose/modules/gp3p/spolynomials.cpp
-      opengv/src/absolute_pose/modules/Epnp.cpp
-      opengv/src/absolute_pose/modules/gpnp1/code.cpp
-      opengv/src/absolute_pose/modules/gpnp1/init.cpp
-      opengv/src/absolute_pose/modules/gpnp1/reductors.cpp
-      opengv/src/absolute_pose/modules/gpnp1/spolynomials.cpp
-      opengv/src/absolute_pose/modules/gpnp2/code.cpp
-      opengv/src/absolute_pose/modules/gpnp2/init.cpp
-      opengv/src/absolute_pose/modules/gpnp2/reductors.cpp
-      opengv/src/absolute_pose/modules/gpnp2/spolynomials.cpp
-      opengv/src/absolute_pose/modules/gpnp3/code.cpp
-      opengv/src/absolute_pose/modules/gpnp3/init.cpp
-      opengv/src/absolute_pose/modules/gpnp3/reductors.cpp
-      opengv/src/absolute_pose/modules/gpnp3/spolynomials.cpp
-      opengv/src/absolute_pose/modules/gpnp4/code.cpp
-      opengv/src/absolute_pose/modules/gpnp4/init.cpp
-      opengv/src/absolute_pose/modules/gpnp4/reductors.cpp
-      opengv/src/absolute_pose/modules/gpnp4/spolynomials.cpp
-      opengv/src/absolute_pose/modules/gpnp5/code.cpp
-      opengv/src/absolute_pose/modules/gpnp5/init.cpp
-      opengv/src/absolute_pose/modules/gpnp5/reductors.cpp
-      opengv/src/absolute_pose/modules/gpnp5/spolynomials.cpp
-      opengv/src/absolute_pose/modules/upnp2.cpp
-      opengv/src/absolute_pose/modules/upnp4.cpp
-      opengv/src/absolute_pose/modules/mlpnp/mlpnp.cpp
-      opengv/src/absolute_pose/modules/mlpnp/mlpnp_lm.cpp
-      opengv/src/relative_pose/modules/main.cpp
-      opengv/src/relative_pose/modules/fivept_nister/modules.cpp
-      opengv/src/relative_pose/modules/fivept_stewenius/modules.cpp
-      opengv/src/relative_pose/modules/fivept_kneip/code.cpp
-      opengv/src/relative_pose/modules/fivept_kneip/init.cpp
-      opengv/src/relative_pose/modules/fivept_kneip/reductors.cpp
-      opengv/src/relative_pose/modules/fivept_kneip/spolynomials.cpp
-      opengv/src/relative_pose/modules/sixpt/modules2.cpp
-      opengv/src/relative_pose/modules/eigensolver/modules.cpp
-      opengv/src/relative_pose/modules/ge/modules.cpp
-      opengv/src/relative_pose/modules/sixpt_ventura/approx_relpose_generalized_fast_computeA.cpp
-      opengv/src/math/cayley.cpp
-      opengv/src/math/rodrigues.cpp
-      opengv/src/math/quaternion.cpp
-      opengv/src/math/arun.cpp
-      opengv/src/math/Sturm.cpp
-      opengv/src/math/roots.cpp
-      opengv/src/math/gauss_jordan.cpp
-      opengv/src/absolute_pose/methods.cpp
-      opengv/src/absolute_pose/CentralAbsoluteAdapter.cpp
-      opengv/src/absolute_pose/NoncentralAbsoluteAdapter.cpp
-      opengv/src/absolute_pose/NoncentralAbsoluteMultiAdapter.cpp
-      opengv/src/relative_pose/methods.cpp
-      opengv/src/relative_pose/CentralRelativeAdapter.cpp
-      opengv/src/relative_pose/CentralRelativeWeightingAdapter.cpp
-      opengv/src/relative_pose/NoncentralRelativeAdapter.cpp
-      opengv/src/relative_pose/CentralRelativeMultiAdapter.cpp
-      opengv/src/relative_pose/NoncentralRelativeMultiAdapter.cpp
-      opengv/src/triangulation/methods.cpp
-      opengv/src/point_cloud/methods.cpp
-      opengv/src/point_cloud/PointCloudAdapter.cpp
-      opengv/src/sac_problems/absolute_pose/AbsolutePoseSacProblem.cpp
-      opengv/src/sac_problems/absolute_pose/MultiNoncentralAbsolutePoseSacProblem.cpp
-      opengv/src/sac_problems/relative_pose/CentralRelativePoseSacProblem.cpp
-      opengv/src/sac_problems/relative_pose/NoncentralRelativePoseSacProblem.cpp
-      opengv/src/sac_problems/relative_pose/RotationOnlySacProblem.cpp
-      opengv/src/sac_problems/relative_pose/TranslationOnlySacProblem.cpp
-      opengv/src/sac_problems/relative_pose/EigensolverSacProblem.cpp
-      opengv/src/sac_problems/relative_pose/MultiCentralRelativePoseSacProblem.cpp
-      opengv/src/sac_problems/relative_pose/MultiNoncentralRelativePoseSacProblem.cpp
-      opengv/src/sac_problems/point_cloud/PointCloudSacProblem.cpp
-      opengv/src/absolute_pose/MACentralAbsolute.cpp
-      opengv/src/absolute_pose/MANoncentralAbsolute.cpp
-      opengv/src/relative_pose/MACentralRelative.cpp
-      opengv/src/relative_pose/MANoncentralRelative.cpp
-      opengv/src/relative_pose/MANoncentralRelativeMulti.cpp
-      opengv/src/point_cloud/MAPointCloud.cpp )
-
-  set( OPENGV_HEADER_FILES
-      opengv/include/opengv/types.hpp
-      opengv/include/opengv/OptimizationFunctor.hpp
-      opengv/include/opengv/absolute_pose/methods.hpp
-      opengv/include/opengv/relative_pose/methods.hpp
-      opengv/include/opengv/triangulation/methods.hpp
-      opengv/include/opengv/point_cloud/methods.hpp
-      opengv/include/opengv/math/cayley.hpp
-      opengv/include/opengv/math/rodrigues.hpp
-      opengv/include/opengv/math/quaternion.hpp
-      opengv/include/opengv/math/arun.hpp
-      opengv/include/opengv/math/Sturm.hpp
-      opengv/include/opengv/math/roots.hpp
-      opengv/include/opengv/math/gauss_jordan.hpp
-      opengv/include/opengv/absolute_pose/AbsoluteAdapterBase.hpp
-      opengv/include/opengv/absolute_pose/CentralAbsoluteAdapter.hpp
-      opengv/include/opengv/absolute_pose/NoncentralAbsoluteAdapter.hpp
-      opengv/include/opengv/absolute_pose/NoncentralAbsoluteMultiAdapter.hpp
-      opengv/include/opengv/absolute_pose/AbsoluteMultiAdapterBase.hpp
-      opengv/include/opengv/relative_pose/RelativeAdapterBase.hpp
-      opengv/include/opengv/relative_pose/RelativeMultiAdapterBase.hpp
-      opengv/include/opengv/relative_pose/CentralRelativeAdapter.hpp
-      opengv/include/opengv/relative_pose/CentralRelativeWeightingAdapter.hpp
-      opengv/include/opengv/relative_pose/NoncentralRelativeAdapter.hpp
-      opengv/include/opengv/relative_pose/CentralRelativeMultiAdapter.hpp
-      opengv/include/opengv/relative_pose/NoncentralRelativeMultiAdapter.hpp
-      opengv/include/opengv/point_cloud/PointCloudAdapterBase.hpp
-      opengv/include/opengv/point_cloud/PointCloudAdapter.hpp
-      opengv/include/opengv/sac_problems/absolute_pose/AbsolutePoseSacProblem.hpp
-      opengv/include/opengv/sac_problems/absolute_pose/MultiNoncentralAbsolutePoseSacProblem.hpp
-      opengv/include/opengv/sac_problems/relative_pose/CentralRelativePoseSacProblem.hpp
-      opengv/include/opengv/sac_problems/relative_pose/NoncentralRelativePoseSacProblem.hpp
-      opengv/include/opengv/sac_problems/relative_pose/MultiCentralRelativePoseSacProblem.hpp
-      opengv/include/opengv/sac_problems/relative_pose/MultiNoncentralRelativePoseSacProblem.hpp
-      opengv/include/opengv/sac_problems/relative_pose/EigensolverSacProblem.hpp
-      opengv/include/opengv/sac_problems/relative_pose/RotationOnlySacProblem.hpp
-      opengv/include/opengv/sac_problems/relative_pose/TranslationOnlySacProblem.hpp
-      opengv/include/opengv/sac_problems/point_cloud/PointCloudSacProblem.hpp
-      opengv/include/opengv/absolute_pose/MACentralAbsolute.hpp
-      opengv/include/opengv/absolute_pose/MANoncentralAbsolute.hpp
-      opengv/include/opengv/relative_pose/MACentralRelative.hpp
-      opengv/include/opengv/relative_pose/MANoncentralRelative.hpp
-      opengv/include/opengv/relative_pose/MANoncentralRelativeMulti.hpp
-      opengv/include/opengv/point_cloud/MAPointCloud.hpp )
-
-
-  IF(WIN32)
-    add_library( opengv ${OPENGV_SOURCE_FILES} ${OPENGV_HEADER_FILES} )
-    add_library( random_generators opengv/test/random_generators.cpp 
-                opengv/test/random_generators.hpp 
-                opengv/test/experiment_helpers.cpp 
-                opengv/test/experiment_helpers.hpp 
-                opengv/test/time_measurement.cpp 
-                opengv/test/time_measurement.hpp )
-  ELSE()
-    add_library( opengv ${OPENGV_SOURCE_FILES} ${OPENGV_HEADER_FILES} )
-    add_library( random_generators 
-    opengv/test/random_generators.cpp 
-    opengv/test/random_generators.hpp 
-    opengv/test/experiment_helpers.cpp 
-    opengv/test/experiment_helpers.hpp 
-    opengv/test/time_measurement.cpp 
-    opengv/test/time_measurement.hpp )
-    target_link_libraries(random_generators opengv)
-  ENDIF()
-ENDIF(OPENGV_IMPORT)
 # set(CMAKE_BUILD_TYPE Debug)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
@@ -252,6 +40,9 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 FIND_PACKAGE(OpenCV REQUIRED)
 find_package(PCL 1.3 REQUIRED COMPONENTS common io)
 find_package(Open3D HINTS ${CMAKE_INSTALL_PREFIX}/lib/cmake)
+find_package(GTSAMCMakeTools)
+find_package(GTSAM REQUIRED)
+
 
 link_directories(${PCL_LIBRARIES_DIRS})
 add_definitions(${PCL_DEFINITIONS})
@@ -277,6 +68,7 @@ ${RTABMap_INCLUDE_DIRS}
 ${OpenCV_INCLUDE_DIRS}
 ${PCL_INCLUDE_DIRS}
 ${Open3D_INCLUDE_DIRS}
+${GTSAM_INCLUDE_DIRS}
 )
 
 # libraries
@@ -541,13 +333,17 @@ add_dependencies(
 )
 
 add_executable(RO_estimator 
-              src/relative_pose_estimation/RO.cpp
-              src/relative_pose_estimation/include/calibration.h)
+              src/relative_pose_estimation/RO.cpp)
 
 target_link_libraries(
   RO_estimator
   ${catkin_LIBRARIES}
-  opengv
+  gtsam
+  )
+
+  add_dependencies(
+    detection_checker
+    ${cpp_EXPORTED_TARGETS}
   )
 
 add_executable(gui src/gui/src/gui_2.cpp)
