@@ -83,7 +83,7 @@ def info_CB(data):
         intrinsics.model = rs2.distortion.kannala_brandt4
     intrinsics.coeffs = [i for i in data.D]
 
-def orbmatch(fileName1, fileName2,previous_features=None):
+def orbmatch(fileName1, fileName2,previous_features=False):
     img1 = cv2.imread(rgb_path+str(fileName1)+".jpg")
     img2 = cv2.imread(rgb_path+str(fileName2)+".jpg")
 
@@ -142,15 +142,15 @@ def orbmatch(fileName1, fileName2,previous_features=None):
             rospy.loginfo("Not enough features...")
         else:
             mask = mask.ravel().tolist()
-            loc1_, loc2_, true_mask = [],[], []
-            detection_index=0
+            loc1_, loc2_, true_mask = [],[],[]
+            features_map={}
+            detection_index=1
             for index_, element in enumerate(mask):
                 if element == 1:
                     true_mask.append(good_matches[index_])
-                    loc1_.append(int(kp1_loc[index_]))
-                    loc2_.append(int(kp2_loc[index_]))
-                    # loc1[detection_index]=loc1_[-1]
-                    # loc2[detection_index]=loc2_[-1]
+                    loc1_.append(kp1_loc[index_])
+                    loc2_.append(kp2_loc[index_])
+                    features_map[detection_index]=[loc1_[-1],loc2_[-1]]
                     detection_index+=1
 
             img_matches = np.empty(
@@ -158,45 +158,76 @@ def orbmatch(fileName1, fileName2,previous_features=None):
             img3 = cv2.drawMatches(img1, kp1, img2, kp2, true_mask, img_matches,
                                    flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
 
-            if not previous_features is None:
-                loc1_=set(map(tuple,loc1_))
-
-                merged=loc1_ & previous_features
-                merged=list(merged)
-
-                merged_=[]
-
-                for coordinate in merged:
-                    merged_.append(loc2_[loc2_.index(list(coordinate))])
-            
-                return merged,merged_,
-                    
+            if(len(loc1_) > 9):
+                # img_rect = cv2.circle(
+                #     img1, (int(loc1[0][0][0]), int(loc1[0][0][1])), 3, (255, 0, 255), thickness=1)
+                cv2.imwrite(
+                    "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/feature_match/"+str(fileName1)+"->"+str(fileName2)+".jpg", img3)
+            if previous_features:
+                return loc2_,features_map,1
             else:
-                return loc2_
+                return loc1_,features_map,1
 
-    return [], [], 0
-
-def derive_duplicated_features(indexes,values):
-    prev_features,prev=[],[]
-    first_features,second_features=[],[]
-
-    for iteration in range(len(indexes)):
-        if iteration==0:
-            prev_features=orbmatch(indexes[0],values[0])
-        elif iteration==len(indexes)-1:
-            first_features,second_features=orbmatch(indexes[iteration],values[iteration],prev_features)
-            return first_features,second_features
-        else:
-            prev_features_,prev_=prev_features,prev
-
-            prev,prev_features=orbmatch(indexes[iteration],values[iteration],prev_features)
-            if len(prev_features)==0:
-                if iteration==1:
-                    return [],[]
-                else:
-                    return prev_,prev_features_
+        return [], [], 0
 
 
+def derive_duplicated_index(list1,list2,list1_map):
+
+    loc1_=set(map(tuple,list1))
+    loc2_=set(map(tuple,list2))
+
+    merged=loc1_ & loc2_
+    merged=list(merged)
+    survived_index=[]
+
+    for feature_val in merged:
+        for key,values in list1_map.items():
+            if(feature_val==values[1]):
+                survived_index.append(key)
+                break
+    return survived_index
+
+
+def derive_duplicated_indexes(indexes,values):
+    second_kpt,feature_map, good = orbmatch(
+                    indexes[0], values[0])
+    survived_index=[]
+    sorted_index,dict_list,new_dict_list=[],[feature_map],[]
+    for i in range(len(indexes)):
+        sorted_index.append(indexes[i])
+        sorted_index.append(values[i])
+
+    if good:
+        for hogehoge in range(1,len(sorted_index)):
+            first_kpt,feature_map_,good_=orbmatch(indexes[hogehoge],values[hogehoge+1],True)
+
+            if not good_:
+                break
+            survived_index=derive_duplicated_index(second_kpt,first_kpt,feature_map)
+
+            if len(survived_index)==0:
+                if hogehoge==2:
+                    return 0,False
+                break
+
+            new_map={}
+            for age,hoge in feature_map_:
+                if age in survived_index:
+                    new_map[age]=hoge
+
+            second_kpt=first_kpt
+            feature_map=new_map
+            dict_list.append(feature_map)
+        
+        for dictionary in dict_list:
+            new_map={}
+            for age,hoge in dictionary:
+                if age in survived_index:
+                    new_map[age]=hoge
+                new_dict_list.append(new_map)
+        
+        return new_dict_list,True
+            
 
 def loop_CB(data):
 
@@ -207,34 +238,42 @@ def loop_CB(data):
     for index, element in loop_dict.items():
         referred, referred_hyp = 0, 0
         i = 0
-
+        feature_map={}
         # 各検知の写真の枚数
         if index == "R1":
-
+    
             element["num"] = len(data.r1_index)
             if element["num"] > 0:
                 referred = data.r1_index[0]
                 referred_hyp = data.r1_value[0]
+                feature_map,good = derive_duplicated_indexes(data.r1_index,data.r1_value)
         else:
             element["num"] = len(data.r2_index)
             if element["num"] > 0:
                 referred = data.r2_index[0]
                 referred_hyp = data.r2_value[0]
+                feature_map,good = derive_duplicated_indexes(data.r2_index,data.r2_value)
         # NOTE 1ペア毎にpublishする
 
-        for iter in range(element["num"]):
+
+        for iter in range(len(feature_map.keys())):
             element["R1"][iter+1], element["R2"][iter+1] = [], []
             i += 1
             indice1, indice2, good = 0, 0, 0
-            r1_feature, r2_feature = [], []
+            if index=="R1":
+                r1_feature, r2_feature, good = orbmatch(
+                    data.r1_index[iter], data.r1_value[iter])
+            else:
+                r2_feature, r1_feature, good = orbmatch(
+                    data.r2_index[iter], data.r2_value[iter])
+            
+
 
             answer=HomogeneousArray()
             info = FeatureArray()
             if index == "R1":
                 # filter
                 # TODO 座標軸の定義を見直すこと.この場合は画像の左上
-                r1_feature, r2_feature, good = orbmatch(
-                    data.r1_index[iter], data.r1_value[iter])
                 indice1, indice2 = data.r1_index[iter], data.r1_value[iter]
                 info.index2value = [indice1, indice2]
                 info.who_detect = 1

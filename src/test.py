@@ -10,11 +10,7 @@
 # print(list(merged[0]) == list__[1])
 # print(merged[0])
 
-def test(a):
-    if a>0:
-        return a,0
-    else:
-        return a
-
-a,b=test(1)
-c=test(-1)
+test_dict={1:[1,2],2:[3,4]}
+dict_list=[test_dict]
+dict_list.append(test_dict)
+print(list(test_dict.values()))
