@@ -37,6 +37,8 @@
 #include "geometry_msgs/Point.h"
 #include <cpp/HomogeneousArray.h>
 
+using namespace gtsam;
+
 class RO_Estimator
 {
 private:
@@ -65,12 +67,12 @@ private:
     Eigen::Matrix4d transformation_result;
     Eigen::Matrix3d cam2robot;
     Eigen::Matrix3d robot2cam;
-    // Eigen::Matrix3d intrinsic_parameter;
-    // Eigen::Matrix4d img_to_cam_coordinate;
-    // cv::Mat camera_parameter;
 
     // NOTE node_map...{time;{1:[]}
     // points location
+    Cal3_S2::shared_ptr K(new Cal3_S2(617.5604248046, 617.3798828, 0, 317.55502, 244.730865));
+    auto measurementNoise = noiseModel::Isotropic::Sigma(2, 1.0);
+    NonlinearFactorGraph graph;
 
 public:
     RO_Estimator(void)

@@ -179,13 +179,13 @@ def loop_CB(data):
 
             element["num"] = len(data.r1_index)
             if element["num"] > 0:
-                referred = data.r1_index[int(element["num"]/2)]
-                referred_hyp = data.r1_value[int(element["num"]/2)]
+                referred = data.r1_index[0]
+                referred_hyp = data.r1_value[0]
         else:
             element["num"] = len(data.r2_index)
             if element["num"] > 0:
-                referred = data.r2_index[int(element["num"]/2)]
-                referred_hyp = data.r2_value[int(element["num"]/2)]
+                referred = data.r2_index[0]
+                referred_hyp = data.r2_value[0]
         # NOTE 1ペア毎にpublishする
 
         for iter in range(element["num"]):
@@ -257,9 +257,6 @@ def loop_CB(data):
         # Loop sequence終了
 
         if element["num"]>0:
-
-            print("referred is"+str(referred))
-            print("referred_hyp is "+str(referred_hyp))
             source_color = o3d.io.read_image(
                 home+"all_rgb/"+str(referred)+".jpg")
             source_depth = o3d.io.read_image(
