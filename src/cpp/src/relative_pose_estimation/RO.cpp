@@ -54,6 +54,8 @@ private:
     int info_index_2{0};
 
     Eigen::Matrix4d transformation_result;
+    Eigen::Matrix3d cam2robot;
+    Eigen::Matrix3d robot2cam;
     // Eigen::Matrix3d intrinsic_parameter;
     // Eigen::Matrix4d img_to_cam_coordinate;
     // cv::Mat camera_parameter;
@@ -75,6 +77,10 @@ public:
         std::map<std::string, std::vector<Eigen::Vector3d>> correspondence_2d3d;
         feature_dict["R1"] = correspondence_2d3d;
         feature_dict["R2"] = correspondence_2d3d;
+
+        cam2robot << 0, -1, 0,
+            0, 0, -1,
+            1, 0, 0;
 
         // img_to_cam_coordinate << 0.0, 0.0, 1.0,
         //     -1.0, 0.0, 0.0,
@@ -132,12 +138,17 @@ public:
             data_->data[8], data_->data[9], data_->data[10], data_->data[11],
             0, 0, 0, 1;
 
-        std::cout << transformation_result << std::endl;
+        // transformation_result=cam2robot*transformation_result;
+
+        // std::cout << transformation_result << std::endl;
 
         Eigen::Vector3d transfer_;
         Eigen::Matrix3d rotation_;
         transfer_ = transformation_result.block(3, 0, 3, 1);
         rotation_ = transformation_result.block(0, 0, 3, 3);
+
+        rotation_ = cam2robot.transpose() * rotation_ * cam2robot;
+        transfer_ = cam2robot.transpose() * transfer_;
 
         cpp::RO_Array pose_result;
         int who_detect = data_->who_detect;
