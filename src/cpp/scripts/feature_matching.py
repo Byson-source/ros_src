@@ -26,9 +26,11 @@ home = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/"
 depth_img = 1
 depth_img2 = 2
 container = {}
+# TODO BA前提でRO_nodeにパブリッシュする。１ペアのみしかloopが検知されなかったとしても、
+# TODO その直後のエポックで近傍のloopが検知される可能性もあるので、１エポック分待つ
+loop_container={}
 bridge = CvBridge()
 intrinsics = rs2.intrinsics()
-
 pinhole_camera_intrinsic=o3d.io.read_pinhole_camera_intrinsic("/home/ayumi/Open3D/examples/test_data/realsense.json")
 
 
@@ -80,8 +82,7 @@ def info_CB(data):
     elif data.distortion_model == 'equidistant':
         intrinsics.model = rs2.distortion.kannala_brandt4
     intrinsics.coeffs = [i for i in data.D]
-
-
+    
 def orbmatch(fileName1, fileName2):
     img1 = cv2.imread(rgb_path+str(fileName1)+".jpg")
     img2 = cv2.imread(rgb_path+str(fileName2)+".jpg")

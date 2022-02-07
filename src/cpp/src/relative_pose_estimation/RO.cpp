@@ -70,9 +70,9 @@ private:
 
     // NOTE node_map...{time;{1:[]}
     // points location
-    Cal3_S2::shared_ptr K(new Cal3_S2(617.5604248046, 617.3798828, 0, 317.55502, 244.730865));
-    auto measurementNoise = noiseModel::Isotropic::Sigma(2, 1.0);
-    NonlinearFactorGraph graph;
+    // Cal3_S2::shared_ptr K(new Cal3_S2(617.5604248046, 617.3798828, 0, 317.55502, 244.730865));
+    // auto measurementNoise = noiseModel::Isotropic::Sigma(2, 1.0);
+    // NonlinearFactorGraph graph;
 
 public:
     RO_Estimator(void)
