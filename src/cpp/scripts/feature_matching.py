@@ -173,24 +173,40 @@ def orbmatch(fileName1, fileName2, previous_features=False):
         return [], [], 0
 
 
+def add_error(mode, input_list, x_or_y):
+    input_list = np.asarray(input_list)
+    if x_or_y == "x":
+        error = np.array([mode, 0]*input_list.shape[0])
+    else:
+        error = np.array([0, mode]*input_list.shape[0])
+    error = error.reshape(-1, 2)
+    return list(input_list+error)
+
+
 def derive_duplicated_index(list1, list2, list1_map):
-    list1_ = set(map(tuple, list1))
-    list2_ = set(map(tuple, list2))
 
-    merged = list1_ & list2_
-    merged = list(merged)
+    mode_list = {"x": [-1, 0, 1], "y": [-1, 0, 1]}
+
     survived_index = []
+    for key, modes in mode_list.items():
+        for mode in modes:
+            list1 = add_error(mode, list1, key)
+            list1_ = set(map(tuple, list1))
+            list2_ = set(map(tuple, list2))
 
-    for feature_val in merged:
-        for key, values in list1_map.items():
-            if(list(feature_val) == values[1]):
-                survived_index.append(key)
-                break
+            merged = list1_ & list2_
+            merged = list(merged)
+
+            for feature_val in merged:
+                for key, values in list1_map.items():
+                    if(list(feature_val) == values[1]):
+                        survived_index.append(key)
+                        break
     return survived_index
 
 
 def derive_duplicated_indexes(indexes, values):
-    survived_index = []
+    survived_index, survived_backup = [], []
 
     second_kpt, feature_map, good = orbmatch(indexes[0], values[0])
     sorted_index, dict_list, new_dict_list = [], [feature_map], []
@@ -224,6 +240,7 @@ def derive_duplicated_indexes(indexes, values):
                 dict_list[0] = feature_map
                 continue
             # NOTE バンドル調整に移行
+            survived_index = survived_backup
             break
 
         valid_img_index.append(sorted_index[hogehoge])
@@ -235,6 +252,7 @@ def derive_duplicated_indexes(indexes, values):
         second_kpt = second_kpt_
         feature_map = new_map
         dict_list.append(feature_map)
+        survived_backup = survived_index
 
     for dictionary in dict_list:
         new_map = {}
@@ -242,6 +260,9 @@ def derive_duplicated_indexes(indexes, values):
             if age in survived_index:
                 new_map[age] = hoge
         new_dict_list.append(new_map)
+
+    rospy.logerr(survived_index)
+    rospy.logerr(valid_img_index)
 
     return new_dict_list, valid_img_index, True
 
@@ -260,21 +281,21 @@ def loop_CB(data):
         if index == "R1":
 
             element["num"] = len(data.r1_index)
-            if element["num"] > 0:
+            if element["num"] > 1:
                 referred = data.r1_index[0]
                 referred_hyp = data.r1_value[0]
                 feature_map_list, valid_img, good_ = derive_duplicated_indexes(
                     data.r1_index, data.r1_value)
         else:
             element["num"] = len(data.r2_index)
-            if element["num"] > 0:
+            if element["num"] > 1:
                 referred = data.r2_index[0]
                 referred_hyp = data.r2_value[0]
                 feature_map_list, valid_img, good_ = derive_duplicated_indexes(
                     data.r2_index, data.r2_value)
         # NOTE 1ペア毎にpublishする
 
-        if good_:
+        if good_ and element["num"] > 1:
             for iter in range(len(feature_map_list)):
                 # NOTE feature_mapは各画像の間でできるものなのでn枚の画像の時n-1個しかできない
                 element["R1"][iter+1], element["R2"][iter+1] = [], []
