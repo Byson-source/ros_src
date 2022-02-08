@@ -25,7 +25,7 @@ rgb_path = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/all_rgb/"
 home = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/"
 depth_img = 1
 depth_img2 = 2
-container,loop_container = {},{"feature_map":[],"valid_img":[]}
+container = {}
 # TODO BA前提でRO_nodeにパブリッシュする。１ペアのみしかloopが検知されなかったとしても、
 # TODO その直後のエポックで近傍のloopが検知される可能性もあるので、１エポック分待つ
 bridge = CvBridge()
@@ -181,7 +181,7 @@ def derive_duplicated_index(list1,list2,list1_map):
 
     for feature_val in merged:
         for key,values in list1_map.items():
-            if(feature_val==values[1]):
+            if(list(feature_val)==values[1]):
                 survived_index.append(key)
                 break
     return survived_index
@@ -189,68 +189,56 @@ def derive_duplicated_index(list1,list2,list1_map):
 
 def derive_duplicated_indexes(indexes,values):
     survived_index=[]
-    sorted_index,dict_list,new_dict_list=[],[],[]
 
     second_kpt,feature_map, good = orbmatch(indexes[0], values[0])
-
-    if len(loop_container["feature_map"])>0:
-        dict_list.append(loop_container["feature_map"][0])
-        sorted_index.append(loop_container["valid_img"][0])
-        sorted_index.append(loop_container["valid_img"][1])
-    else:
-        dict_list.append(feature_map)
+    sorted_index,dict_list,new_dict_list=[],[feature_map],[]
 
     for i in range(len(indexes)):
         sorted_index.append(indexes[i])
         sorted_index.append(values[i])
 
     valid_img_index=[sorted_index[0],sorted_index[1]]
+    for hogehoge in range(1,len(sorted_index)):
+        first_kpt,second_kpt_,feature_map_,good_=orbmatch(sorted_index[hogehoge],sorted_index[hogehoge+1],True)
+
+        
+        survived_index=derive_duplicated_index(second_kpt,first_kpt,feature_map)
+
+        # NOTE 共通の特徴点が見つからなかった時
+        if len(survived_index)==0:
+            # NOTE ペアから抽出した特徴点の中に共通のものが見いだせない時、その次のペアを試す。
+            if len(dict_list)==1:
+                if hogehoge==len(sorted_index)-2:
+                    # NOTE バンドル調整不可（共通の特徴点を持つ三枚以上の画像が存在しない）
+                    rospy.loginfo("Can't find corresponding features...Quit...")
+                    return 0,0,False
+
+                rospy.loginfo("There is no common features...Trying next pairs...")
+                second_kpt=second_kpt_
+                feature_map=feature_map_
+                dict_list[0]=feature_map
+                continue
+            # NOTE バンドル調整に移行
+            break
+
+        valid_img_index.append(sorted_index[hogehoge+1])
+        new_map={}
+        for age,hoge in feature_map_:
+            if age in survived_index:
+                new_map[age]=hoge
+
+        second_kpt=second_kpt_
+        feature_map=new_map
+        dict_list.append(feature_map)
     
-    # NOTE Which images has the common features.
-
-    if good:
-        for hogehoge in range(1,len(sorted_index)):
-            first_kpt,second_kpt_,feature_map_,good_=orbmatch(sorted_index[hogehoge],sorted_index[hogehoge+1],True)
-
-            if not good_:
-                break
-            survived_index=derive_duplicated_index(second_kpt,first_kpt,feature_map)
-
-            # NOTE 共通の特徴点が見つからなかった時
-            if len(survived_index)==0:
-                # NOTE ペアから抽出した特徴点の中に共通のものが見いだせない時、その次のペアを試す。
-                if len(dict_list)==1:
-                    if hogehoge==len(sorted_index)-2:
-                        # NOTE バンドル調整不可（共通の特徴点を持つ三枚以上の画像が存在しない）
-                        rospy.loginfo("Can't find corresponding features...Quit...")
-                        return 0,0,False
-
-                    rospy.loginfo("There is no common features...Trying next pairs...")
-                    second_kpt=second_kpt_
-                    feature_map=feature_map_
-                    dict_list[0]=feature_map
-                    continue
-                # NOTE バンドル調整に移行
-                break
-
-            valid_img_index.append(sorted_index[hogehoge+1])
-            new_map={}
-            for age,hoge in feature_map_:
-                if age in survived_index:
-                    new_map[age]=hoge
-
-            second_kpt=second_kpt_
-            feature_map=new_map
-            dict_list.append(feature_map)
-        
-        for dictionary in dict_list:
-            new_map={}
-            for age,hoge in dictionary:
-                if age in survived_index:
-                    new_map[age]=hoge
-            new_dict_list.append(new_map)
-        
-        return new_dict_list,valid_img_index,True
+    for dictionary in dict_list:
+        new_map={}
+        for age,hoge in dictionary:
+            if age in survived_index:
+                new_map[age]=hoge
+        new_dict_list.append(new_map)
+    
+    return new_dict_list,valid_img_index,True
             
 
 def loop_CB(data):
@@ -278,11 +266,8 @@ def loop_CB(data):
                 referred_hyp = data.r2_value[0]
                 feature_map_list,valid_img,good_ = derive_duplicated_indexes(data.r2_index,data.r2_value)
         # NOTE 1ペア毎にpublishする
-        if not good_:
-            loop_container["feature_map"]=feature_map_list,loop_container["valid_img"]=valid_img
-            continue
 
-        else:
+        if good_:
             for iter in range(len(feature_map_list)):
                 # NOTE feature_mapは各画像の間でできるものなのでn枚の画像の時n-1個しかできない
                 element["R1"][iter+1], element["R2"][iter+1] = [], []
@@ -354,43 +339,41 @@ def loop_CB(data):
                 feature_pub.publish(info)
             # Loop sequence終了
 
-            if element["num"]>0:
-                # FIXME referred
-                source_color = o3d.io.read_image(
-                    home+"all_rgb/"+str(referred)+".jpg")
-                source_depth = o3d.io.read_image(
-                    home+"depth/"+str(referred)+".png")
-                target_color = o3d.io.read_image(
-                    home+"all_rgb/"+str(referred_hyp)+".jpg")
-                target_depth = o3d.io.read_image(
-                    home+"depth/"+str(referred_hyp)+".png")
+            source_color = o3d.io.read_image(
+                home+"all_rgb/"+str(referred)+".jpg")
+            source_depth = o3d.io.read_image(
+                home+"depth/"+str(referred)+".png")
+            target_color = o3d.io.read_image(
+                home+"all_rgb/"+str(referred_hyp)+".jpg")
+            target_depth = o3d.io.read_image(
+                home+"depth/"+str(referred_hyp)+".png")
 
-                source_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
-                    source_color, source_depth)
-                target_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
-                    target_color, target_depth)
+            source_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
+                source_color, source_depth)
+            target_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
+                target_color, target_depth)
 
-                option = o3d.pipelines.odometry.OdometryOption()
-                # option.max_depth=10
-                odo_init = np.identity(4)
+            option = o3d.pipelines.odometry.OdometryOption()
+            # option.max_depth=10
+            odo_init = np.identity(4)
 
-                [success_hybrid_term, trans_hybrid_term,
-                info] = o3d.pipelines.odometry.compute_rgbd_odometry(
-                source_rgbd_image, target_rgbd_image,
-                pinhole_camera_intrinsic, odo_init,
-                o3d.pipelines.odometry.RGBDOdometryJacobianFromHybridTerm(), option)
+            [success_hybrid_term, trans_hybrid_term,
+            info] = o3d.pipelines.odometry.compute_rgbd_odometry(
+            source_rgbd_image, target_rgbd_image,
+            pinhole_camera_intrinsic, odo_init,
+            o3d.pipelines.odometry.RGBDOdometryJacobianFromHybridTerm(), option)
 
-                odom_result=[]
+            odom_result=[]
 
-                if not success_hybrid_term:
-                    rospy.loginfo("Can not compute RGBD Odometry...")
-                else:
-                    print(trans_hybrid_term)
-                    for value in trans_hybrid_term:
-                        for value_ in value:
-                            odom_result.append(value_)
-                    answer.data=odom_result
-                    odometry_pub.publish(answer)
+            if not success_hybrid_term:
+                rospy.loginfo("Can not compute RGBD Odometry...")
+            else:
+                print(trans_hybrid_term)
+                for value in trans_hybrid_term:
+                    for value_ in value:
+                        odom_result.append(value_)
+                answer.data=odom_result
+                odometry_pub.publish(answer)
 
 if __name__ == '__main__':
     # node_name = os.path.basename(sys.argv[0]).split('.')[0]
