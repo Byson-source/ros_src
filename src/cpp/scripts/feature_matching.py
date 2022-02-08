@@ -173,26 +173,24 @@ def orbmatch(fileName1, fileName2, previous_features=False):
         return [], [], 0
 
 
-def add_error(mode, input_list, x_or_y):
+def add_error(input_list, x, y):
     input_list = np.asarray(input_list)
-    if x_or_y == "x":
-        error = np.array([mode, 0]*input_list.shape[0])
-    else:
-        error = np.array([0, mode]*input_list.shape[0])
+
+    error = np.array([x, y]*input_list.shape[0])
     error = error.reshape(-1, 2)
-    return list(input_list+error)
+    return input_list+error
 
 
 def derive_duplicated_index(list1, list2, list1_map):
 
-    mode_list = {"x": [-1, 0, 1], "y": [-1, 0, 1]}
+    error_list = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
 
     survived_index = []
-    for key, modes in mode_list.items():
-        for mode in modes:
-            list1 = add_error(mode, list1, key)
+    for error_element_x in error_list:
+        for error_element_y in error_list:
+            list2_ = add_error(list2, error_element_x, error_element_y)
             list1_ = set(map(tuple, list1))
-            list2_ = set(map(tuple, list2))
+            list2_ = set(map(tuple, list2_))
 
             merged = list1_ & list2_
             merged = list(merged)
@@ -202,6 +200,7 @@ def derive_duplicated_index(list1, list2, list1_map):
                     if(list(feature_val) == values[1]):
                         survived_index.append(key)
                         break
+    survived_index = list(dict.fromkeys(survived_index))
     return survived_index
 
 
@@ -261,8 +260,8 @@ def derive_duplicated_indexes(indexes, values):
                 new_map[age] = hoge
         new_dict_list.append(new_map)
 
-    rospy.logerr(survived_index)
-    rospy.logerr(valid_img_index)
+    # rospy.logerr(survived_index)
+    # rospy.logerr(valid_img_index)
 
     return new_dict_list, valid_img_index, True
 
@@ -296,6 +295,7 @@ def loop_CB(data):
         # NOTE 1ペア毎にpublishする
 
         if good_ and element["num"] > 1:
+
             for iter in range(len(feature_map_list)):
                 # NOTE feature_mapは各画像の間でできるものなのでn枚の画像の時n-1個しかできない
                 element["R1"][iter+1], element["R2"][iter+1] = [], []
@@ -314,7 +314,6 @@ def loop_CB(data):
                 info = FeatureArray()
                 if index == "R1":
                     # filter
-                    # TODO 座標軸の定義を見直すこと.この場合は画像の左上
                     indice1, indice2 = valid_img[iter], valid_img[iter+1]
                     info.index2value = [indice1, indice2]
                     info.who_detect = 1
@@ -326,15 +325,11 @@ def loop_CB(data):
                     answer.who_detect = 2
 
                 r1_coord, r2_coord = [], []
-                # NOTE feature iterations
-                # NOTE loopの画像だけで、BAを行うのか、他の画像も巻き込むのか
 
                 # rospy.loginfo("This is No."+str(indice1))
                 for point in range(len(r1_feature)):
                     if(container[indice1][int(r1_feature[point][1]), int(r1_feature[point][0])] != 0 and
                        container[indice2][int(r2_feature[point][1]), int(r2_feature[point][0])] != 0):
-
-                        #    NOTE camera coordinateをpublishする
 
                         depth_r1 = container[indice1][int(
                             r1_feature[point][1]), int(r1_feature[point][0])]

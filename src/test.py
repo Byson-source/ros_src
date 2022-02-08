@@ -1,8 +1,11 @@
 import numpy as np
 listdayo = [[1, 2], [2, 3], [3, 5]]
+listdayo_ = [[-1, -2], [2, 3], [3, 6]]
 list_ = np.asarray(listdayo)
-list2 = list(list_)
-print(list)
+list_2 = np.asarray(listdayo_)
+list_ = list_+list_2
+print(list_)
+# print(merged)
 # print(type(list(list_)))
 # print(list_.shape)
 # list__ = np.array([[1, 2], [2, 1], [3, 5]])
