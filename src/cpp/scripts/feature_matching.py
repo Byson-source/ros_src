@@ -173,10 +173,10 @@ def orbmatch(fileName1, fileName2,previous_features=False):
 
 def derive_duplicated_index(list1,list2,list1_map):
 
-    loc1_=set(map(tuple,list1))
-    loc2_=set(map(tuple,list2))
+    list1_=set(map(tuple,list1))
+    list2_=set(map(tuple,list2))
 
-    merged=loc1_ & loc2_
+    merged=list1_ & list2_
     merged=list(merged)
     survived_index=[]
 
@@ -196,20 +196,28 @@ def derive_duplicated_indexes(indexes,values):
     for i in range(len(indexes)):
         sorted_index.append(indexes[i])
         sorted_index.append(values[i])
+    
+    valid_img_index=[sorted_index[0],sorted_index[1]]
+    # NOTE Which images has the common features.
 
     if good:
         for hogehoge in range(1,len(sorted_index)):
-            first_kpt,feature_map_,good_=orbmatch(indexes[hogehoge],values[hogehoge+1],True)
+            first_kpt,feature_map_,good_=orbmatch(sorted_index[hogehoge],sorted_index[hogehoge+1],True)
 
             if not good_:
                 break
             survived_index=derive_duplicated_index(second_kpt,first_kpt,feature_map)
 
+            # NOTE 共通の特徴点が見つからなかった時
             if len(survived_index)==0:
-                if hogehoge==2:
-                    return 0,False
+                # NOTE バンドル調整不可（共通の特徴点を持つ三枚以上の画像が存在しない）
+                if hogehoge==1:
+                    rospy.loginfo("There is no common features...")
+                    return 0,0,False
+                # NOTE バンドル調整に移行
                 break
 
+            valid_img_index.append(sorted_index[hogehoge+1])
             new_map={}
             for age,hoge in feature_map_:
                 if age in survived_index:
@@ -224,9 +232,9 @@ def derive_duplicated_indexes(indexes,values):
             for age,hoge in dictionary:
                 if age in survived_index:
                     new_map[age]=hoge
-                new_dict_list.append(new_map)
+            new_dict_list.append(new_map)
         
-        return new_dict_list,True
+        return new_dict_list,valid_img_index,True
             
 
 def loop_CB(data):
@@ -238,7 +246,7 @@ def loop_CB(data):
     for index, element in loop_dict.items():
         referred, referred_hyp = 0, 0
         i = 0
-        feature_map={}
+        feature_map_list,valid_img=[],[]
         # 各検知の写真の枚数
         if index == "R1":
     
@@ -246,43 +254,44 @@ def loop_CB(data):
             if element["num"] > 0:
                 referred = data.r1_index[0]
                 referred_hyp = data.r1_value[0]
-                feature_map,good = derive_duplicated_indexes(data.r1_index,data.r1_value)
+                feature_map_list,valid_img,good = derive_duplicated_indexes(data.r1_index,data.r1_value)
         else:
             element["num"] = len(data.r2_index)
             if element["num"] > 0:
                 referred = data.r2_index[0]
                 referred_hyp = data.r2_value[0]
-                feature_map,good = derive_duplicated_indexes(data.r2_index,data.r2_value)
+                feature_map_list,valid_img,good = derive_duplicated_indexes(data.r2_index,data.r2_value)
         # NOTE 1ペア毎にpublishする
 
 
-        for iter in range(len(feature_map.keys())):
+        for iter in range(len(feature_map_list)):
+            # NOTE feature_mapは各画像の間でできるものなのでn枚の画像の時n-1個しかできない
             element["R1"][iter+1], element["R2"][iter+1] = [], []
             i += 1
             indice1, indice2, good = 0, 0, 0
-            if index=="R1":
-                r1_feature, r2_feature, good = orbmatch(
-                    data.r1_index[iter], data.r1_value[iter])
-            else:
-                r2_feature, r1_feature, good = orbmatch(
-                    data.r2_index[iter], data.r2_value[iter])
-            
-
+            r1_feature,r2_feature=[],[]
+        
+            for key,feature_coords in feature_map_list[iter]:
+                if index=="R1":
+                    r1_feature.append(feature_coords[0])
+                    r2_feature.append(feature_coords[1])
+                else:
+                    r1_feature.append(feature_coords[1])
+                    r2_feature.append(feature_coords[0])
 
             answer=HomogeneousArray()
             info = FeatureArray()
             if index == "R1":
                 # filter
                 # TODO 座標軸の定義を見直すこと.この場合は画像の左上
-                indice1, indice2 = data.r1_index[iter], data.r1_value[iter]
+                indice1,indice2=valid_img[iter],valid_img[iter+1]
                 info.index2value = [indice1, indice2]
                 info.who_detect = 1
                 answer.who_detect=1
             else:
                 r2_feature, r1_feature, good = orbmatch(
                     data.r2_index[iter], data.r2_value[iter])
-                # indice1,indice2="value","index"
-                indice2, indice1 = data.r2_index[iter], data.r2_value[iter]
+                indice1,indice2=valid_img[iter+1],valid_img[iter]
                 info.index2value = [indice2, indice1]
                 info.who_detect = 2
                 answer.who_detect=2
@@ -330,6 +339,7 @@ def loop_CB(data):
         # Loop sequence終了
 
         if element["num"]>0:
+            # FIXME referred
             source_color = o3d.io.read_image(
                 home+"all_rgb/"+str(referred)+".jpg")
             source_depth = o3d.io.read_image(
@@ -397,6 +407,8 @@ if __name__ == '__main__':
 
     # /////////////////////////////////////////////////////////////////////////
     loop_sub = rospy.Subscriber("result", MultiArray, loop_CB)
+    # Odometry計算の並列化
+    # loop_sub2=rospy.Subscriber("result", MultiArray, Odometry_CB)
     feature_pub = rospy.Publisher("features", FeatureArray, queue_size=10)
     odometry_pub=rospy.Publisher("odometry_result",HomogeneousArray,queue_size=10)
 
