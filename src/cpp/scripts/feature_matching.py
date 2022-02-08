@@ -25,10 +25,9 @@ rgb_path = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/all_rgb/"
 home = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/"
 depth_img = 1
 depth_img2 = 2
-container = {}
+container,loop_container = {},{"feature_map":[],"valid_img":[]}
 # TODO BA前提でRO_nodeにパブリッシュする。１ペアのみしかloopが検知されなかったとしても、
 # TODO その直後のエポックで近傍のloopが検知される可能性もあるので、１エポック分待つ
-loop_container={}
 bridge = CvBridge()
 intrinsics = rs2.intrinsics()
 pinhole_camera_intrinsic=o3d.io.read_pinhole_camera_intrinsic("/home/ayumi/Open3D/examples/test_data/realsense.json")
@@ -164,9 +163,9 @@ def orbmatch(fileName1, fileName2,previous_features=False):
                 cv2.imwrite(
                     "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/feature_match/"+str(fileName1)+"->"+str(fileName2)+".jpg", img3)
             if previous_features:
-                return loc2_,features_map,1
+                return loc1_,loc2_,features_map,1
             else:
-                return loc1_,features_map,1
+                return loc2_,features_map,1
 
         return [], [], 0
 
@@ -189,20 +188,29 @@ def derive_duplicated_index(list1,list2,list1_map):
 
 
 def derive_duplicated_indexes(indexes,values):
-    second_kpt,feature_map, good = orbmatch(
-                    indexes[0], values[0])
     survived_index=[]
-    sorted_index,dict_list,new_dict_list=[],[feature_map],[]
+    sorted_index,dict_list,new_dict_list=[],[],[]
+
+    second_kpt,feature_map, good = orbmatch(indexes[0], values[0])
+
+    if len(loop_container["feature_map"])>0:
+        dict_list.append(loop_container["feature_map"][0])
+        sorted_index.append(loop_container["valid_img"][0])
+        sorted_index.append(loop_container["valid_img"][1])
+    else:
+        dict_list.append(feature_map)
+
     for i in range(len(indexes)):
         sorted_index.append(indexes[i])
         sorted_index.append(values[i])
-    
+
     valid_img_index=[sorted_index[0],sorted_index[1]]
+    
     # NOTE Which images has the common features.
 
     if good:
         for hogehoge in range(1,len(sorted_index)):
-            first_kpt,feature_map_,good_=orbmatch(sorted_index[hogehoge],sorted_index[hogehoge+1],True)
+            first_kpt,second_kpt_,feature_map_,good_=orbmatch(sorted_index[hogehoge],sorted_index[hogehoge+1],True)
 
             if not good_:
                 break
@@ -210,10 +218,18 @@ def derive_duplicated_indexes(indexes,values):
 
             # NOTE 共通の特徴点が見つからなかった時
             if len(survived_index)==0:
-                # NOTE バンドル調整不可（共通の特徴点を持つ三枚以上の画像が存在しない）
-                if hogehoge==1:
-                    rospy.loginfo("There is no common features...")
-                    return 0,0,False
+                # NOTE ペアから抽出した特徴点の中に共通のものが見いだせない時、その次のペアを試す。
+                if len(dict_list)==1:
+                    if hogehoge==len(sorted_index)-2:
+                        # NOTE バンドル調整不可（共通の特徴点を持つ三枚以上の画像が存在しない）
+                        rospy.loginfo("Can't find corresponding features...Quit...")
+                        return 0,0,False
+
+                    rospy.loginfo("There is no common features...Trying next pairs...")
+                    second_kpt=second_kpt_
+                    feature_map=feature_map_
+                    dict_list[0]=feature_map
+                    continue
                 # NOTE バンドル調整に移行
                 break
 
@@ -223,7 +239,7 @@ def derive_duplicated_indexes(indexes,values):
                 if age in survived_index:
                     new_map[age]=hoge
 
-            second_kpt=first_kpt
+            second_kpt=second_kpt_
             feature_map=new_map
             dict_list.append(feature_map)
         
@@ -245,7 +261,7 @@ def loop_CB(data):
     # NOTE R1とR2
     for index, element in loop_dict.items():
         referred, referred_hyp = 0, 0
-        i = 0
+        good_ = 0
         feature_map_list,valid_img=[],[]
         # 各検知の写真の枚数
         if index == "R1":
@@ -254,56 +270,56 @@ def loop_CB(data):
             if element["num"] > 0:
                 referred = data.r1_index[0]
                 referred_hyp = data.r1_value[0]
-                feature_map_list,valid_img,good = derive_duplicated_indexes(data.r1_index,data.r1_value)
+                feature_map_list,valid_img,good_ = derive_duplicated_indexes(data.r1_index,data.r1_value)
         else:
             element["num"] = len(data.r2_index)
             if element["num"] > 0:
                 referred = data.r2_index[0]
                 referred_hyp = data.r2_value[0]
-                feature_map_list,valid_img,good = derive_duplicated_indexes(data.r2_index,data.r2_value)
+                feature_map_list,valid_img,good_ = derive_duplicated_indexes(data.r2_index,data.r2_value)
         # NOTE 1ペア毎にpublishする
+        if not good_:
+            loop_container["feature_map"]=feature_map_list,loop_container["valid_img"]=valid_img
+            continue
 
+        else:
+            for iter in range(len(feature_map_list)):
+                # NOTE feature_mapは各画像の間でできるものなのでn枚の画像の時n-1個しかできない
+                element["R1"][iter+1], element["R2"][iter+1] = [], []
+                indice1, indice2= 0, 0
+                r1_feature,r2_feature=[],[]
+            
+                for key,feature_coords in feature_map_list[iter].items():
+                    if index=="R1":
+                        r1_feature.append(feature_coords[0])
+                        r2_feature.append(feature_coords[1])
+                    else:
+                        r1_feature.append(feature_coords[1])
+                        r2_feature.append(feature_coords[0])
 
-        for iter in range(len(feature_map_list)):
-            # NOTE feature_mapは各画像の間でできるものなのでn枚の画像の時n-1個しかできない
-            element["R1"][iter+1], element["R2"][iter+1] = [], []
-            i += 1
-            indice1, indice2, good = 0, 0, 0
-            r1_feature,r2_feature=[],[]
-        
-            for key,feature_coords in feature_map_list[iter]:
-                if index=="R1":
-                    r1_feature.append(feature_coords[0])
-                    r2_feature.append(feature_coords[1])
+                answer=HomogeneousArray()
+                info = FeatureArray()
+                if index == "R1":
+                    # filter
+                    # TODO 座標軸の定義を見直すこと.この場合は画像の左上
+                    indice1,indice2=valid_img[iter],valid_img[iter+1]
+                    info.index2value = [indice1, indice2]
+                    info.who_detect = 1
+                    answer.who_detect=1
                 else:
-                    r1_feature.append(feature_coords[1])
-                    r2_feature.append(feature_coords[0])
+                    indice1,indice2=valid_img[iter+1],valid_img[iter]
+                    info.index2value = [indice2, indice1]
+                    info.who_detect = 2
+                    answer.who_detect=2
 
-            answer=HomogeneousArray()
-            info = FeatureArray()
-            if index == "R1":
-                # filter
-                # TODO 座標軸の定義を見直すこと.この場合は画像の左上
-                indice1,indice2=valid_img[iter],valid_img[iter+1]
-                info.index2value = [indice1, indice2]
-                info.who_detect = 1
-                answer.who_detect=1
-            else:
-                r2_feature, r1_feature, good = orbmatch(
-                    data.r2_index[iter], data.r2_value[iter])
-                indice1,indice2=valid_img[iter+1],valid_img[iter]
-                info.index2value = [indice2, indice1]
-                info.who_detect = 2
-                answer.who_detect=2
-
-            r1_coord, r2_coord = [], []
-            # NOTE feature iterations
-            # NOTE loopの画像だけで、BAを行うのか、他の画像も巻き込むのか
-            if(good):
-                # rospy.loginfo("This is No."+str(indice1))
+                r1_coord, r2_coord = [], []
+                # NOTE feature iterations
+                # NOTE loopの画像だけで、BAを行うのか、他の画像も巻き込むのか
+                
+                    # rospy.loginfo("This is No."+str(indice1))
                 for point in range(len(r1_feature)):
                     if(container[indice1][int(r1_feature[point][1]), int(r1_feature[point][0])] != 0 and
-                       container[indice2][int(r2_feature[point][1]), int(r2_feature[point][0])] != 0):
+                    container[indice2][int(r2_feature[point][1]), int(r2_feature[point][0])] != 0):
 
                         #    NOTE camera coordinateをpublishする
 
@@ -336,45 +352,45 @@ def loop_CB(data):
                 info.r2_imgcoord = r2_coord
 
                 feature_pub.publish(info)
-        # Loop sequence終了
+            # Loop sequence終了
 
-        if element["num"]>0:
-            # FIXME referred
-            source_color = o3d.io.read_image(
-                home+"all_rgb/"+str(referred)+".jpg")
-            source_depth = o3d.io.read_image(
-                home+"depth/"+str(referred)+".png")
-            target_color = o3d.io.read_image(
-                home+"all_rgb/"+str(referred_hyp)+".jpg")
-            target_depth = o3d.io.read_image(
-                home+"depth/"+str(referred_hyp)+".png")
+            if element["num"]>0:
+                # FIXME referred
+                source_color = o3d.io.read_image(
+                    home+"all_rgb/"+str(referred)+".jpg")
+                source_depth = o3d.io.read_image(
+                    home+"depth/"+str(referred)+".png")
+                target_color = o3d.io.read_image(
+                    home+"all_rgb/"+str(referred_hyp)+".jpg")
+                target_depth = o3d.io.read_image(
+                    home+"depth/"+str(referred_hyp)+".png")
 
-            source_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
-                source_color, source_depth)
-            target_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
-                target_color, target_depth)
+                source_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
+                    source_color, source_depth)
+                target_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
+                    target_color, target_depth)
 
-            option = o3d.pipelines.odometry.OdometryOption()
-            # option.max_depth=10
-            odo_init = np.identity(4)
+                option = o3d.pipelines.odometry.OdometryOption()
+                # option.max_depth=10
+                odo_init = np.identity(4)
 
-            [success_hybrid_term, trans_hybrid_term,
-            info] = o3d.pipelines.odometry.compute_rgbd_odometry(
-            source_rgbd_image, target_rgbd_image,
-            pinhole_camera_intrinsic, odo_init,
-            o3d.pipelines.odometry.RGBDOdometryJacobianFromHybridTerm(), option)
+                [success_hybrid_term, trans_hybrid_term,
+                info] = o3d.pipelines.odometry.compute_rgbd_odometry(
+                source_rgbd_image, target_rgbd_image,
+                pinhole_camera_intrinsic, odo_init,
+                o3d.pipelines.odometry.RGBDOdometryJacobianFromHybridTerm(), option)
 
-            odom_result=[]
+                odom_result=[]
 
-            if not success_hybrid_term:
-                rospy.loginfo("Can not compute RGBD Odometry...")
-            else:
-                print(trans_hybrid_term)
-                for value in trans_hybrid_term:
-                    for value_ in value:
-                        odom_result.append(value_)
-                answer.data=odom_result
-                odometry_pub.publish(answer)
+                if not success_hybrid_term:
+                    rospy.loginfo("Can not compute RGBD Odometry...")
+                else:
+                    print(trans_hybrid_term)
+                    for value in trans_hybrid_term:
+                        for value_ in value:
+                            odom_result.append(value_)
+                    answer.data=odom_result
+                    odometry_pub.publish(answer)
 
 if __name__ == '__main__':
     # node_name = os.path.basename(sys.argv[0]).split('.')[0]
