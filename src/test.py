@@ -1,19 +1,11 @@
-list_=[[1,2],[2,3],[3,5]]
-list__=[[1,2],[2,3],[3,5]]
-list_2=[[1,2],[2,3],[3,7]]
-list_3=[]
-list_4=[]
-# print(list_.index([1,2]))
-list_=set(map(tuple,list_3))
-list_2=set(map(tuple,list_4))
-merged=list_ & list_2
-merged=list(merged)
-print(merged)
+import numpy as np
+list=[[1,2],[2,3],[3,5]]
+list_=np.asarray(list)
+list__=np.array([[1,2],[2,1],[3,5]])
+answer=list_-list__
+for idx,val in enumerate(answer):
+    if val.max()==0:
+        print(idx)
+survived_index=[idx for idx,val in enumerate(answer) if val.max()<5]
 
-# print(list(merged[0]) == list__[1])
-# print(merged[0])
-
-# test_dict={1:[1,2],2:[3,4]}
-# dict_list=[test_dict]
-# dict_list.append(test_dict)
-# print(list(test_dict.values()))
+print(survived_index)

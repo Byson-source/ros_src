@@ -87,7 +87,7 @@ def orbmatch(fileName1, fileName2,previous_features=False):
     img2 = cv2.imread(rgb_path+str(fileName2)+".jpg")
 
     # ORB検出器生成
-    orb = cv2.ORB_create(3000)
+    orb = cv2.ORB_create(10000)
 
     kp1, des1 = orb.detectAndCompute(img1, None)
     kp2, des2 = orb.detectAndCompute(img2, None)
@@ -172,11 +172,10 @@ def orbmatch(fileName1, fileName2,previous_features=False):
 
 def derive_duplicated_index(list1,list2,list1_map):
 
-    list1_=set(map(tuple,list1))
-    list2_=set(map(tuple,list2))
-
-    merged=list1_ & list2_
-    merged=list(merged)
+    list1=np.array(list1)
+    list2=np.array(list2)
+    new_list=list1-list2
+    merged=[list1[hage] for hage,val_hage in enumerate(new_list) if val_hage.max()<5]
     survived_index=[]
 
     for feature_val in merged:
@@ -196,6 +195,7 @@ def derive_duplicated_indexes(indexes,values):
     for i in range(len(indexes)):
         sorted_index.append(indexes[i])
         sorted_index.append(values[i])
+        rospy.logwarn(str(indexes[i])+"->"+str(values[i]))
 
     valid_img_index=[sorted_index[0],sorted_index[1]]
     for hogehoge in range(1,len(sorted_index)):
@@ -210,10 +210,10 @@ def derive_duplicated_indexes(indexes,values):
             if len(dict_list)==1:
                 if hogehoge==len(sorted_index)-2:
                     # NOTE バンドル調整不可（共通の特徴点を持つ三枚以上の画像が存在しない）
-                    rospy.loginfo("Can't find corresponding features...Quit...")
+                    rospy.logerr("Can't find corresponding features...Quit...")
                     return 0,0,False
 
-                rospy.loginfo("There is no common features...Trying next pairs...")
+                rospy.logdebug("There is no common features...Trying next pairs...")
                 second_kpt=second_kpt_
                 feature_map=feature_map_
                 dict_list[0]=feature_map
