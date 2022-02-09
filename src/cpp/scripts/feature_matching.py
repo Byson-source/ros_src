@@ -186,6 +186,7 @@ def derive_duplicated_index(list1, list2, list1_map):
     error_list = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
 
     survived_index = []
+    features_locs = []
     for error_element_x in error_list:
         for error_element_y in error_list:
             list2_ = add_error(list2, error_element_x, error_element_y)
@@ -199,8 +200,11 @@ def derive_duplicated_index(list1, list2, list1_map):
                 for key, values in list1_map.items():
                     if(list(feature_val) == values[1]):
                         survived_index.append(key)
+                        features_locs.append(values[1])
                         break
+
     survived_index = list(dict.fromkeys(survived_index))
+    # features_locs = list(dict.fromkeys(features_locs))
     return survived_index
 
 
@@ -240,6 +244,7 @@ def derive_duplicated_indexes(indexes, values):
                 continue
             # NOTE バンドル調整に移行
             survived_index = survived_backup
+            # features_group=features_group_backup
             break
 
         valid_img_index.append(sorted_index[hogehoge])
@@ -252,18 +257,18 @@ def derive_duplicated_indexes(indexes, values):
         feature_map = new_map
         dict_list.append(feature_map)
         survived_backup = survived_index
+        # features_group_backup=features_group
 
-    for dictionary in dict_list:
+    for dictionary_idx in range(1, len(dict_list)):
         new_map = {}
-        for age, hoge in dictionary.items():
-            if age in survived_index:
-                new_map[age] = hoge
+        for surviver in survived_index:
+            for idx__, value__ in dict_list[dictionary_idx].items():
+                if value__[0] == dict_list[dictionary_idx-1][surviver][1]:
+                    new_map[surviver] = value__
+                    break
         new_dict_list.append(new_map)
 
-    # rospy.logerr(survived_index)
-    # rospy.logerr(valid_img_index)
-
-    return new_dict_list, valid_img_index, True
+    return new_dict_list, valid_img_index, survived_index, True
 
 
 def loop_CB(data):
@@ -275,7 +280,7 @@ def loop_CB(data):
     for index, element in loop_dict.items():
         referred, referred_hyp = 0, 0
         good_ = 0
-        feature_map_list, valid_img = [], []
+        feature_map_list, valid_img, survived = [], [], []
         # 各検知の写真の枚数
         if index == "R1":
 
@@ -283,18 +288,24 @@ def loop_CB(data):
             if element["num"] > 1:
                 referred = data.r1_index[0]
                 referred_hyp = data.r1_value[0]
-                feature_map_list, valid_img, good_ = derive_duplicated_indexes(
+                feature_map_list, valid_img, survived, good_ = derive_duplicated_indexes(
                     data.r1_index, data.r1_value)
+                rospy.loginfo(len(survived))
         else:
             element["num"] = len(data.r2_index)
             if element["num"] > 1:
                 referred = data.r2_index[0]
                 referred_hyp = data.r2_value[0]
-                feature_map_list, valid_img, good_ = derive_duplicated_indexes(
+                feature_map_list, valid_img, survived, good_ = derive_duplicated_indexes(
                     data.r2_index, data.r2_value)
+                rospy.loginfo(len(survived))
         # NOTE 1ペア毎にpublishする
 
         if good_ and element["num"] > 1:
+
+            for feature_maphoge in feature_map_list:
+                print(feature_maphoge)
+                print("================")
 
             for iter in range(len(feature_map_list)):
                 # NOTE feature_mapは各画像の間でできるものなのでn枚の画像の時n-1個しかできない
