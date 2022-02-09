@@ -1,15 +1,6 @@
-#include <gtsam/geometry/Point2.h>
-#include <gtsam/geometry/Pose2.h>
-#include <gtsam/inference/Symbol.h>
-#include <gtsam/slam/ProjectionFactor.h>
-#include <gtsam/slam/BetweenFactor.h>
-#include <gtsam/sam/BearingRangeFactor.h>
-#include <gtsam/nonlinear/NonlinearFactorGraph.h>
-#include <gtsam/nonlinear/DoglegOptimizer.h>
-#include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
-#include <gtsam/nonlinear/Marginals.h>
-#include <gtsam/nonlinear/Values.h>
 
+// TODO 各ノードのposeを受けとり、t=0どうしのR,tを逆算すること、また、共分散行列も
+// TODO かさみ付き平均を適用して最適なR,tも求める
 #include <iostream>
 #include <iomanip>
 #include <Eigen/Core>
@@ -36,8 +27,6 @@
 #include "geometry_msgs/PoseStamped.h"
 #include "geometry_msgs/Point.h"
 #include <cpp/HomogeneousArray.h>
-
-using namespace gtsam;
 
 class RO_Estimator
 {
@@ -67,8 +56,12 @@ private:
     Eigen::Matrix4d transformation_result;
     Eigen::Matrix3d cam2robot;
     Eigen::Matrix3d robot2cam;
+    // Eigen::Matrix3d intrinsic_parameter;
+    // Eigen::Matrix4d img_to_cam_coordinate;
+    // cv::Mat camera_parameter;
 
     // NOTE node_map...{time;{1:[]}
+    // points location
 
 public:
     RO_Estimator(void)
@@ -131,6 +124,7 @@ public:
             path_2.push_back(pose);
         }
         info_index_2 += 1;
+        std::cout << path_2.size() << std::endl;
         mapPath_dict_2[info_index_2] = path_2.size() - 1;
 
         // std::vector<double> pose;
@@ -143,15 +137,13 @@ public:
         transformation_result << data_->data[0], data_->data[1], data_->data[2], data_->data[3],
             data_->data[4], data_->data[5], data_->data[6], data_->data[7],
             data_->data[8], data_->data[9], data_->data[10], data_->data[11],
-            0, 0, 0, 1;
+            0.0, 0.0, 0.0, 1.0;
 
         // transformation_result=cam2robot*transformation_result;
 
-        // std::cout << transformation_result << std::endl;
-
         Eigen::Vector3d transfer_;
         Eigen::Matrix3d rotation_;
-        transfer_ = transformation_result.block(3, 0, 3, 1);
+        transfer_ = transformation_result.block(0, 3, 3, 1);
         rotation_ = transformation_result.block(0, 0, 3, 3);
 
         rotation_ = cam2robot.transpose() * rotation_ * cam2robot;
@@ -201,37 +193,6 @@ public:
                     img_coord_2.push_back(r2_coord);
                 }
             }
-
-            // if (who_detect == 1)
-            // {
-            //     feature_dict["R1"]["3d"].push_back(kp_loc_)
-            // }
-
-            // if (who_detect == 1)
-            //     result = RO_Estimator::pnp(kp_loc_r1_s, img_coord_2);
-            // else
-            //     result = RO_Estimator::pnp(kp_loc_r2_s, img_coord_1);
-
-            // Eigen::Matrix4   d result = RO_Estimator::pnp(who_detect, kp_loc_r1_s, kp_loc_r2_s);
-
-            // Eigen::Matrix3d R_ = result.block(0, 0, 3, 3);
-            // Eigen::Vector3d rpy = R_.eulerAngles(0, 1, 2);
-            // Eigen::Vector3d t_ = result.block(0, 3, 3, 1);
-            // std::cout << "=============================" << std::endl;
-            // std::cout << t_ << std::endl;
-            // std::cout << std::endl;
-
-            // cpp::RO_Array pose_result;
-            // Eigen::Vector3d ans_t = turnout_T(t_, who_detect);
-            // Eigen::Quaterniond ans_r = turnout_R(R_, who_detect);
-
-            // std::vector<double> R{ans_r.w(), ans_r.x(), ans_r.y(), ans_r.z()};
-            // std::vector<double> t{ans_t[0], ans_t[1], ans_t[2]};
-
-            // pose_result.translation = t;
-            // pose_result.euler = R;
-
-            // rt_pub.publish(pose_result);
         }
         else
         {
@@ -250,18 +211,18 @@ public:
         Eigen::Vector3d transfer_1_to_2;
         if (who_is_detect == 1)
         {
-            r1_img_index = loop_info[0];
-            r2_img_index = loop_info[1];
+            r1_img_index = (loop_info[0] - 1) * 0.5 + 1;
+            r2_img_index = loop_info[1] / 2;
             transfer_1_to_2 = transfer;
         }
         else
         {
-            r1_img_index = loop_info[1];
-            r2_img_index = loop_info[0];
-            transfer_1_to_2 = Eigen::Vector3d::Ones() - transfer;
+            r1_img_index = (loop_info[1] - 1) * 0.5 + 1;
+            r2_img_index = loop_info[0] / 2;
+            transfer_1_to_2 = Eigen::Vector3d::Zero() - transfer;
         }
-
         origin2r1 << path_1[mapPath_dict[r1_img_index]][0], path_1[mapPath_dict[r1_img_index]][1], path_1[mapPath_dict[r1_img_index]][2];
+
         origin2r2 << path_2[mapPath_dict_2[r2_img_index]][0], path_2[mapPath_dict_2[r2_img_index]][1], path_2[mapPath_dict_2[r2_img_index]][2];
 
         Eigen::Vector3d ans_t = transfer_1_to_2 - (origin2r2 - origin2r1);
@@ -280,14 +241,14 @@ public:
         if (who_is_detect == 1)
         {
             rotation_1TO2 = rotation_matrix;
-            r1_img_index = loop_info[0];
-            r2_img_index = loop_info[1];
+            r1_img_index = (loop_info[0] - 1) * 0.5 + 1;
+            r2_img_index = loop_info[1] / 2;
         }
         else
         {
             rotation_1TO2 = rotation_matrix.transpose();
-            r1_img_index = loop_info[1];
-            r2_img_index = loop_info[0];
+            r1_img_index = (loop_info[1] - 1) * 0.5 + 1;
+            r2_img_index = loop_info[0] / 2;
         }
 
         r1_q.x() = path_1[mapPath_dict[r1_img_index]][3];
@@ -305,35 +266,6 @@ public:
         Eigen::Quaterniond q_r1_to_r2 = (r2_q.inverse()) * rotation_1TO2 * r1_q;
         return q_r1_to_r2.normalized();
     }
-
-    // FIXME 前処理が必要
-    // Eigen::Matrix4d pnp(std::vector<cv::Point3d> kp_loc,
-    //                     std::vector<cv::Point2d> coord)
-    // {
-    //     // bearing vectors
-    //     // 3Dポイント集
-    //     std::cout << loop_info[0] << "->" << loop_info[1] << std::endl;
-
-    //     cv::Mat rotation_vector;
-    //     cv::Mat translation_vector;
-    //     cv::Mat dist_coeffs = cv::Mat::zeros(4, 1, cv::DataType<double>::type);
-
-    //     cv::solvePnP(kp_loc, coord, camera_parameter, dist_coeffs, rotation_vector, translation_vector);
-
-    //     Eigen::Vector3d translation;
-    //     Eigen::Matrix3d rotation;
-    //     cv::cv2eigen(rotation_vector, rotation);
-    //     cv::cv2eigen(translation_vector, translation);
-
-    //     rotation = rotation.transpose();
-    //     translation = rotation * (-translation);
-
-    //     Eigen::Matrix4d transformation;
-    //     transformation.block(0, 0, 3, 3) = rotation;
-    //     transformation.block(0, 3, 3, 1) = translation;
-
-    //     return transformation;
-    // }
 };
 
 int main(int argc, char **argv)
