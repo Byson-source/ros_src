@@ -3,8 +3,6 @@ import open3d as o3d
 from sensor_msgs.msg import Image as msg_Image
 from sensor_msgs.msg import CameraInfo
 from cv_bridge import CvBridge, CvBridgeError
-import sys
-import os
 import numpy as np
 import pyrealsense2 as rs2
 import os
@@ -19,15 +17,11 @@ from cpp.msg import HomogeneousArray
 import message_filters
 import cv2
 
-# if (not hasattr(rs2, 'intrinsics')):
-#     import pyrealsense2.pyrealsense2 as rs2
 rgb_path = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/all_rgb/"
 home = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/"
 depth_img = 1
 depth_img2 = 2
 container = {}
-# TODO BA前提でRO_nodeにパブリッシュする。１ペアのみしかloopが検知されなかったとしても、
-# TODO その直後のエポックで近傍のloopが検知される可能性もあるので、１エポック分待つ
 bridge = CvBridge()
 intrinsics = rs2.intrinsics()
 pinhole_camera_intrinsic = o3d.io.read_pinhole_camera_intrinsic(
@@ -174,21 +168,20 @@ def orbmatch(fileName1, fileName2, previous_features=False):
 
 
 def add_error(input_list, x, y):
-    input_list = np.asarray(input_list)
+    input_list = np.asarray(input_list, dtype=object)
 
     error = np.array([x, y]*input_list.shape[0])
     error = error.reshape(-1, 2)
     return input_list+error
 
 
-def derive_duplicated_index(list1, list2, list1_map):
+def derive_duplicated_index(list1, list2):
 
-    # error_list = [0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5]
-    error_list = []
-    a = 0
-    for i in range(5):
-        error_list.append(i)
-        error_list.append(-i)
+    error_list = [0]
+
+    # for i in range(1):
+    #     error_list.append(i+1)
+    #     error_list.append(-i-1)
 
     survived_index = []
     survived_local = []
@@ -205,15 +198,11 @@ def derive_duplicated_index(list1, list2, list1_map):
             for feature_val in merged:
                 feature_val = list(feature_val)
                 index_hoge = list1.index(feature_val)
-                survived_index.append(index_hoge)
-                survived_local.append(np.where(list2_ == feature_val)[0][0])
-                # 重ならないようにする
-                a += 1
-                list1[index_hoge] = [a]
-                a += 1
-                list2[list2.index([feature_val[0]-error_element_x,
-                                   feature_val[1]-error_element_y])] = [a]
-    rospy.logwarn(survived_index)
+                local_hoge = np.where(list2_ == feature_val)[0][0]
+                if (index_hoge not in survived_index) and (local_hoge not in survived_local):
+                    survived_index.append(index_hoge)
+                    survived_local.append(local_hoge)
+                    # 重ならないようにする
     return survived_index, survived_local
 
 
@@ -226,7 +215,7 @@ def derive_duplicated_indexes(indexes, values):
     for i in range(len(indexes)):
         sorted_index.append(indexes[i])
         sorted_index.append(values[i])
-        rospy.logwarn(str(indexes[i])+"->"+str(values[i]))
+        # rospy.logwarn(str(indexes[i])+"->"+str(values[i]))
 
     valid_img_index = [sorted_index[0], sorted_index[1]]
     for hogehoge in range(2, len(sorted_index)):
@@ -234,10 +223,25 @@ def derive_duplicated_indexes(indexes, values):
             sorted_index[hogehoge-1], sorted_index[hogehoge], True)
 
         survived_index, local_survivor = derive_duplicated_index(
-            second_kpt, first_kpt, feature_map)
+            second_kpt, first_kpt)
+
+        # rospy.logwarn(feature_map_)
+        # rospy.logwarn("-----------------------------------------")
+        # rospy.logwarn(first_kpt)
+
+        rospy.logwarn(survived_index)
+        rospy.logwarn(
+            "--------------------------------------------------------------")
+        rospy.logwarn(local_survivor)
+        rospy.logwarn(
+            "--------------------------------------------------------------")
+        rospy.logwarn(feature_map)
+        rospy.logwarn(
+            "--------------------------------------------------------------")
+        rospy.logwarn(feature_map_)
 
         # NOTE 共通の特徴点が見つからなかった時
-        if len(survived_index) < 2:
+        if len(survived_index) < 4:
             # NOTE ペアから抽出した特徴点の中に共通のものが見いだせない時、その次のペアを試す。
             if len(dict_list) == 1:
                 if hogehoge == len(sorted_index)-2:
@@ -259,6 +263,10 @@ def derive_duplicated_indexes(indexes, values):
             new_map[survived_index[hogeee]] = feature_map_[
                 local_survivor[hogeee]]
 
+        # rospy.logwarn(feature_map)
+        # rospy.logwarn("================")
+        # rospy.logwarn(new_map)
+
         second_kpt = second_kpt_
         feature_map = new_map
         dict_list.append(feature_map)
@@ -271,7 +279,6 @@ def derive_duplicated_indexes(indexes, values):
             if dict_keyidx in survived_index:
                 new_map[dict_keyidx] = dict_value
                 new_map_list.append(new_map)
-                break
 
     return new_map_list, valid_img_index, survived_index, True
 
@@ -303,6 +310,12 @@ def loop_CB(data):
                 feature_map_list, valid_img, survived, good_ = derive_duplicated_indexes(
                     data.r2_index, data.r2_value)
         # NOTE 1ペア毎にpublishする
+        # for valid_idx in range(1, len(valid_img)):
+        #     rospy.logwarn(str(valid_img[valid_idx-1]) +
+        #                   "->"+str(valid_img[valid_idx]))
+
+        # for each_map in feature_map_list:
+        #     rospy.logwarn(each_map)
 
         if good_ and element["num"] > 1:
 

@@ -74,7 +74,7 @@ public:
     RO_Estimator(void)
     {
         rt_pub = n.advertise<cpp::RO_Array>("RT_result", 50);
-        // BA_pub = n.advertise
+        // BA_pub = n.advertiset
 
         feature_sub = n.subscribe("features", 20, &RO_Estimator::RO_CB, this);
         path_sub1 = n.subscribe("robot1/rtabmap/mapPath", 10, &RO_Estimator::path1_CB, this);
