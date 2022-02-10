@@ -175,34 +175,45 @@ def add_error(input_list, x, y):
     return input_list+error
 
 
-def derive_duplicated_index(list1, list2):
+def derive_duplicated_index(list1, list2, sorted_keys=None):
 
     error_list = [0]
 
     # for i in range(1):
     #     error_list.append(i+1)
     #     error_list.append(-i-1)
+    sorted_idx = {}
+    sorthoge = 0
+    if not sorted_keys is None:
+        for sorted_index in sorted_keys:
+            sorted_idx[sorthoge] = sorted_index
+            sorthoge += 1
+    else:
+        for num_element in range(len(list1)):
+            sorted_idx[sorthoge] = num_element+1
+            sorthoge += 1
 
     survived_index = []
     survived_local = []
-    for error_element_x in error_list:
-        for error_element_y in error_list:
-            list2_ = add_error(list2, error_element_x, error_element_y)
+    # for error_element_x in error_list:
+    #     for error_element_y in error_list:
+    # list2_ = add_error(list2, error_element_x, error_element_y)
 
-            list1_ = set(map(tuple, list1))
-            list2_set = set(map(tuple, list2_))
+    list1_ = set(map(tuple, list1))
+    list2_set = set(map(tuple, list2))
 
-            merged = list1_ & list2_set
-            merged = list(merged)
+    merged = list1_ & list2_set
+    merged = list(merged)
+    rospy.logerr(merged)
 
-            for feature_val in merged:
-                feature_val = list(feature_val)
-                index_hoge = list1.index(feature_val)
-                local_hoge = np.where(list2_ == feature_val)[0][0]
-                if (index_hoge not in survived_index) and (local_hoge not in survived_local):
-                    survived_index.append(index_hoge)
-                    survived_local.append(local_hoge)
-                    # 重ならないようにする
+    for feature_val in merged:
+        feature_val = list(feature_val)
+        index_hoge = list1.index(feature_val)
+        local_hoge = list2.index(feature_val)
+        if (index_hoge not in survived_index) and (local_hoge not in survived_local):
+            survived_index.append(sorted_idx[index_hoge])
+            survived_local.append(local_hoge+1)
+            # 重ならないようにする
     return survived_index, survived_local
 
 
@@ -222,8 +233,12 @@ def derive_duplicated_indexes(indexes, values):
         first_kpt, second_kpt_, feature_map_, good_ = orbmatch(
             sorted_index[hogehoge-1], sorted_index[hogehoge], True)
 
-        survived_index, local_survivor = derive_duplicated_index(
-            second_kpt, first_kpt)
+        if hogehoge > 2:
+            survived_index, local_survivor = derive_duplicated_index(
+                second_kpt, first_kpt, new_map.keys())
+        else:
+            survived_index, local_survivor = derive_duplicated_index(
+                second_kpt, first_kpt)
 
         # rospy.logwarn(feature_map_)
         # rospy.logwarn("-----------------------------------------")
@@ -259,15 +274,20 @@ def derive_duplicated_indexes(indexes, values):
 
         valid_img_index.append(sorted_index[hogehoge])
         new_map = {}
+        next_second = []
         for hogeee in range(len(survived_index)):
             new_map[survived_index[hogeee]] = feature_map_[
                 local_survivor[hogeee]]
+            next_second.append(feature_map_[
+                local_survivor[hogeee]][1])
+
+        rospy.logerr(new_map)
 
         # rospy.logwarn(feature_map)
         # rospy.logwarn("================")
         # rospy.logwarn(new_map)
 
-        second_kpt = second_kpt_
+        second_kpt = next_second
         feature_map = new_map
         dict_list.append(feature_map)
         survived_backup = survived_index
