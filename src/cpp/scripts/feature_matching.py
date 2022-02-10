@@ -139,7 +139,7 @@ def orbmatch(fileName1, fileName2, previous_features=False):
             mask = mask.ravel().tolist()
             loc1_, loc2_, true_mask = [], [], []
             features_map = {}
-            detection_index = 1
+            detection_index = 0
             for index_, element in enumerate(mask):
                 if element == 1:
                     true_mask.append(good_matches[index_])
@@ -179,9 +179,13 @@ def derive_duplicated_index(list1, list2, sorted_keys=None):
 
     error_list = [0]
 
-    # for i in range(1):
-    #     error_list.append(i+1)
-    #     error_list.append(-i-1)
+    for i in range(2):
+        error_list.append(i+1)
+        error_list.append(-i-1)
+
+    survived_index = []
+    survived_local = []
+
     sorted_idx = {}
     sorthoge = 0
     if not sorted_keys is None:
@@ -190,30 +194,30 @@ def derive_duplicated_index(list1, list2, sorted_keys=None):
             sorthoge += 1
     else:
         for num_element in range(len(list1)):
-            sorted_idx[sorthoge] = num_element+1
+            sorted_idx[sorthoge] = num_element
             sorthoge += 1
 
-    survived_index = []
-    survived_local = []
-    # for error_element_x in error_list:
-    #     for error_element_y in error_list:
-    # list2_ = add_error(list2, error_element_x, error_element_y)
+    for error_element_x in error_list:
+        for error_element_y in error_list:
+            list2_ = add_error(list2, error_element_x, error_element_y)
 
-    list1_ = set(map(tuple, list1))
-    list2_set = set(map(tuple, list2))
+            list1_ = set(map(tuple, list1))
+            list2_set = set(map(tuple, list2_))
 
-    merged = list1_ & list2_set
-    merged = list(merged)
-    rospy.logerr(merged)
+            merged = list1_ & list2_set
+            merged = list(merged)
+            rospy.logerr(merged)
 
-    for feature_val in merged:
-        feature_val = list(feature_val)
-        index_hoge = list1.index(feature_val)
-        local_hoge = list2.index(feature_val)
-        if (index_hoge not in survived_index) and (local_hoge not in survived_local):
-            survived_index.append(sorted_idx[index_hoge])
-            survived_local.append(local_hoge+1)
-            # 重ならないようにする
+            for feature_val in merged:
+                feature_val = list(feature_val)
+                index_hoge = list1.index(feature_val)
+                local_hoge = np.where(list2_ == feature_val)[0][0]
+                if (sorted_idx[index_hoge] not in survived_index) and (local_hoge not in survived_local):
+                    rospy.loginfo(index_hoge)
+                    rospy.loginfo(feature_val)
+                    survived_index.append(sorted_idx[index_hoge])
+                    survived_local.append(local_hoge)
+                    # 重ならないようにする
     return survived_index, survived_local
 
 
@@ -280,8 +284,6 @@ def derive_duplicated_indexes(indexes, values):
                 local_survivor[hogeee]]
             next_second.append(feature_map_[
                 local_survivor[hogeee]][1])
-
-        rospy.logerr(new_map)
 
         # rospy.logwarn(feature_map)
         # rospy.logwarn("================")
