@@ -206,15 +206,12 @@ def derive_duplicated_index(list1, list2, sorted_keys=None):
 
             merged = list1_ & list2_set
             merged = list(merged)
-            rospy.logerr(merged)
 
             for feature_val in merged:
                 feature_val = list(feature_val)
                 index_hoge = list1.index(feature_val)
                 local_hoge = np.where(list2_ == feature_val)[0][0]
                 if (sorted_idx[index_hoge] not in survived_index) and (local_hoge not in survived_local):
-                    rospy.loginfo(index_hoge)
-                    rospy.loginfo(feature_val)
                     survived_index.append(sorted_idx[index_hoge])
                     survived_local.append(local_hoge)
                     # 重ならないようにする
@@ -244,21 +241,6 @@ def derive_duplicated_indexes(indexes, values):
             survived_index, local_survivor = derive_duplicated_index(
                 second_kpt, first_kpt)
 
-        # rospy.logwarn(feature_map_)
-        # rospy.logwarn("-----------------------------------------")
-        # rospy.logwarn(first_kpt)
-
-        rospy.logwarn(survived_index)
-        rospy.logwarn(
-            "--------------------------------------------------------------")
-        rospy.logwarn(local_survivor)
-        rospy.logwarn(
-            "--------------------------------------------------------------")
-        rospy.logwarn(feature_map)
-        rospy.logwarn(
-            "--------------------------------------------------------------")
-        rospy.logwarn(feature_map_)
-
         # NOTE 共通の特徴点が見つからなかった時
         if len(survived_index) < 4:
             # NOTE ペアから抽出した特徴点の中に共通のものが見いだせない時、その次のペアを試す。
@@ -285,10 +267,6 @@ def derive_duplicated_indexes(indexes, values):
             next_second.append(feature_map_[
                 local_survivor[hogeee]][1])
 
-        # rospy.logwarn(feature_map)
-        # rospy.logwarn("================")
-        # rospy.logwarn(new_map)
-
         second_kpt = next_second
         feature_map = new_map
         dict_list.append(feature_map)
@@ -300,7 +278,7 @@ def derive_duplicated_indexes(indexes, values):
         for dict_keyidx, dict_value in dictionary.items():
             if dict_keyidx in survived_index:
                 new_map[dict_keyidx] = dict_value
-                new_map_list.append(new_map)
+        new_map_list.append(new_map)
 
     return new_map_list, valid_img_index, survived_index, True
 
@@ -331,19 +309,14 @@ def loop_CB(data):
                 referred_hyp = data.r2_value[0]
                 feature_map_list, valid_img, survived, good_ = derive_duplicated_indexes(
                     data.r2_index, data.r2_value)
-        # NOTE 1ペア毎にpublishする
-        # for valid_idx in range(1, len(valid_img)):
-        #     rospy.logwarn(str(valid_img[valid_idx-1]) +
-        #                   "->"+str(valid_img[valid_idx]))
-
-        # for each_map in feature_map_list:
-        #     rospy.logwarn(each_map)
+        rospy.loginfo(len(feature_map_list))
+        rospy.loginfo(len(valid_img))
 
         if good_ and element["num"] > 1:
 
             for iter in range(len(feature_map_list)):
                 # NOTE feature_mapは各画像の間でできるものなのでn枚の画像の時n-1個しかできない
-                element["R1"][iter+1], element["R2"][iter+1] = [], []
+                element["R1"][iter], element["R2"][iter] = [], []
                 indice1, indice2 = 0, 0
                 r1_feature, r2_feature = [], []
 
@@ -364,7 +337,7 @@ def loop_CB(data):
                     info.who_detect = 1
                     answer.who_detect = 1
                 else:
-                    indice1, indice2 = valid_img[iter+1], valid_img[iter]
+                    indice1, indice2 = valid_img[iter], valid_img[iter+1]
                     info.index2value = [indice2, indice1]
                     info.who_detect = 2
                     answer.who_detect = 2
