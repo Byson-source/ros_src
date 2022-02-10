@@ -309,8 +309,6 @@ def loop_CB(data):
                 referred_hyp = data.r2_value[0]
                 feature_map_list, valid_img, survived, good_ = derive_duplicated_indexes(
                     data.r2_index, data.r2_value)
-        rospy.loginfo(len(feature_map_list))
-        rospy.loginfo(len(valid_img))
 
         if good_ and element["num"] > 1:
 
@@ -367,12 +365,12 @@ def loop_CB(data):
                         r2_coord.append(0)
 
                         for k in range(3):
-                            element["R1"][iter+1].append(result_1[k])
-                            element["R2"][iter+1].append(result_2[k])
+                            element["R1"][iter].append(result_1[k])
+                            element["R2"][iter].append(result_2[k])
 
                 info.signal = 0
-                info.r1 = element["R1"][iter+1]
-                info.r2 = element["R2"][iter+1]
+                info.r1 = element["R1"][iter]
+                info.r2 = element["R2"][iter]
 
                 info.r1_imgcoord = r1_coord
                 info.r2_imgcoord = r2_coord
