@@ -61,11 +61,11 @@ public:
 
         rtabmap.setTimeThreshold(700.0f); // Time threshold : 700 ms, 0 ms means no limit
 
-        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRtabmapLoopThr(), "0.15"));
+        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRtabmapLoopThr(), "0.07"));
         parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRGBDEnabled(), "false"));
 
         // REVIEW rtabmapのstmの決め方
-        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kMemSTMSize(), "2"));
+        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kMemSTMSize(), "5"));
 
         // UFile::erase(database_path);
         // REVIEW 何故か強制シャットダウンする。.ros/rtabmap.dbを消すと治った？？
