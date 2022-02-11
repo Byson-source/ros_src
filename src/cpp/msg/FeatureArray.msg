@@ -1,12 +1,11 @@
 std_msgs/MultiArrayLayout layout
-float64[] r1
+float64[] r_3d
 
-float64[] r2
+int32[] r_2d
 
-int32[] r1_imgcoord
-
-int32[] r2_imgcoord
+int32[] valid_img
 
 string who_detect
-int32[] index2value
+string this
+
 int32 signal

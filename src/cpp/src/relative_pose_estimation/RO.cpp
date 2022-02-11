@@ -268,27 +268,21 @@ public:
     {
         std::string who_detect = data->who_detect;
         loop_info.push_back(data->index2value);
-        std::vector<Eigen::Vector3d> img_coord_1;
-        std::vector<Eigen::Vector3d> img_coord_2;
+        std::vector<Eigen::Vector3d> img_coord;
 
-        std::vector<Eigen::Vector3d> kp_loc_r1_s;
-        std::vector<Eigen::Vector3d> kp_loc_r2_s;
+        std::vector<Eigen::Vector3d> kp_loc_r_s;
 
         for (size_t index{1}; index < data->r1.size() + 1; ++index)
         {
             // ３つ目の要素に差し掛かった時
             if (index % 3 == 0)
             {
-                Eigen::Vector3d kp_loc_r1(data->r1[index - 3], data->r1[index - 2], data->r1[index - 1]);
-                Eigen::Vector3d kp_loc_r2(data->r2[index - 3], data->r2[index - 2], data->r2[index - 1]);
-                kp_loc_r1_s.push_back(kp_loc_r1);
-                kp_loc_r2_s.push_back(kp_loc_r2);
+                Eigen::Vector3d kp_loc_r(data->r_3d[index - 3], data->r_3d[index - 2], data->r_3d[index - 1]);
+                kp_loc_r_s.push_back(kp_loc_r);
                 // NOTE ポイントのカメラ座標
-                Eigen::Vector2d r1_coord(data->r1_imgcoord[index - 3], data->r1_imgcoord[index - 2]);
-                Eigen::Vector2d r2_coord(data->r2_imgcoord[index - 3], data->r2_imgcoord[index - 2]);
+                Eigen::Vector2d r_coord(data->r_2d[index - 3], data->r_2d[index - 2]);
 
-                img_coord_1.push_back(r1_coord);
-                img_coord_2.push_back(r2_coord);
+                img_coord.push_back(r_coord);
             }
         }
 
@@ -306,10 +300,9 @@ public:
             feature_2d_pointer = &feature_2d_dict_r2;
         }
 
-        (*feature_3d_pointer)["R1"][count] = kp_loc_r1_s;
+        (*feature_3d_pointer)["R1"][count] = kp_loc_r_s;
         (*feature_3d_pointer)["R2"][count] = kp_loc_r2_s;
-        (*feature_2d_pointer)["R1"][count] = img_coord_1;
-        (*feature_2d_pointer)["R2"][count] = img_coord_2;
+        (*feature_2d_pointer)["R1"][count] = img_coord;
         count += 1;
 
         if (data->signal == 0)
