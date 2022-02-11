@@ -63,11 +63,11 @@ def convert(path, header):
     two_round(path_1, path, header)
 
 
-home_path = "/home/ayumi/Documents/tohoku_uni/CLOVERs/datasets/field_test/2022_0205_indoor/"
+home_path = "/home/ayumi/Documents/tohoku_uni/CLOVERs/datasets/field_test/2022_0212_indoor/"
 
 
-convert(home_path+"record_g2.bag", "robot1/")
-convert(home_path+"record_r2.bag", "robot2/")
+convert(home_path+"record_r1.bag", "robot1/")
+convert(home_path+"record_b1.bag", "robot2/")
 # convert(home_path+"record_b3.bag", "robot2/")
 # convert(home_path+"record_p1.bag", "robot2/")
 # convert(home_path+"record_p2.bag", "robot2/")
