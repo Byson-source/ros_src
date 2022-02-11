@@ -61,12 +61,12 @@ private:
 
     std::map<int, int> mapPath_dict;
     std::map<int, int> mapPath_dict_2;
-    std::map<std::string, std::map<int, std::vector<Eigen::Vector3d>>> feature_3d_dict_r1;
+    std::map<std::string, std::vector<Eigen::Vector3d>> feature_3d_dict_r1;
     // NOTE {"R1":{1:[[x1,y1,z1],[x2,y2...]],2:...},"R2":...}
-    std::map<std::string, std::map<int, std::vector<Eigen::Vector2d>>> feature_2d_dict_r1;
+    std::map<std::string, std::vector<Eigen::Vector2d>> feature_2d_dict_r1;
     // NOTE {"R1":{1:[[x1,y1,0],[x2,y2...]],2:...},"R2":...}
-    std::map<std::string, std::map<int, std::vector<Eigen::Vector3d>>> feature_3d_dict_r2;
-    std::map<std::string, std::map<int, std::vector<Eigen::Vector2d>>> feature_2d_dict_r2;
+    std::map<std::string, std::vector<Eigen::Vector3d>> feature_3d_dict_r2;
+    std::map < std::string, std::vector < Eigen::Vector2d >>> feature_2d_dict_r2;
 
     int info_index{0};
     int info_index_2{0};
@@ -216,6 +216,10 @@ public:
             data_->data[8], data_->data[9], data_->data[10], data_->data[11],
             0.0, 0.0, 0.0, 1.0;
 
+        std::vector<int> valid;
+        valid = data_->index2value;
+        loop_info = [ data_->index2value[0], data_->index2value[1] ];
+
         // NOTE turnout necessary robot's poses
 
         // NOTE BA
@@ -248,7 +252,7 @@ public:
         // status = 1;
     }
     // NOTE {image_id;[x,y,z]}
-    std::map<int, std::vector<double>> turnout_pose(std::vector<std::vector<int>> img_pairs, std::string who_detect)
+    std::map<int, std::vector<double>> turnout_Localpose(std::vector<std::vector<int>> local_pairs, std::string who_detect)
     {
         std::map<std::string, std::vector<int>> imgs;
         imgs[who_detect].push_back(img_pairs[0[0])
@@ -267,12 +271,11 @@ public:
     void RO_CB(const cpp::FeatureArray::ConstPtr &data)
     {
         std::string who_detect = data->who_detect;
-        loop_info.push_back(data->index2value);
-        std::vector<Eigen::Vector3d> img_coord;
+        std::vector<Eigen::Vector2d> img_coord;
 
         std::vector<Eigen::Vector3d> kp_loc_r_s;
 
-        for (size_t index{1}; index < data->r1.size() + 1; ++index)
+        for (size_t index{1}; index < data->r_3d.size() + 1; ++index)
         {
             // ３つ目の要素に差し掛かった時
             if (index % 3 == 0)
@@ -300,17 +303,12 @@ public:
             feature_2d_pointer = &feature_2d_dict_r2;
         }
 
-        (*feature_3d_pointer)["R1"][count] = kp_loc_r_s;
-        (*feature_3d_pointer)["R2"][count] = kp_loc_r2_s;
-        (*feature_2d_pointer)["R1"][count] = img_coord;
+        (*feature_3d_pointer)[data->this].append(kp_loc_r_s);
+        (*feature_2d_pointer)[data->this].append(img_coord);
         count += 1;
 
         if (data->signal == 0)
         {
-            count = 0;
-            loop_info.clear();
-            feature_3d_pointer->clear();
-            feature_2d_pointer->clear();
         }
 
         // std::map<std::string, std::vector<Eigen::Vector3d>> correspondence_2d3d;
@@ -342,6 +340,14 @@ public:
 
         Eigen::Vector3d ans_t = transfer_1_to_2 - (origin2r2 - origin2r1);
         return ans_t;
+    }
+
+    int translate_index(int img_number, std::string robot_name)
+    {
+        if (robot_name == "R1")
+            return (img_number - 1) / 2;
+        else
+            return img_number / 2;
     }
 
     // NOTE R_o2o'=R_o2a * R_a2b * R_b2o'

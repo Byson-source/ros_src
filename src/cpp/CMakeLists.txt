@@ -332,14 +332,14 @@ add_dependencies(
   ${cpp_EXPORTED_TARGETS}
 )
 
-# add_executable(RO_estimator 
-#               src/relative_pose_estimation/RO.cpp)
+add_executable(RO_estimator 
+              src/relative_pose_estimation/RO.cpp)
 
-# target_link_libraries(
-#   RO_estimator
-#   ${catkin_LIBRARIES}
-#   gtsam
-#   )
+target_link_libraries(
+  RO_estimator
+  ${catkin_LIBRARIES}
+  gtsam
+  )
 # add_executable(gui src/gui/src/gui_2.cpp)
 # target_link_libraries(gui ${catkin_LIBRARIES})
 # add_dependencies(open3d_conversions_ex_sub ${open3d_conversions_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
