@@ -52,8 +52,8 @@ private:
     std::map<int, int> mapPath_dict_2;
     std::map<std::string, std::map<std::string, std::vector<Eigen::Vector3d>>> feature_dict;
     // NOTE {"R1":{"3d":[[x1,y1,z1],[x2,y2...]],"2d":[[x1,y1,0],[x2,y2,0],....]}}...}
-    int info_index{0};
-    int info_index_2{0};
+    int info_index{1};
+    int info_index_2{1};
 
     int status{0};
 
