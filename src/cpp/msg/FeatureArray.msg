@@ -7,6 +7,6 @@ int32[] r1_imgcoord
 
 int32[] r2_imgcoord
 
-int32 who_detect
+string who_detect
 int32[] index2value
 int32 signal

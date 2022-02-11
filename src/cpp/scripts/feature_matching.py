@@ -168,18 +168,23 @@ def orbmatch(fileName1, fileName2, previous_features=False):
 
 
 def add_error(input_list, x, y):
-    input_list = np.asarray(input_list, dtype=object)
 
-    error = np.array([x, y]*input_list.shape[0])
-    error = error.reshape(-1, 2)
-    return input_list+error
+    error = [[x, y]]*len(input_list)
+    errored_list = []
+
+    for i in range(len(input_list)):
+        list_ = []
+        for a, b in zip(input_list[i], error[i]):
+            list_.append(a+b)
+        errored_list.append(list_)
+    return errored_list
 
 
 def derive_duplicated_index(list1, list2, sorted_keys=None):
 
     error_list = [0]
 
-    for i in range(2):
+    for i in range(1):
         error_list.append(i+1)
         error_list.append(-i-1)
 
@@ -210,7 +215,8 @@ def derive_duplicated_index(list1, list2, sorted_keys=None):
             for feature_val in merged:
                 feature_val = list(feature_val)
                 index_hoge = list1.index(feature_val)
-                local_hoge = np.where(list2_ == feature_val)[0][0]
+                local_hoge = list2_.index(feature_val)
+
                 if (sorted_idx[index_hoge] not in survived_index) and (local_hoge not in survived_local):
                     survived_index.append(sorted_idx[index_hoge])
                     survived_local.append(local_hoge)
@@ -267,20 +273,34 @@ def derive_duplicated_indexes(indexes, values):
             next_second.append(feature_map_[
                 local_survivor[hogeee]][1])
 
+        # rospy.logerr(feature_map)
+        # rospy.logwarn(new_map)
+        dict_list.append(new_map)
+
         second_kpt = next_second
         feature_map = new_map
-        dict_list.append(feature_map)
         survived_backup = survived_index
     # 上位のdictの間引きを行う
     new_map_list = []
+    new_map = {}
+
     for dictionary in dict_list:
-        new_map = {}
+        new = {}
         for dict_keyidx, dict_value in dictionary.items():
             if dict_keyidx in survived_index:
-                new_map[dict_keyidx] = dict_value
-        new_map_list.append(new_map)
+                new[dict_keyidx] = dict_value
+        new_map_list.append(new)
 
-    return new_map_list, valid_img_index, survived_index, True
+    first_info = []
+    for first_keys, first_values in new_map_list[0].items():
+        first_info.append(first_values[0])
+    answer_info = [first_info]
+    for dictionary in new_map_list:
+        other_map = []
+        for other_keys, other_values in dictionary.items():
+            other_map.append(other_values[1])
+        answer_info.append(other_map)
+    return answer_info, valid_img_index, survived_index, True
 
 
 def loop_CB(data):
@@ -311,108 +331,109 @@ def loop_CB(data):
                     data.r2_index, data.r2_value)
 
         if good_ and element["num"] > 1:
-
             for iter in range(len(feature_map_list)):
-                # NOTE feature_mapは各画像の間でできるものなのでn枚の画像の時n-1個しかできない
+                #         # NOTE feature_mapは各画像の間でできるものなのでn枚の画像の時n-1個しかできない
                 element["R1"][iter], element["R2"][iter] = [], []
-                indice1, indice2 = 0, 0
-                r1_feature, r2_feature = [], []
+                #         indice1, indice2 = 0, 0
+                #         r1_feature, r2_feature = [], []
 
-                for key, feature_coords in feature_map_list[iter].items():
-                    if index == "R1":
-                        r1_feature.append(feature_coords[0])
-                        r2_feature.append(feature_coords[1])
-                    else:
-                        r1_feature.append(feature_coords[1])
-                        r2_feature.append(feature_coords[0])
+                #         for key, feature_coords in feature_map_list[iter].items():
+                #             if index == "R1":
+                #                 r1_feature.append(feature_coords[0])
+                #                 r2_feature.append(feature_coords[1])
+                #             else:
+                #                 r2_feature.append(feature_coords[0])
+                #                 r1_feature.append(feature_coords[1])
 
-                answer = HomogeneousArray()
-                info = FeatureArray()
-                if index == "R1":
-                    # filter
-                    indice1, indice2 = valid_img[iter], valid_img[iter+1]
-                    info.index2value = [indice1, indice2]
-                    info.who_detect = 1
-                    answer.who_detect = 1
-                else:
-                    indice1, indice2 = valid_img[iter], valid_img[iter+1]
-                    info.index2value = [indice2, indice1]
-                    info.who_detect = 2
-                    answer.who_detect = 2
+                #         answer = HomogeneousArray()
+                #         info = FeatureArray()
+                #         if index == "R1":
+                #             # filter
+                #             indice1, indice2 = valid_img[iter], valid_img[iter+1]
+                #             info.who_detect = "R1"
+                #             answer.who_detect = "R1"
+                #         else:
+                #             indice1, indice2 = valid_img[iter], valid_img[iter+1]
+                #             info.who_detect = "R2"
+                #             answer.who_detect = "R2"
 
-                r1_coord, r2_coord = [], []
+                #         r1_coord, r2_coord = [], []
 
-                # rospy.loginfo("This is No."+str(indice1))
-                for point in range(len(r1_feature)):
-                    if(container[indice1][int(r1_feature[point][1]), int(r1_feature[point][0])] != 0 and
-                       container[indice2][int(r2_feature[point][1]), int(r2_feature[point][0])] != 0):
+                #         # rospy.loginfo("This is No."+str(indice1))
+                #         for point in range(len(r1_feature)):
+                #             if(container[indice1][int(r1_feature[point][1]), int(r1_feature[point][0])] != 0 and
+                #                container[indice2][int(r2_feature[point][1]), int(r2_feature[point][0])] != 0):
 
-                        depth_r1 = container[indice1][int(
-                            r1_feature[point][1]), int(r1_feature[point][0])]
-                        depth_r2 = container[indice2][int(
-                            r2_feature[point][1]), int(r2_feature[point][0])]
+                #                 depth_r1 = container[indice1][int(
+                #                     r1_feature[point][1]), int(r1_feature[point][0])]
+                #                 depth_r2 = container[indice2][int(
+                #                     r2_feature[point][1]), int(r2_feature[point][0])]
 
-                        result_1 = rs2.rs2_deproject_pixel_to_point(
-                            intrinsics, [int(r1_feature[point][0]), int(r1_feature[point][1])], depth_r1)
-                        result_2 = rs2.rs2_deproject_pixel_to_point(
-                            intrinsics, [int(r2_feature[point][0]), int(r2_feature[point][1])], depth_r2)
+                #                 result_1 = rs2.rs2_deproject_pixel_to_point(
+                #                     intrinsics, [int(r1_feature[point][0]), int(r1_feature[point][1])], depth_r1)
+                #                 result_2 = rs2.rs2_deproject_pixel_to_point(
+                #                     intrinsics, [int(r2_feature[point][0]), int(r2_feature[point][1])], depth_r2)
 
-                        r1_coord.append(int(r1_feature[point][0]))
-                        r1_coord.append(int(r1_feature[point][1]))
-                        r1_coord.append(0)
-                        r2_coord.append(int(r2_feature[point][0]))
-                        r2_coord.append(int(r2_feature[point][1]))
-                        r2_coord.append(0)
+                #                 r1_coord.append(int(r1_feature[point][0]))
+                #                 r1_coord.append(int(r1_feature[point][1]))
+                #                 r1_coord.append(0)
+                #                 r2_coord.append(int(r2_feature[point][0]))
+                #                 r2_coord.append(int(r2_feature[point][1]))
+                #                 r2_coord.append(0)
 
-                        for k in range(3):
-                            element["R1"][iter].append(result_1[k])
-                            element["R2"][iter].append(result_2[k])
+                #                 for k in range(3):
+                #                     element["R1"][iter].append(result_1[k])
+                #                     element["R2"][iter].append(result_2[k])
+                #         if iter == len(feature_map_list)-1:
+                #             info.signal = 1
+                #         else:
+                #             info.signal = 0
+                #         info.r1 = element["R1"][iter]
+                #         info.r2 = element["R2"][iter]
 
-                info.signal = 0
-                info.r1 = element["R1"][iter]
-                info.r2 = element["R2"][iter]
+                #         info.r1_imgcoord = r1_coord
+                #         info.r2_imgcoord = r2_coord
 
-                info.r1_imgcoord = r1_coord
-                info.r2_imgcoord = r2_coord
+                #         info.index2value = [valid_img[0], valid_img[1]]
 
-                feature_pub.publish(info)
-            # Loop sequence終了
+                #         feature_pub.publish(info)
+                #     # Loop sequence終了
 
-            source_color = o3d.io.read_image(
-                home+"all_rgb/"+str(referred)+".jpg")
-            source_depth = o3d.io.read_image(
-                home+"depth/"+str(referred)+".png")
-            target_color = o3d.io.read_image(
-                home+"all_rgb/"+str(referred_hyp)+".jpg")
-            target_depth = o3d.io.read_image(
-                home+"depth/"+str(referred_hyp)+".png")
+                #     source_color = o3d.io.read_image(
+                #         home+"all_rgb/"+str(referred)+".jpg")
+                #     source_depth = o3d.io.read_image(
+                #         home+"depth/"+str(referred)+".png")
+                #     target_color = o3d.io.read_image(
+                #         home+"all_rgb/"+str(referred_hyp)+".jpg")
+                #     target_depth = o3d.io.read_image(
+                #         home+"depth/"+str(referred_hyp)+".png")
 
-            source_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
-                source_color, source_depth)
-            target_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
-                target_color, target_depth)
+                #     source_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
+                #         source_color, source_depth)
+                #     target_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
+                #         target_color, target_depth)
 
-            option = o3d.pipelines.odometry.OdometryOption()
-            # option.max_depth=10
-            odo_init = np.identity(4)
+                #     option = o3d.pipelines.odometry.OdometryOption()
+                #     # option.max_depth=10
+                #     odo_init = np.identity(4)
 
-            [success_hybrid_term, trans_hybrid_term,
-             info] = o3d.pipelines.odometry.compute_rgbd_odometry(
-                source_rgbd_image, target_rgbd_image,
-                pinhole_camera_intrinsic, odo_init,
-                o3d.pipelines.odometry.RGBDOdometryJacobianFromHybridTerm(), option)
+                #     [success_hybrid_term, trans_hybrid_term,
+                #      info] = o3d.pipelines.odometry.compute_rgbd_odometry(
+                #         source_rgbd_image, target_rgbd_image,
+                #         pinhole_camera_intrinsic, odo_init,
+                #         o3d.pipelines.odometry.RGBDOdometryJacobianFromHybridTerm(), option)
 
-            odom_result = []
+                #     odom_result = []
 
-            if not success_hybrid_term:
-                rospy.loginfo("Can not compute RGBD Odometry...")
-            else:
-                print(trans_hybrid_term)
-                for value in trans_hybrid_term:
-                    for value_ in value:
-                        odom_result.append(value_)
-                answer.data = odom_result
-                odometry_pub.publish(answer)
+                #     if not success_hybrid_term:
+                #         rospy.loginfo("Can not compute RGBD Odometry...")
+                #     else:
+                #         print(trans_hybrid_term)
+                #         for value in trans_hybrid_term:
+                #             for value_ in value:
+                #                 odom_result.append(value_)
+                #         answer.data = odom_result
+                #         odometry_pub.publish(answer)
 
 
 if __name__ == '__main__':
