@@ -349,7 +349,6 @@ def loop_CB(data):
                 for each_kpt in feature_map_list[iter]:
                     r_feature.append(each_kpt)
 
-                r_coord = []
                 point_coord = []
                 indice = valid_img[iter]
 
@@ -362,10 +361,6 @@ def loop_CB(data):
                         result = rs2.rs2_deproject_pixel_to_point(
                             intrinsics, [int(r_feature[point][0]), int(r_feature[point][1])], depth_r)
 
-                        r_coord.append(int(r_feature[point][0]))
-                        r_coord.append(int(r_feature[point][1]))
-                        r_coord.append(0)
-
                         for k in range(3):
                             point_coord.append(result[k])
 
@@ -375,7 +370,6 @@ def loop_CB(data):
                     info.signal = 0
 
                 info.r_3d = point_coord
-                info.r_2d = r_coord
 
                 if ((index == "R1" and iter % 2 == 1) or (index == "R2" and iter % 2 == 0)):
                     info.me = "R1"
