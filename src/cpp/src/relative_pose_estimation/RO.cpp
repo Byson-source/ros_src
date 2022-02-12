@@ -251,20 +251,46 @@ public:
         // draw_t = ans_t;
         // status = 1;
     }
-    // NOTE {image_id;[x,y,z]}
-    std::map<int, std::vector<double>> turnout_Localpose(std::vector<std::vector<int>> local_pairs, std::string who_detect)
+    // NOTE [[x,y,z,qx,qy,qz,qw],[..]]
+    std::vector<std::vector<double>> turnout_Localpose(std::vector<int> local_pairs, std::string who_detect)
     {
-        std::map<std::string, std::vector<int>> imgs;
-        imgs[who_detect].push_back(img_pairs[0[0])
-
-        if(who_detect=="R1")
+        std::map<int, int> *mapPath_dict_ptr{nullptr};
+        std::vector<std::vector<double>> *path_ptr{nullptr};
+        if (who_detect == "R1")
         {
-            for (auto pair : img_pairs)
-                imgs["R2"].push_back(pair[1])
+            mapPath_dict_ptr = &mapPath_dict_1;
+            path_ptr = &path_1;
+        }
+        else
+        {
+            mapPath_dict_ptr = &mapPath_dict_2;
+            path_ptr = &path_2;
         }
 
-        for (auto pair : img_pairs)
-            imgs.push_back(pair[1]);
+        std::vector<std::vector<double>> answer_poses{[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]};
+        int local_origin_id{translate_index(local_pairs[0], who_detect)};
+        int path_idx{(*mapPath_dict_ptr)[local_origin_id - 1]};
+
+        Eigen::Vector3d origin_xyz((*path_ptr)[path_idx][0], (*path_ptr)[path_idx][1], (*path_ptr)[path_idx][2]);
+        Eigen::Quaterniond origin_quat((*path_ptr)[path_idx][6], (*path_ptr)[path_idx][3], (*path_ptr)[path_idx][4], (*path_ptr)[path_idx][5]);
+        Eigen::Matrix3d origin_rot = origin_quat.matrix();
+
+        for (int id{1}; id < local_pairs.size(); ++id)
+        {
+            int local_id{translate_index(local_pairs[id], who_detect)};
+            int local_path_idx{(*mapPath_dict_ptr)[local_id - 1]} Eigen::Vector3d local_xyz((*path_ptr)[local_path_idx][0], (*path_ptr)[local_path_idx][1], (*path_ptr)[local_path_idx][2]);
+            Eigen::Quaterniond local_quat((*path_ptr)[local_path_idx][6], (*path_ptr)[local_path_idx][3], (*path_ptr)[local_path_idx][4], (*path_ptr)[local_path_idx][5]);
+            Eigen::Matrix3d local_rot = local_quat.matrix();
+            // x,y,z
+            local_xyz = local_xyz - origin_xyz;
+            // rot
+            local_rot = origin_rot.transpose() * local_rot;
+            Eigen::Quaterniond answer_quat{local_rot};
+
+            std::vector<double> answer_pose{local_xyz.x(), local_xyz.y(), local_xyz.z(), answer_quat.w(), answer_quat.x(), answer_quat.y(), answer_quat.z()};
+            answer_poses.push_back(answer_pose);
+        }
+        return answer_poses;
     }
 
     // NOTE 共通特徴点の画像座標とカメラ座標を取得
@@ -345,7 +371,7 @@ public:
     int translate_index(int img_number, std::string robot_name)
     {
         if (robot_name == "R1")
-            return (img_number - 1) / 2;
+            return (img_number - 1) / 2 + 1;
         else
             return img_number / 2;
     }
