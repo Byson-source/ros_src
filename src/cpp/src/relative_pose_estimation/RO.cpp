@@ -58,15 +58,14 @@ private:
     // NOTE xyz / xyzw
     std::vector<std::vector<double>> path_1;
     std::vector<std::vector<double>> path_2;
+    std::vector<int> valids;
 
     std::map<int, int> mapPath_dict;
     std::map<int, int> mapPath_dict_2;
-    std::map<std::string, std::vector<std::vector<Eigen::Vector3d>>> feature_3d_dict_r1;
+    std::vector<std::vector<Eigen::Vector3d>> feature_3d_dict;
     // NOTE {"R1":{1:[[x1,y1,z1],[x2,y2...]],2:...},"R2":...}
-    std::map<std::string, std::vector<std::vector<Eigen::Vector2d>>> feature_2d_dict_r1;
+    std::vector<std::vector<Eigen::Vector2d>> feature_2d_dict;
     // NOTE {"R1":{1:[[x1,y1,0],[x2,y2...]],2:...},"R2":...}
-    std::map<std::string, std::vector<std::vector<Eigen::Vector3d>>> feature_3d_dict_r2;
-    std::map<std::string, std::vector<std::vector<Eigen::Vector2d>>> feature_2d_dict_r2;
 
     int info_index{0};
     int info_index_2{0};
@@ -79,8 +78,6 @@ private:
 
     Eigen::Matrix3d draw_rotation;
     Eigen::Vector3d draw_t;
-
-    int count{0};
 
     // NOTE node_map...{time;{1:[]}
     // points location
@@ -216,39 +213,55 @@ public:
             data_->data[8], data_->data[9], data_->data[10], data_->data[11],
             0.0, 0.0, 0.0, 1.0;
         loop_info = data_->index2value;
+        valids = data_->valid_img;
+        who_detect = data_->who_detect;
+
+        transformation_result = cam2robot * transformation_result;
+
+        std::vector hyps, locals;
+        for (int idx{0}; idx < valids.size(); ++idx)
+        {
+            if (i % 2 == 1)
+                locals.push_back(valids[idx]);
+            else
+                hyps.push_back(valids[idx]);
+        }
 
         // NOTE turnout necessary robot's poses
+        std::vector<std::vector<double>> local_poses = turnout_localpose(locals, who_detect);
+
+        std::vector<std::vector<double>> hyp_poses = turnout_hyps_pose(transformation_result, hyps, "R2");
+
+        std::vector<std::vector<Eigen::Vector3d>> pcds = turnout_point_coord(feature_3d_dict, local_poses);
+        std::vector<std::vector<Eigen::Vector3d>> hyp_pointclouds = turnout_point_coord(feature_3d_dict, local_poses);
 
         // NOTE BA
-
-        // transformation_result=cam2robot*transformation_result;
-
-        // Eigen::Vector3d transfer_;
-        // Eigen::Matrix3d rotation_;
-        // transfer_ = transformation_result.block(0, 3, 3, 1);
-        // rotation_ = transformation_result.block(0, 0, 3, 3);
-
-        // rotation_ = cam2robot.transpose() * rotation_ * cam2robot;
-        // transfer_ = cam2robot.transpose() * transfer_;
-
-        // cpp::RO_Array pose_result;
-        // std::string who_detect = data_->who_detect;
-        // Eigen::Vector3d ans_t = turnout_T(transfer_, who_detect);
-        // Eigen::Quaterniond ans_r = turnout_R(rotation_, who_detect);
-
-        // std::vector<double> R{ans_r.w(), ans_r.x(), ans_r.y(), ans_r.z()};
-        // std::vector<double> t{ans_t[0], ans_t[1], ans_t[2]};
-
-        // pose_result.translation = t;
-        // pose_result.euler = R;
-
-        // rt_pub.publish(pose_result);
-
-        // draw_rotation = ans_r.matrix();
-        // draw_t = ans_t;
-        // status = 1;
     }
     // NOTE [[x,y,z,qx,qy,qz,qw],[..]]
+
+    std::vector<std::vector<Eigen::Vector3d>> turnout_point_coord(std::vector<std::vector<Eigen::Vector3d>> point_coord, std::vector<std::vector<double>> each_poses)
+    {
+        std::vector<std::vector<Eigen::Vector3d>> answer_point_coord;
+        for (int i_{0}; i_ < each_poses.size(); ++i_)
+        {
+            std::vector<Eigen::Vector3d> answer_per_image;
+            for (val : point_coord[i_])
+            {
+                Eigen::Vector3d transhoge(each_poses[i][0], each_poses[i][1], each_poses[i][2]);
+                Eigen::Quaterniond rot_(each_poses[i][3], each_poses[i][4], each_poses[i][5], each_poses[i][6])
+                    Eigen::Matrix3d rothoge = rot_.matrix();
+
+                Eigen::Vector3d answer;
+                answer = rothoge * val + transhoge
+
+                                             answer_per_image.push_back(answer);
+            }
+            answer_point_coord.push_back(answer_per_image);
+        }
+
+        return answer_point_coord;
+    }
+
     std::vector<std::vector<double>> turnout_Localpose(std::vector<int> local_pairs, std::string who_detect)
     {
         std::map<int, int> *mapPath_dict_ptr{nullptr};
@@ -294,12 +307,15 @@ public:
         return answer_poses;
     }
 
-    std::vector<std::vector<double>> turnout_hyps_pose(Eigen::Matrix3d rotation_mat, Eigen::Vector3d translation_vec, std::vector<int> hyp_pairs, std::string robot_name)
+    std::vector<std::vector<double>> turnout_hyps_pose(Eigen::Matrix4d odom_trans, std::vector<int> hyp_pairs, std::string robot_name)
     {
         std::vector<std::vector<double>> hyps_local_poses = turnout_Localpose(hyp_pairs, robot_name);
         std::vector<Eigen::Vector3d> t_s;
         std::vector<Eigen::Matrix3d> r_s;
         std::vector<std::vector<double>> answers;
+
+        Eigen::Matrix3d rotation_mat = odom_trans.block(0, 0, 3, 3);
+        Eigen::Matrix3d translation_vec = odom_trans.block(3, 0, 3, 1);
 
         for (auto each : hyps_local_poses)
         {
@@ -326,7 +342,6 @@ public:
     // NOTE 共通特徴点の画像座標とカメラ座標を取得
     void RO_CB(const cpp::FeatureArray::ConstPtr &data)
     {
-        std::string who_detect = data->who_detect;
         std::vector<Eigen::Vector2d> img_coord;
 
         std::vector<Eigen::Vector3d> kp_loc_r_s;
@@ -345,27 +360,8 @@ public:
             }
         }
 
-        std::map<std::string, std::vector<std::vector<Eigen::Vector3d>>> *feature_3d_pointer{nullptr};
-        std::map<std::string, std::vector<std::vector<Eigen::Vector2d>>> *feature_2d_pointer{nullptr};
-
-        if (who_detect == "R1")
-        {
-            feature_3d_pointer = &feature_3d_dict_r1;
-            feature_2d_pointer = &feature_2d_dict_r1;
-        }
-        else
-        {
-            feature_3d_pointer = &feature_3d_dict_r2;
-            feature_2d_pointer = &feature_2d_dict_r2;
-        }
-
-        (*feature_3d_pointer)[data->me].push_back(kp_loc_r_s);
-        (*feature_2d_pointer)[data->me].push_back(img_coord);
-        count += 1;
-
-        if (data->signal == 0)
-        {
-        }
+        feature_3d_dict.push_back(kp_loc_r_s);
+        feature_2d_dict.push_back(img_coord);
 
         // std::map<std::string, std::vector<Eigen::Vector3d>> correspondence_2d3d;
     }
