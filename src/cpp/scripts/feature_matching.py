@@ -378,9 +378,9 @@ def loop_CB(data):
                 info.r_2d = r_coord
 
                 if ((index == "R1" and iter % 2 == 1) or (index == "R2" and iter % 2 == 0)):
-                    info.this = "R1"
+                    info.me = "R1"
                 else:
-                    info.this = "R2"
+                    info.me = "R2"
 
                 feature_pub.publish(info)
 

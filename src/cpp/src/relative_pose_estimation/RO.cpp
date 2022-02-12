@@ -54,19 +54,19 @@ private:
 
     visualization_msgs::Marker points, line_strip, line_list;
 
-    std::vector<std::vector<int>> loop_info;
+    std::vector<int> loop_info;
     // NOTE xyz / xyzw
     std::vector<std::vector<double>> path_1;
     std::vector<std::vector<double>> path_2;
 
     std::map<int, int> mapPath_dict;
     std::map<int, int> mapPath_dict_2;
-    std::map<std::string, std::vector<Eigen::Vector3d>> feature_3d_dict_r1;
+    std::map<std::string, std::vector<std::vector<Eigen::Vector3d>>> feature_3d_dict_r1;
     // NOTE {"R1":{1:[[x1,y1,z1],[x2,y2...]],2:...},"R2":...}
-    std::map<std::string, std::vector<Eigen::Vector2d>> feature_2d_dict_r1;
+    std::map<std::string, std::vector<std::vector<Eigen::Vector2d>>> feature_2d_dict_r1;
     // NOTE {"R1":{1:[[x1,y1,0],[x2,y2...]],2:...},"R2":...}
-    std::map<std::string, std::vector<Eigen::Vector3d>> feature_3d_dict_r2;
-    std::map < std::string, std::vector < Eigen::Vector2d >>> feature_2d_dict_r2;
+    std::map<std::string, std::vector<std::vector<Eigen::Vector3d>>> feature_3d_dict_r2;
+    std::map<std::string, std::vector<std::vector<Eigen::Vector2d>>> feature_2d_dict_r2;
 
     int info_index{0};
     int info_index_2{0};
@@ -215,10 +215,7 @@ public:
             data_->data[4], data_->data[5], data_->data[6], data_->data[7],
             data_->data[8], data_->data[9], data_->data[10], data_->data[11],
             0.0, 0.0, 0.0, 1.0;
-
-        std::vector<int> valid;
-        valid = data_->index2value;
-        loop_info = [ data_->index2value[0], data_->index2value[1] ];
+        loop_info = data_->index2value;
 
         // NOTE turnout necessary robot's poses
 
@@ -258,7 +255,7 @@ public:
         std::vector<std::vector<double>> *path_ptr{nullptr};
         if (who_detect == "R1")
         {
-            mapPath_dict_ptr = &mapPath_dict_1;
+            mapPath_dict_ptr = &mapPath_dict;
             path_ptr = &path_1;
         }
         else
@@ -267,7 +264,10 @@ public:
             path_ptr = &path_2;
         }
 
-        std::vector<std::vector<double>> answer_poses{[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]};
+        std::vector<std::vector<double>> answer_poses;
+        std::vector<double> initial{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
+        answer_poses.push_back(initial);
+
         int local_origin_id{translate_index(local_pairs[0], who_detect)};
         int path_idx{(*mapPath_dict_ptr)[local_origin_id - 1]};
 
@@ -278,7 +278,8 @@ public:
         for (int id{1}; id < local_pairs.size(); ++id)
         {
             int local_id{translate_index(local_pairs[id], who_detect)};
-            int local_path_idx{(*mapPath_dict_ptr)[local_id - 1]} Eigen::Vector3d local_xyz((*path_ptr)[local_path_idx][0], (*path_ptr)[local_path_idx][1], (*path_ptr)[local_path_idx][2]);
+            int local_path_idx{(*mapPath_dict_ptr)[local_id - 1]};
+            Eigen::Vector3d local_xyz((*path_ptr)[local_path_idx][0], (*path_ptr)[local_path_idx][1], (*path_ptr)[local_path_idx][2]);
             Eigen::Quaterniond local_quat((*path_ptr)[local_path_idx][6], (*path_ptr)[local_path_idx][3], (*path_ptr)[local_path_idx][4], (*path_ptr)[local_path_idx][5]);
             Eigen::Matrix3d local_rot = local_quat.matrix();
             // x,y,z
@@ -291,6 +292,35 @@ public:
             answer_poses.push_back(answer_pose);
         }
         return answer_poses;
+    }
+
+    std::vector<std::vector<double>> turnout_hyps_pose(Eigen::Matrix3d rotation_mat, Eigen::Vector3d translation_vec, std::vector<int> hyp_pairs, std::string robot_name)
+    {
+        std::vector<std::vector<double>> hyps_local_poses = turnout_Localpose(hyp_pairs, robot_name);
+        std::vector<Eigen::Vector3d> t_s;
+        std::vector<Eigen::Matrix3d> r_s;
+        std::vector<std::vector<double>> answers;
+
+        for (auto each : hyps_local_poses)
+        {
+            Eigen::Vector3d each_translation(each[0], each[1], each[2]);
+            Eigen::Quaterniond extract_quat(each[3], each[4], each[5], each[6]);
+            Eigen::Matrix3d each_rot = extract_quat.matrix();
+
+            t_s.push_back(each_translation);
+            r_s.push_back(each_rot);
+        }
+
+        for (int iteration{0}; iteration < t_s.size(); ++iteration)
+        {
+            Eigen::Vector3d ans_trans = rotation_mat * t_s[iteration] + translation_vec;
+            Eigen::Matrix3d ans_rot = rotation_mat * r_s[iteration];
+            Eigen::Quaterniond ans_quat{ans_rot};
+            std::vector<double> answer{ans_trans.x(), ans_trans.y(), ans_trans.z(), ans_quat.w(), ans_quat.x(), ans_quat.y(), ans_quat.z()};
+            answers.push_back(answer);
+        }
+
+        return answers;
     }
 
     // NOTE 共通特徴点の画像座標とカメラ座標を取得
@@ -315,8 +345,8 @@ public:
             }
         }
 
-        std::map<std::string, std::map<int, std::vector<Eigen::Vector3d>>> *feature_3d_pointer{nullptr};
-        std::map<std::string, std::map<int, std::vector<Eigen::Vector3d>>> *feature_2d_pointer{nullptr};
+        std::map<std::string, std::vector<std::vector<Eigen::Vector3d>>> *feature_3d_pointer{nullptr};
+        std::map<std::string, std::vector<std::vector<Eigen::Vector2d>>> *feature_2d_pointer{nullptr};
 
         if (who_detect == "R1")
         {
@@ -329,8 +359,8 @@ public:
             feature_2d_pointer = &feature_2d_dict_r2;
         }
 
-        (*feature_3d_pointer)[data->this].append(kp_loc_r_s);
-        (*feature_2d_pointer)[data->this].append(img_coord);
+        (*feature_3d_pointer)[data->me].push_back(kp_loc_r_s);
+        (*feature_2d_pointer)[data->me].push_back(img_coord);
         count += 1;
 
         if (data->signal == 0)

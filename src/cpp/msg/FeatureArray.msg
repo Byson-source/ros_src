@@ -6,6 +6,6 @@ int32[] r_2d
 int32[] valid_img
 
 string who_detect
-string this
+string me
 
 int32 signal
