@@ -91,6 +91,9 @@ private:
     // NOTE node_map...{time;{1:[]}
     // points location
 
+    auto measurementNoise =
+        noiseModel::Isotropic::Sigma(2, 1.0); // one pixel in u and v
+
 public:
     // NOTE コンストラクタ、各種設定
     RO_Estimator(void)
@@ -303,7 +306,13 @@ public:
         // NOTE BA
     }
 
-    // void compute_BA(std::vector<std::vector<Eigen::Vector3d>> local_pcds, std::vector<std::vector<double>>)
+    void compute_BA(std::vector<std::vector<Eigen::Vector3d>> local_pcds, std::vector<Eigen::VectorXd> local_sigma, std::vector<Eigen::VectorXd> hyp_sigma,
+                    std::vector<std::vector<double>> local_pose, std::vector<std::vector<double>> hyp_pose, )
+    {
+        auto initial_pose_noise = noiseModel::Diagonal::Sigmas(Vector(6) << Vector3::Constant(0.0), Vector3::Constant(0.0));
+        graph.addPrior(Symbol('x', 0), local_pose[0], initial_pose_noise);
+        std::vector<Symbol> pose_symbol;
+        }
     // NOTE [[x,y,z,qx,qy,qz,qw],[..]]
 
     std::vector<std::vector<Eigen::Vector3d>> turnout_point_coord(std::vector<std::vector<Eigen::Vector3d>> point_coord, std::vector<std::vector<double>> each_poses)
@@ -432,6 +441,14 @@ public:
         feature_local_list.push_back(kp_local);
     }
 
+    int translate_index(int img_number, std::string robot_name)
+    {
+        if (robot_name == "R1")
+            return (img_number - 1) / 2 + 1;
+        else
+            return img_number / 2;
+    }
+
     Eigen::Vector3d turnout_T(Eigen::Vector3d transfer, std::string who_is_detect)
     {
         Eigen::Vector3d r1_to_r2;
@@ -458,14 +475,6 @@ public:
 
         Eigen::Vector3d ans_t = transfer_1_to_2 - (origin2r2 - origin2r1);
         return ans_t;
-    }
-
-    int translate_index(int img_number, std::string robot_name)
-    {
-        if (robot_name == "R1")
-            return (img_number - 1) / 2 + 1;
-        else
-            return img_number / 2;
     }
 
     // NOTE R_o2o'=R_o2a * R_a2b * R_b2o'
