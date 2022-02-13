@@ -68,8 +68,6 @@ private:
     std::map<int, int> mapPath_dict_2;
     std::vector<std::vector<Eigen::Vector3d>> feature_local_list;
     // NOTE {"R1":{1:[[x1,y1,z1],[x2,y2...]],2:...},"R2":...}
-    std::vector<std::vector<Eigen::Vector3d>> feature_hyp_list;
-    // NOTE {"R1":{1:[[x1,y1,0],[x2,y2...]],2:...},"R2":...}
 
     int info_index{0};
     int info_index_2{0};
@@ -231,7 +229,6 @@ public:
         std::vector<std::vector<double>> hyp_poses = turnout_hyps_pose(transformation_result, hyps, "R2");
 
         std::vector<std::vector<Eigen::Vector3d>> local_pcds = turnout_point_coord(feature_local_list, local_poses);
-        std::vector<std::vector<Eigen::Vector3d>> hyp_pcds = turnout_point_coord(feature_hyp_list, hyp_poses);
         // NOTE BA
     }
     // NOTE [[x,y,z,qx,qy,qz,qw],[..]]
@@ -360,7 +357,6 @@ public:
         }
 
         feature_local_list.push_back(kp_local);
-        feature_hyp_list.push_back(kp_hyp);
     }
 
     Eigen::Vector3d turnout_T(Eigen::Vector3d transfer, std::string who_is_detect)
