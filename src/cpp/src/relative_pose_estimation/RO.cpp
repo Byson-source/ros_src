@@ -40,9 +40,13 @@
 #include <gtsam/nonlinear/Marginals.h>
 #include <gtsam/nonlinear/Values.h>
 
+using namespace gtsam;
+
 class RO_Estimator
 {
 private:
+    Cal3_S2::shared_ptr K(new Cal3_S2(617.5604248046, 617.3798828, 0.0, 317.55502, 244.730865));
+
     ros::NodeHandle n;
     ros::Subscriber feature_sub;
     ros::Subscriber path_sub1;
@@ -226,9 +230,8 @@ public:
 
         std::vector<std::vector<double>> hyp_poses = turnout_hyps_pose(transformation_result, hyps, "R2");
 
-        std::vector<std::vector<Eigen::Vector3d>> pcds = turnout_point_coord(feature_local_list, local_poses);
-        std::vector<std::vector<Eigen::Vector3d>> hyp_pointclouds = turnout_point_coord(feature_hyp_list, hyp_poses);
-
+        std::vector<std::vector<Eigen::Vector3d>> local_pcds = turnout_point_coord(feature_local_list, local_poses);
+        std::vector<std::vector<Eigen::Vector3d>> hyp_pcds = turnout_point_coord(feature_hyp_list, hyp_poses);
         // NOTE BA
     }
     // NOTE [[x,y,z,qx,qy,qz,qw],[..]]
