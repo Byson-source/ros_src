@@ -70,8 +70,10 @@ private:
 
     std::map<int, int> mapPath_dict;
     std::map<int, int> mapPath_dict_2;
-    std::map<std::vector<int>, Eigen::VectorXd> link_dict1;
-    std::map<std::vector<int>, Eigen::VectorXd> link_dict2;
+    std::map<std::vector<int>, Eigen::VectorXd> info_dict1;
+    std::map<std::vector<int>, Eigen::VectorXd> info_dict2;
+    std::map<std::vector<int>, std::vector<double>> odom_dict1;
+    std::map<std::vector<int>, std::vector<double>> odom_dict2;
 
     std::vector<std::vector<Eigen::Vector3d>> feature_local_list;
     // NOTE {"R1":{1:[[x1,y1,z1],[x2,y2...]],2:...},"R2":...}
@@ -90,9 +92,6 @@ private:
 
     // NOTE node_map...{time;{1:[]}
     // points location
-
-    auto measurementNoise =
-        noiseModel::Isotropic::Sigma(2, 1.0); // one pixel in u and v
 
 public:
     // NOTE コンストラクタ、各種設定
@@ -141,27 +140,36 @@ public:
 
     void info_CB1(const rtabmap_ros::MapGraph::ConstPtr &data)
     {
-        link_dict1.clear();
+        info_dict1.clear();
+        odom_dict1.clear();
         for (auto each_link : data->links)
         {
             std::vector<int> fromto{each_link.fromId, each_link.toId};
             Eigen::VectorXd infos(6);
-            infos << 1 / each_link.information[0], 1 / each_link.information[7], 1 / each_link.information[14],
-                1 / each_link.information[21], 1 / each_link.information[28], 1 / each_link.information[35];
-            link_dict1[fromto] = infos;
+            std::vector<double> odom_link{each_link.transform.translation.x, each_link.transform.translation.y, each_link.transform.translation.z,
+                                          each_link.transform.rotation.x, each_link.transform.rotation.y, each_link.transform.rotation.z, each_link.transform.rotation.w};
+            infos << each_link.information[0], each_link.information[7], each_link.information[14],
+                each_link.information[21], each_link.information[28], each_link.information[35];
+            info_dict1[fromto] = infos;
+            odom_dict1[fromto] = odom_link;
         }
     }
 
     void info_CB2(const rtabmap_ros::MapGraph::ConstPtr &data)
     {
-        link_dict2.clear();
+        info_dict2.clear();
+        odom_dict2.clear();
         for (auto each_link : data->links)
         {
             std::vector<int> fromto{each_link.fromId, each_link.toId};
+            std::vector<double> odom_link{each_link.transform.translation.x, each_link.transform.translation.y, each_link.transform.translation.z,
+                                          each_link.transform.rotation.x, each_link.transform.rotation.y, each_link.transform.rotation.z, each_link.transform.rotation.w};
+
             Eigen::VectorXd infos(6);
-            infos << 1 / each_link.information[0], 1 / each_link.information[7], 1 / each_link.information[14],
-                1 / each_link.information[21], 1 / each_link.information[28], 1 / each_link.information[35];
-            link_dict2[fromto] = infos;
+            infos << each_link.information[0], each_link.information[7], each_link.information[14],
+                each_link.information[21], each_link.information[28], each_link.information[35];
+            info_dict2[fromto] = infos;
+            odom_dict2[fromto] = odom_link;
         }
     }
 
@@ -237,34 +245,6 @@ public:
         // lineの描画
     }
 
-    std::vector<Eigen::VectorXd> turnout_sigma(std::vector<int> imgs, std::string name)
-    {
-        std::map<std::vector<int>, Eigen::VectorXd> *link_dict_ptr;
-        if (name == "R1")
-            link_dict_ptr = &link_dict1;
-        else
-            link_dict_ptr = &link_dict2;
-
-        int initial{imgs[0]};
-
-        Eigen::VectorXd initial_vector(6);
-        initial_vector << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-
-        std::vector<Eigen::VectorXd> sigma_answer{initial_vector};
-        // TODO GTSAM上で表現できる？
-        for (int iteration{0}; iteration < imgs.size(); ++iteration)
-        {
-            Eigen::VectorXd accumulated_sigma(6);
-            accumulated_sigma << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-            for (int iter{initial}; iter < initial + iteration; ++iter)
-            {
-                accumulated_sigma = accumulated_sigma + (*link_dict_ptr)[{iter + 1, iter}];
-            }
-            sigma_answer.push_back(accumulated_sigma);
-        }
-
-        return sigma_answer;
-    }
     // NOTE feature_matcherからrgbd odometryの計算結果をsubscribe
     void odom_CB(const cpp::HomogeneousArray::ConstPtr &data_)
     {
@@ -300,19 +280,18 @@ public:
         std::vector<std::vector<double>> hyp_poses = turnout_hyps_pose(transformation_result, hyps, another_one);
 
         std::vector<std::vector<Eigen::Vector3d>> local_pcds = turnout_point_coord(feature_local_list, local_poses);
-
-        std::vector<Eigen::VectorXd> local_sigmas = turnout_sigma(locals, who_detect);
-        std::vector<Eigen::VectorXd> hyp_sigmas = turnout_sigma(hyps, another_one);
         // NOTE BA
     }
 
     void compute_BA(std::vector<std::vector<Eigen::Vector3d>> local_pcds, std::vector<Eigen::VectorXd> local_sigma, std::vector<Eigen::VectorXd> hyp_sigma,
-                    std::vector<std::vector<double>> local_pose, std::vector<std::vector<double>> hyp_pose, )
+                    std::vector<std::vector<double>> local_pose, std::vector<std::vector<double>> hyp_pose)
     {
-        auto initial_pose_noise = noiseModel::Diagonal::Sigmas(Vector(6) << Vector3::Constant(0.0), Vector3::Constant(0.0));
+        auto initial_pose_noise = noiseModel::Diagonal::Sigmas((Vector(6) << Vector3::Constant(0.0), Vector3::Constant(0.0)).finished());
+        auto measurementNoise = noiseModel::Isotropic::Sigma(2, 1.0);
+        NonlinearFactorGraph graph;
         graph.addPrior(Symbol('x', 0), local_pose[0], initial_pose_noise);
         std::vector<Symbol> pose_symbol;
-        }
+    }
     // NOTE [[x,y,z,qx,qy,qz,qw],[..]]
 
     std::vector<std::vector<Eigen::Vector3d>> turnout_point_coord(std::vector<std::vector<Eigen::Vector3d>> point_coord, std::vector<std::vector<double>> each_poses)
@@ -375,6 +354,7 @@ public:
             local_xyz = local_xyz - origin_xyz;
             // rot
             local_rot = origin_rot.transpose() * local_rot;
+
             Eigen::Quaterniond answer_quat{local_rot};
 
             std::vector<double> answer_pose{local_xyz.x(), local_xyz.y(), local_xyz.z(), answer_quat.w(), answer_quat.x(), answer_quat.y(), answer_quat.z()};
