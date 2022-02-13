@@ -275,9 +275,9 @@ public:
         }
 
         // NOTE turnout necessary robot's poses
-        std::vector<std::vector<double>> local_poses = turnout_Localpose(locals, who_detect);
+        std::vector<Eigen::Matrix4d> local_poses = turnout_Localpose(locals, who_detect);
 
-        std::vector<std::vector<double>> hyp_poses = turnout_hyps_pose(transformation_result, hyps, another_one);
+        std::vector<Eigen::Matrix4d> hyp_poses = turnout_hyps_pose(transformation_result, hyps, another_one);
 
         std::vector<std::vector<Eigen::Vector3d>> local_pcds = turnout_point_coord(feature_local_list, local_poses);
         // NOTE BA
@@ -294,7 +294,7 @@ public:
     }
     // NOTE [[x,y,z,qx,qy,qz,qw],[..]]
 
-    std::vector<std::vector<Eigen::Vector3d>> turnout_point_coord(std::vector<std::vector<Eigen::Vector3d>> point_coord, std::vector<std::vector<double>> each_poses)
+    std::vector<std::vector<Eigen::Vector3d>> turnout_point_coord(std::vector<std::vector<Eigen::Vector3d>> point_coord, std::vector<Eigen::Matrix4d> each_poses)
     {
         std::vector<std::vector<Eigen::Vector3d>> answer_point_coord;
         for (int i_{0}; i_ < each_poses.size(); ++i_)
@@ -302,9 +302,8 @@ public:
             std::vector<Eigen::Vector3d> answer_per_image;
             for (auto val : point_coord[i_])
             {
-                Eigen::Vector3d transhoge(each_poses[i_][0], each_poses[i_][1], each_poses[i_][2]);
-                Eigen::Quaterniond rot_(each_poses[i_][3], each_poses[i_][4], each_poses[i_][5], each_poses[i_][6]);
-                Eigen::Matrix3d rothoge = rot_.matrix();
+                Eigen::Vector3d transhoge = each_poses[i_].block(0, 3, 3, 1);
+                Eigen::Matrix3d rothoge = each_poses[i_].block(0, 0, 3, 3);
 
                 Eigen::Vector3d answer;
                 answer = rothoge * val + transhoge;
@@ -317,7 +316,7 @@ public:
         return answer_point_coord;
     }
 
-    std::vector<std::vector<double>> turnout_Localpose(std::vector<int> local_pairs, std::string who_detect)
+    std::vector<Eigen::Matrix4d> turnout_Localpose(std::vector<int> local_pairs, std::string who_detect)
     {
         std::map<int, int> *mapPath_dict_ptr{nullptr};
         std::vector<std::vector<double>> *path_ptr{nullptr};
@@ -332,8 +331,12 @@ public:
             path_ptr = &path_2;
         }
 
-        std::vector<std::vector<double>> answer_poses;
-        std::vector<double> initial{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
+        std::vector<Eigen::Matrix4d> answer_poses;
+        Eigen::Matrix4d initial;
+        initial << 0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 1;
         answer_poses.push_back(initial);
 
         int local_origin_id{translate_index(local_pairs[0], who_detect)};
@@ -355,29 +358,28 @@ public:
             // rot
             local_rot = origin_rot.transpose() * local_rot;
 
-            Eigen::Quaterniond answer_quat{local_rot};
-
-            std::vector<double> answer_pose{local_xyz.x(), local_xyz.y(), local_xyz.z(), answer_quat.w(), answer_quat.x(), answer_quat.y(), answer_quat.z()};
+            Eigen::Matrix4d answer_pose;
+            answer_pose.block(0, 0, 3, 3) = local_rot;
+            answer_pose.block(0, 3, 3, 1) = local_xyz;
             answer_poses.push_back(answer_pose);
         }
         return answer_poses;
     }
 
-    std::vector<std::vector<double>> turnout_hyps_pose(Eigen::Matrix4d odom_trans, std::vector<int> hyp_pairs, std::string robot_name)
+    std::vector<Eigen::Matrix4d> turnout_hyps_pose(Eigen::Matrix4d odom_trans, std::vector<int> hyp_pairs, std::string robot_name)
     {
-        std::vector<std::vector<double>> hyps_local_poses = turnout_Localpose(hyp_pairs, robot_name);
+        std::vector<Eigen::Matrix4d> hyps_local_poses = turnout_Localpose(hyp_pairs, robot_name);
         std::vector<Eigen::Vector3d> t_s;
         std::vector<Eigen::Matrix3d> r_s;
-        std::vector<std::vector<double>> answers;
+        std::vector<Eigen::Matrix4d> answers;
 
         Eigen::Matrix3d rotation_mat = odom_trans.block(0, 0, 3, 3);
         Eigen::Vector3d translation_vec = odom_trans.block(3, 0, 3, 1);
 
         for (auto each : hyps_local_poses)
         {
-            Eigen::Vector3d each_translation(each[0], each[1], each[2]);
-            Eigen::Quaterniond extract_quat(each[3], each[4], each[5], each[6]);
-            Eigen::Matrix3d each_rot = extract_quat.matrix();
+            Eigen::Vector3d each_translation = each.block(0, 3, 3, 1);
+            Eigen::Matrix3d each_rot = each.block(0, 0, 3, 3);
 
             t_s.push_back(each_translation);
             r_s.push_back(each_rot);
@@ -387,8 +389,10 @@ public:
         {
             Eigen::Vector3d ans_trans = rotation_mat * t_s[iteration] + translation_vec;
             Eigen::Matrix3d ans_rot = rotation_mat * r_s[iteration];
-            Eigen::Quaterniond ans_quat{ans_rot};
-            std::vector<double> answer{ans_trans.x(), ans_trans.y(), ans_trans.z(), ans_quat.w(), ans_quat.x(), ans_quat.y(), ans_quat.z()};
+            Eigen::Matrix4d answer;
+
+            answer.block(0, 0, 3, 3) = ans_rot;
+            answer.block(0, 3, 3, 1) = ans_trans;
             answers.push_back(answer);
         }
 
