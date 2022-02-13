@@ -20,6 +20,7 @@
 #include <vector>
 #include "cpp/FeatureArray.h"
 #include "cpp/RO_Array.h"
+#include "rtabmap_ros/MapGraph.h"
 #include <math.h>
 // #include "calibration.h"
 // FIXME CMakeLists.txtを修正
@@ -45,13 +46,16 @@ using namespace gtsam;
 class RO_Estimator
 {
 private:
-    Cal3_S2::shared_ptr K(new Cal3_S2(617.5604248046, 617.3798828, 0.0, 317.55502, 244.730865));
+    Cal3_S2::shared_ptr K{new Cal3_S2(617.5604248046, 617.3798828, 0.0, 317.55502, 244.730865)};
 
     ros::NodeHandle n;
     ros::Subscriber feature_sub;
     ros::Subscriber path_sub1;
     ros::Subscriber path_sub2;
+    ros::Subscriber info_sub1;
+    ros::Subscriber info_sub2;
     ros::Subscriber transformation_sub;
+
     ros::Publisher BA_pub;
     ros::Publisher rt_pub;
     ros::Publisher marker_pub;
@@ -66,6 +70,9 @@ private:
 
     std::map<int, int> mapPath_dict;
     std::map<int, int> mapPath_dict_2;
+    std::map<std::vector<int>, Eigen::VectorXd> link_dict1;
+    std::map<std::vector<int>, Eigen::VectorXd> link_dict2;
+
     std::vector<std::vector<Eigen::Vector3d>> feature_local_list;
     // NOTE {"R1":{1:[[x1,y1,z1],[x2,y2...]],2:...},"R2":...}
 
@@ -94,6 +101,8 @@ public:
         feature_sub = n.subscribe("features", 20, &RO_Estimator::RO_CB, this);
         path_sub1 = n.subscribe("robot1/rtabmap/mapPath", 10, &RO_Estimator::path1_CB, this);
         path_sub2 = n.subscribe("robot2/rtabmap/mapPath", 10, &RO_Estimator::path2_CB, this);
+        info_sub1 = n.subscribe("robot1/rtabmap/mapGraph", 10, &RO_Estimator::info_CB1, this);
+        info_sub2 = n.subscribe("robot2/rtabmap/mapGraph", 10, &RO_Estimator::info_CB2, this);
         transformation_sub = n.subscribe("odometry_result", 1000, &RO_Estimator::odom_CB, this);
 
         cam2robot << 0, -1, 0, 0,
@@ -125,6 +134,32 @@ public:
         points.color.a = 1.0;
         line_list.color.r = 1.0;
         line_list.color.a = 1.0;
+    }
+
+    void info_CB1(const rtabmap_ros::MapGraph::ConstPtr &data)
+    {
+        link_dict1.clear();
+        for (auto each_link : data->links)
+        {
+            std::vector<int> fromto{each_link.fromId, each_link.toId};
+            Eigen::VectorXd infos(6);
+            infos << 1 / each_link.information[0], 1 / each_link.information[7], 1 / each_link.information[14],
+                1 / each_link.information[21], 1 / each_link.information[28], 1 / each_link.information[35];
+            link_dict1[fromto] = infos;
+        }
+    }
+
+    void info_CB2(const rtabmap_ros::MapGraph::ConstPtr &data)
+    {
+        link_dict2.clear();
+        for (auto each_link : data->links)
+        {
+            std::vector<int> fromto{each_link.fromId, each_link.toId};
+            Eigen::VectorXd infos(6);
+            infos << 1 / each_link.information[0], 1 / each_link.information[7], 1 / each_link.information[14],
+                1 / each_link.information[21], 1 / each_link.information[28], 1 / each_link.information[35];
+            link_dict2[fromto] = infos;
+        }
     }
 
     void path1_CB(const nav_msgs::Path::ConstPtr &path)
@@ -199,6 +234,34 @@ public:
         // lineの描画
     }
 
+    std::vector<Eigen::VectorXd> turnout_sigma(std::vector<int> imgs, std::string name)
+    {
+        std::map<std::vector<int>, Eigen::VectorXd> *link_dict_ptr;
+        if (name == "R1")
+            link_dict_ptr = &link_dict1;
+        else
+            link_dict_ptr = &link_dict2;
+
+        int initial{imgs[0]};
+
+        Eigen::VectorXd initial_vector(6);
+        initial_vector << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+
+        std::vector<Eigen::VectorXd> sigma_answer{initial_vector};
+        // TODO GTSAM上で表現できる？
+        for (int iteration{0}; iteration < imgs.size(); ++iteration)
+        {
+            Eigen::VectorXd accumulated_sigma(6);
+            accumulated_sigma << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+            for (int iter{initial}; iter < initial + iteration; ++iter)
+            {
+                accumulated_sigma = accumulated_sigma + (*link_dict_ptr)[{iter + 1, iter}];
+            }
+            sigma_answer.push_back(accumulated_sigma);
+        }
+
+        return sigma_answer;
+    }
     // NOTE feature_matcherからrgbd odometryの計算結果をsubscribe
     void odom_CB(const cpp::HomogeneousArray::ConstPtr &data_)
     {
@@ -210,6 +273,11 @@ public:
         loop_info = data_->index2value;
         valids = data_->valid_img;
         std::string who_detect = data_->who_detect;
+        std::string another_one;
+        if (who_detect == "R1")
+            another_one = "R2";
+        else
+            another_one = "R1";
 
         transformation_result = cam2robot * transformation_result;
 
@@ -226,11 +294,16 @@ public:
         // NOTE turnout necessary robot's poses
         std::vector<std::vector<double>> local_poses = turnout_Localpose(locals, who_detect);
 
-        std::vector<std::vector<double>> hyp_poses = turnout_hyps_pose(transformation_result, hyps, "R2");
+        std::vector<std::vector<double>> hyp_poses = turnout_hyps_pose(transformation_result, hyps, another_one);
 
         std::vector<std::vector<Eigen::Vector3d>> local_pcds = turnout_point_coord(feature_local_list, local_poses);
+
+        std::vector<Eigen::VectorXd> local_sigmas = turnout_sigma(locals, who_detect);
+        std::vector<Eigen::VectorXd> hyp_sigmas = turnout_sigma(hyps, another_one);
         // NOTE BA
     }
+
+    // void compute_BA(std::vector<std::vector<Eigen::Vector3d>> local_pcds, std::vector<std::vector<double>>)
     // NOTE [[x,y,z,qx,qy,qz,qw],[..]]
 
     std::vector<std::vector<Eigen::Vector3d>> turnout_point_coord(std::vector<std::vector<Eigen::Vector3d>> point_coord, std::vector<std::vector<double>> each_poses)
