@@ -70,11 +70,11 @@ private:
 
     std::map<int, int> mapPath_dict;
     std::map<int, int> mapPath_dict_2;
-    std::map<std::vector<int>, std::vector<double>> info_dict1;
-    std::map<std::vector<int>, std::vector<double>> info_dict2;
+    std::map<std::vector<int>, Eigen::VectorXd> info_dict1;
+    std::map<std::vector<int>, Eigen::VectorXd> info_dict2;
 
     std::map<std::vector<int>, Eigen::Matrix4d> odom_dict1;
-    std::map<std::vector<int>, Eigen::matrix4d> odom_dict2;
+    std::map<std::vector<int>, Eigen::Matrix4d> odom_dict2;
 
     std::vector<std::vector<Eigen::Vector3d>> feature_local_list;
     // NOTE {"R1":{1:[[x1,y1,z1],[x2,y2...]],2:...},"R2":...}
@@ -138,28 +138,33 @@ public:
         line_list.color.r = 1.0;
         line_list.color.a = 1.0;
     }
-
+    // FIXME odomの拘束条件しか考慮しない
     void info_CB1(const rtabmap_ros::MapGraph::ConstPtr &data)
     {
         info_dict1.clear();
         odom_dict1.clear();
         for (auto each_link : data->links)
         {
-            std::vector<int> fromto{each_link.fromId, each_link.toId};
-            std::vector<double> infos{each_link.information[0], each_link.information[7], each_link.information[14],
-                                      each_link.information[21], each_link.information[28], each_link.information[35]};
+            if (each_link.fromId + 1 == each_link.toId)
+            {
+                std::vector<int> fromto{each_link.fromId, each_link.toId};
+                Eigen::VectorXd infos(6);
+                infos << each_link.information[0], each_link.information[7], each_link.information[14],
+                    each_link.information[21], each_link.information[28], each_link.information[35];
 
-            Eigen::Vector3d odom_translation(each_link.transform.translation.x, each_link.transform.translation.y, each_link.transform.translation.z);
-            Eigen::Quaterniond odom_orientation(each_link.transform.rotation.w, each_link.transform.rotation.x, each_link.transform.rotation.y, each_link.transform.rotation.z);
+                Eigen::Vector3d odom_translation(each_link.transform.translation.x, each_link.transform.translation.y, each_link.transform.translation.z);
+                Eigen::Quaterniond odom_orientation(each_link.transform.rotation.w, each_link.transform.rotation.x, each_link.transform.rotation.y, each_link.transform.rotation.z);
 
-            Eigen::Vector4d transfer_affine;
-            transfer_affine.block(0, 0, 3, 3) = odom_orientation;
-            transfer_affine.block(0, 3, 3, 1) = odom_translation;
+                Eigen::Matrix4d transfer_affine;
+                transfer_affine.block(0, 0, 3, 3) = odom_orientation.matrix();
+                transfer_affine.block(0, 3, 3, 1) = odom_translation;
 
-            info_dict1[fromto] = infos;
-            odom_dict1[fromto] = transfer_affine;
+                info_dict1[fromto] = infos;
+                odom_dict1[fromto] = transfer_affine;
+            }
         }
     }
+    // FIXME odomの拘束条件しか考慮しない
 
     void info_CB2(const rtabmap_ros::MapGraph::ConstPtr &data)
     {
@@ -167,18 +172,22 @@ public:
         odom_dict2.clear();
         for (auto each_link : data->links)
         {
-            std::vector<int> fromto{each_link.fromId, each_link.toId};
-            Eigen::Vector3d odom_translation(each_link.transform.translation.x, each_link.transform.translation.y, each_link.transform.translation.z);
-            Eigen::Quaterniond odom_orientation(each_link.transform.rotation.w, each_link.transform.rotation.x, each_link.transform.rotation.y, each_link.transform.rotation.z);
+            if (each_link.fromId + 1 == each_link.toId)
+            {
+                std::vector<int> fromto{each_link.fromId, each_link.toId};
+                Eigen::Vector3d odom_translation(each_link.transform.translation.x, each_link.transform.translation.y, each_link.transform.translation.z);
+                Eigen::Quaterniond odom_orientation(each_link.transform.rotation.w, each_link.transform.rotation.x, each_link.transform.rotation.y, each_link.transform.rotation.z);
 
-            Eigen::Vector4d transfer_affine;
-            transfer_affine.block(0, 0, 3, 3) = odom_orientation;
-            transfer_affine.block(0, 3, 3, 1) = odom_translation;
+                Eigen::Matrix4d transfer_affine;
+                transfer_affine.block(0, 0, 3, 3) = odom_orientation.matrix();
+                transfer_affine.block(0, 3, 3, 1) = odom_translation;
 
-            std::vector<double> infos{each_link.information[0], each_link.information[7], each_link.information[14],
-                                      each_link.information[21], each_link.information[28], each_link.information[35]};
-            info_dict2[fromto] = infos;
-            odom_dict2[fromto] = transfer_affine;
+                Eigen::VectorXd infos(6);
+                infos << each_link.information[0], each_link.information[7], each_link.information[14],
+                    each_link.information[21], each_link.information[28], each_link.information[35];
+                info_dict2[fromto] = infos;
+                odom_dict2[fromto] = transfer_affine;
+            }
         }
     }
 
@@ -296,48 +305,79 @@ public:
                     std::vector<Eigen::Vector4d> local_pose, std::vector<Eigen::Vector4d> hyp_pose, std::string who_detect,
                     std::vector<int> local_ids, std::vector<int> hyp_ids)
     {
+        // 各local_pcdについて同じ分だけバンドル調整を行い、errorが最も小さいやつを選ぶ
+        for (auto local_pcd : local_pcds)
+        {
 
-        auto initial_pose_noise = noiseModjel::Diagonal::Sigmas((Vector(6) << Vector3::Constant(0.0), Vector3::Constant(0.0)).finished());
-        auto measurementNoise = noiseModel::Isotropic::Sigma(2, 1.0);
-        NonlinearFactorGraph graph;
-        // Poseの定義
-        // std::vector<Pose3> input_local_poses;
-        // std::vector<Pose3> input_hyp_poses;
-        // std::vector<Pose3> local_odom;
-        // std::vector<Pose3> hyp_odom;
+            auto initial_pose_noise = noiseModel::Diagonal::Sigmas((Vector(6) << Vector3::Constant(0.0), Vector3::Constant(0.0)).finished());
+            auto measurementNoise = noiseModel::Isotropic::Sigma(2, 1.0);
 
-        // std::map<std::vector<int>, Eigen::Matrix4d> *odom_local_ptr{nullptr};
-        // std::map<std::vector<int>, std::vector<double>> *info_local_ptr{nullptr};
-        // std::map<std::vector<int>, Eigen::Matrix4d> *odom_hyp_ptr{nullptr};
-        // std::map<std::vector<int>, std::vector<double>> *info_hyp_ptr{nullptr};
+            NonlinearFactorGraph graph;
 
-        // if (who_detect == "R1")
-        // {
-        //     odom_local_ptr = &odom_dict1;
-        //     info_local_ptr=&info_dict1;
-        //     odom_hyp_ptr = &odom_dict2;
-        //     info_hyp_ptr=&info_dict2;
-        // }else{
-        //     odom_local_ptr = &odom_dict2;
-        //     info_local_ptr=&info_dict2;
-        //     odom_hyp_ptr = &odom_dict1;
-        //     info_hyp_ptr=&info_dict1;
-        // }
+            std::map<std::vector<int>, Eigen::Matrix4d> *odom_local_ptr{nullptr};
+            std::map<std::vector<int>, Eigen::VectorXd> *info_local_ptr{nullptr};
+            std::map<std::vector<int>, Eigen::Matrix4d> *odom_hyp_ptr{nullptr};
+            std::map<std::vector<int>, Eigen::VectorXd> *info_hyp_ptr{nullptr};
 
-        // for (int idx{0}; idx < local_ids.size())
-        // {
-        //     int current_id=idx+
-        //     input_local_poses.push_back(Pose3(local_pose[idx]));
-        //     if (idx != 0)
-        //     {
-        //         local_odom.push_back(Pose3((*odom_local_ptr)[{local_ids[idx],local_ids[idx-1]}]))
+            if (who_detect == "R1")
+            {
+                odom_local_ptr = &odom_dict1;
+                info_local_ptr = &info_dict1;
+                odom_hyp_ptr = &odom_dict2;
+                info_hyp_ptr = &info_dict2;
+            }
+            else
+            {
+                odom_local_ptr = &odom_dict2;
+                info_local_ptr = &info_dict2;
+                odom_hyp_ptr = &odom_dict1;
+                info_hyp_ptr = &info_dict1;
+            }
 
-        //     }
-        // }
+            Pose3 initial_local_pose(local_pose[0]);
 
-        graph.addPrior(Symbol('x', 0), input_local_poses[0], initial_pose_noise);
+            graph.addPrior(Symbol('x', 0), initial_local_pose, initial_pose_noise);
+            std::vector<Symbol> pose_symbol;
 
-        std::vector<Symbol> pose_symbol;
+            for (size_t idx{0}; idx < local_ids.size(); ++idx)
+            {
+                // local_odom.push_back(Pose3((*odom_local_ptr)[{local_ids[idx], local_ids[idx - 1]}]));
+                if (idx > 0)
+                {
+                    if (odom_local_ptr->count({local_ids[idx], local_ids[idx - 1]}))
+                    {
+                        Pose3 odometry((*odom_local_ptr)[{local_ids[idx], local_ids[idx - 1]}]);
+                        auto odometryNoise = noiseModel::Diagonal::Sigmas((*info_local_ptr)[{local_ids[idx - 1], local_ids[idx]}]);
+                        graph.emplace_shared<BetweenFactor<Pose3>>(local_ids[idx], local_ids[idx - 1], odometry, odometryNoise);
+                    }
+                    else
+                    {
+                        ROS_WARN("One of odom constraints missing its sequential indexes...");
+                        exit(1);
+                    }
+                }
+
+                // Projection regisration
+                // Pose definition
+                Pose3 individual_pose(local_pose[idx]);
+                PinholeCamera<Cal3_S2> camera(individual_pose, *K);
+                pose_symbol.push_back(Symbol('x', idx));
+
+                for (size_t j = 0; j < local_pcd.size(); ++j)
+                {
+                    Point2 measurement = camera.project(local_pcd[j]);
+                    graph.emplace_shared<GenericProjectionFactor<Pose3, Point3, Cal3_S2>>(
+                        measurement, measurementNoise, Symbol('x', idx), Symbol('l', j), K);
+                }
+            }
+
+            // hyp
+            for (size_t idx{local_ids.size()}; idx < local_ids.size() + hyp_ids.size() - 1; ++idx)
+            {
+            }
+        }
+
+        // TODO hypの方はひとまずオドメトリによる拘束条件飲みに限定して考える。余裕があればProx loop, loop closureによる影響も考慮すると良い。
     }
     // NOTE [[x,y,z,qx,qy,qz,qw],[..]]
 
