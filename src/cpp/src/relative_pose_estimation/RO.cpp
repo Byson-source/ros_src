@@ -75,8 +75,6 @@ private:
 
     std::map<std::vector<int>, Eigen::Matrix4d> odom_dict1;
     std::map<std::vector<int>, Eigen::Matrix4d> odom_dict2;
-
-    std::vector<std::vector<Eigen::Vector3d>> feature_local_list;
     // NOTE {"R1":{1:[[x1,y1,z1],[x2,y2...]],2:...},"R2":...}
 
     int info_index{0};
@@ -101,7 +99,7 @@ public:
         rt_pub = n.advertise<cpp::RO_Array>("RT_result", 50);
         // BA_pub = n.advertise
 
-        feature_sub = n.subscribe("features", 20, &RO_Estimator::RO_CB, this);
+        // feature_sub = n.subscribe("features", 20, &RO_Estimator::RO_CB, this);
         path_sub1 = n.subscribe("robot1/rtabmap/mapPath", 10, &RO_Estimator::path1_CB, this);
         path_sub2 = n.subscribe("robot2/rtabmap/mapPath", 10, &RO_Estimator::path2_CB, this);
         info_sub1 = n.subscribe("robot1/rtabmap/mapGraph", 10, &RO_Estimator::info_CB1, this);
@@ -297,110 +295,104 @@ public:
 
         std::vector<Eigen::Matrix4d> hyp_poses = turnout_hyps_pose(transformation_result, hyps, another_one);
 
-        std::vector<std::vector<Eigen::Vector3d>> local_pcds = turnout_point_coord(feature_local_list, local_poses);
+        std::vector<double> local_pcd = data_->r_3d;
+        std::vector<Eigen::Vector3d> local_pcds = turnout_point_coord(local_pcd);
         // NOTE BA
     }
 
-    void compute_BA(std::vector<std::vector<Eigen::Vector3d>> local_pcds, std::vector<Eigen::VectorXd> local_sigma, std::vector<Eigen::VectorXd> hyp_sigma,
+    void compute_BA(std::vector<Eigen::Vector3d> local_pcd, std::vector<Eigen::VectorXd> local_sigma, std::vector<Eigen::VectorXd> hyp_sigma,
                     std::vector<Eigen::Vector4d> local_pose, std::vector<Eigen::Vector4d> hyp_pose, std::string who_detect,
                     std::vector<int> local_ids, std::vector<int> hyp_ids)
     {
-        // 各local_pcdについて同じ分だけバンドル調整を行い、errorが最も小さいやつを選ぶ
-        for (auto local_pcd : local_pcds)
+
+        auto initial_pose_noise = noiseModel::Diagonal::Sigmas((Vector(6) << Vector3::Constant(0.0), Vector3::Constant(0.0)).finished());
+        auto measurementNoise = noiseModel::Isotropic::Sigma(2, 1.0);
+
+        NonlinearFactorGraph graph;
+
+        std::map<std::vector<int>, Eigen::Matrix4d> *odom_local_ptr{nullptr};
+        std::map<std::vector<int>, Eigen::VectorXd> *info_local_ptr{nullptr};
+        std::map<std::vector<int>, Eigen::Matrix4d> *odom_hyp_ptr{nullptr};
+        std::map<std::vector<int>, Eigen::VectorXd> *info_hyp_ptr{nullptr};
+
+        if (who_detect == "R1")
         {
+            odom_local_ptr = &odom_dict1;
+            info_local_ptr = &info_dict1;
+            odom_hyp_ptr = &odom_dict2;
+            info_hyp_ptr = &info_dict2;
+        }
+        else
+        {
+            odom_local_ptr = &odom_dict2;
+            info_local_ptr = &info_dict2;
+            odom_hyp_ptr = &odom_dict1;
+            info_hyp_ptr = &info_dict1;
+        }
 
-            auto initial_pose_noise = noiseModel::Diagonal::Sigmas((Vector(6) << Vector3::Constant(0.0), Vector3::Constant(0.0)).finished());
-            auto measurementNoise = noiseModel::Isotropic::Sigma(2, 1.0);
+        Pose3 initial_local_pose(local_pose[0]);
 
-            NonlinearFactorGraph graph;
+        graph.addPrior(Symbol('x', 0), initial_local_pose, initial_pose_noise);
+        std::vector<Symbol> pose_symbol;
 
-            std::map<std::vector<int>, Eigen::Matrix4d> *odom_local_ptr{nullptr};
-            std::map<std::vector<int>, Eigen::VectorXd> *info_local_ptr{nullptr};
-            std::map<std::vector<int>, Eigen::Matrix4d> *odom_hyp_ptr{nullptr};
-            std::map<std::vector<int>, Eigen::VectorXd> *info_hyp_ptr{nullptr};
-
-            if (who_detect == "R1")
+        for (size_t idx{0}; idx < local_ids.size(); ++idx)
+        {
+            // local_odom.push_back(Pose3((*odom_local_ptr)[{local_ids[idx], local_ids[idx - 1]}]));
+            if (idx > 0)
             {
-                odom_local_ptr = &odom_dict1;
-                info_local_ptr = &info_dict1;
-                odom_hyp_ptr = &odom_dict2;
-                info_hyp_ptr = &info_dict2;
-            }
-            else
-            {
-                odom_local_ptr = &odom_dict2;
-                info_local_ptr = &info_dict2;
-                odom_hyp_ptr = &odom_dict1;
-                info_hyp_ptr = &info_dict1;
-            }
-
-            Pose3 initial_local_pose(local_pose[0]);
-
-            graph.addPrior(Symbol('x', 0), initial_local_pose, initial_pose_noise);
-            std::vector<Symbol> pose_symbol;
-
-            for (size_t idx{0}; idx < local_ids.size(); ++idx)
-            {
-                // local_odom.push_back(Pose3((*odom_local_ptr)[{local_ids[idx], local_ids[idx - 1]}]));
-                if (idx > 0)
+                if (odom_local_ptr->count({local_ids[idx], local_ids[idx - 1]}))
                 {
-                    if (odom_local_ptr->count({local_ids[idx], local_ids[idx - 1]}))
-                    {
-                        Pose3 odometry((*odom_local_ptr)[{local_ids[idx], local_ids[idx - 1]}]);
-                        auto odometryNoise = noiseModel::Diagonal::Sigmas((*info_local_ptr)[{local_ids[idx - 1], local_ids[idx]}]);
-                        graph.emplace_shared<BetweenFactor<Pose3>>(local_ids[idx], local_ids[idx - 1], odometry, odometryNoise);
-                    }
-                    else
-                    {
-                        ROS_WARN("One of odom constraints missing its sequential indexes...");
-                        exit(1);
-                    }
+                    Pose3 odometry((*odom_local_ptr)[{local_ids[idx], local_ids[idx - 1]}]);
+                    auto odometryNoise = noiseModel::Diagonal::Sigmas((*info_local_ptr)[{local_ids[idx - 1], local_ids[idx]}]);
+                    graph.emplace_shared<BetweenFactor<Pose3>>(local_ids[idx], local_ids[idx - 1], odometry, odometryNoise);
                 }
-
-                // Projection regisration
-                // Pose definition
-                Pose3 individual_pose(local_pose[idx]);
-                PinholeCamera<Cal3_S2> camera(individual_pose, *K);
-                pose_symbol.push_back(Symbol('x', idx));
-
-                for (size_t j = 0; j < local_pcd.size(); ++j)
+                else
                 {
-                    Point2 measurement = camera.project(local_pcd[j]);
-                    graph.emplace_shared<GenericProjectionFactor<Pose3, Point3, Cal3_S2>>(
-                        measurement, measurementNoise, Symbol('x', idx), Symbol('l', j), K);
+                    ROS_WARN("One of odom constraints missing its sequential indexes...");
+                    exit(1);
                 }
             }
 
-            // hyp
-            for (size_t idx{local_ids.size()}; idx < local_ids.size() + hyp_ids.size() - 1; ++idx)
+            // Projection regisration
+            // Pose definition
+            Pose3 individual_pose(local_pose[idx]);
+            PinholeCamera<Cal3_S2> camera(individual_pose, *K);
+            pose_symbol.push_back(Symbol('x', idx));
+
+            for (size_t j = 0; j < local_pcd.size(); ++j)
             {
+                Point2 measurement = camera.project(local_pcd[j]);
+                graph.emplace_shared<GenericProjectionFactor<Pose3, Point3, Cal3_S2>>(
+                    measurement, measurementNoise, Symbol('x', idx), Symbol('l', j), K);
             }
+        }
+
+        // hyp
+        for (size_t idx{local_ids.size()}; idx < local_ids.size() + hyp_ids.size() - 1; ++idx)
+        {
         }
 
         // TODO hypの方はひとまずオドメトリによる拘束条件飲みに限定して考える。余裕があればProx loop, loop closureによる影響も考慮すると良い。
     }
     // NOTE [[x,y,z,qx,qy,qz,qw],[..]]
 
-    std::vector<std::vector<Eigen::Vector3d>> turnout_point_coord(std::vector<std::vector<Eigen::Vector3d>> point_coord, std::vector<Eigen::Matrix4d> each_poses)
+    std::vector<Eigen::Vector3d> turnout_point_coord(std::vector<double> point_coord)
     {
-        std::vector<std::vector<Eigen::Vector3d>> answer_point_coord;
-        for (int i_{0}; i_ < each_poses.size(); ++i_)
+
+        std::vector<Eigen::Vector3d> kp_local;
+
+        for (size_t index{1}; index < point_coord.size() + 1; ++index)
         {
-            std::vector<Eigen::Vector3d> answer_per_image;
-            for (auto val : point_coord[i_])
+            // ３つ目の要素に差し掛かった時
+            if (index % 3 == 0)
             {
-                Eigen::Vector3d transhoge = each_poses[i_].block(0, 3, 3, 1);
-                Eigen::Matrix3d rothoge = each_poses[i_].block(0, 0, 3, 3);
-
-                Eigen::Vector3d answer;
-                answer = rothoge * val + transhoge;
-
-                answer_per_image.push_back(answer);
+                Eigen::Vector3d kp_loc_r(point_coord[index - 3], point_coord[index - 2], point_coord[index - 1]);
+                kp_local.push_back(kp_loc_r);
+                // NOTE ポイントのカメラ座標
             }
-            answer_point_coord.push_back(answer_per_image);
         }
 
-        return answer_point_coord;
+        return kp_local;
     }
 
     std::vector<Eigen::Matrix4d> turnout_Localpose(std::vector<int> local_pairs, std::string who_detect)
@@ -486,31 +478,23 @@ public:
         return answers;
     }
 
-    // NOTE 共通特徴点の画像座標とカメラ座標を取得
-    void RO_CB(const cpp::FeatureArray::ConstPtr &data)
-    {
-        std::vector<Eigen::Vector3d> kp_hyp;
+    // // NOTE 共通特徴点の画像座標とカメラ座標を取得
+    // void RO_CB(const cpp::FeatureArray::ConstPtr &data)
+    // {
 
-        std::vector<Eigen::Vector3d> kp_local;
+    //     std::vector<Eigen::Vector3d> kp_local;
 
-        for (size_t index{1}; index < data->r_3d.size() + 1; ++index)
-        {
-            // ３つ目の要素に差し掛かった時
-            if (index % 6 == 3)
-            {
-                Eigen::Vector3d kp_loc_r(data->r_3d[index - 3], data->r_3d[index - 2], data->r_3d[index - 1]);
-                kp_local.push_back(kp_loc_r);
-                // NOTE ポイントのカメラ座標
-            }
-            else if (index % 6 == 0)
-            {
-                Eigen::Vector3d kp_loc_r(data->r_3d[index - 3], data->r_3d[index - 2], data->r_3d[index - 1]);
-                kp_hyp.push_back(kp_loc_r);
-            }
-        }
-
-        feature_local_list.push_back(kp_local);
-    }
+    //     for (size_t index{1}; index < data->r_3d.size() + 1; ++index)
+    //     {
+    //         // ３つ目の要素に差し掛かった時
+    //         if (index % 6 == 3)
+    //         {
+    //             Eigen::Vector3d kp_loc_r(data->r_3d[index - 3], data->r_3d[index - 2], data->r_3d[index - 1]);
+    //             kp_local.push_back(kp_loc_r);
+    //             // NOTE ポイントのカメラ座標
+    //         }
+    //     }
+    // }
 
     int translate_index(int img_number, std::string robot_name)
     {
