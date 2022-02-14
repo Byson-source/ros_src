@@ -70,10 +70,11 @@ private:
 
     std::map<int, int> mapPath_dict;
     std::map<int, int> mapPath_dict_2;
-    std::map<std::vector<int>, Eigen::VectorXd> info_dict1;
-    std::map<std::vector<int>, Eigen::VectorXd> info_dict2;
-    std::map<std::vector<int>, std::vector<double>> odom_dict1;
-    std::map<std::vector<int>, std::vector<double>> odom_dict2;
+    std::map<std::vector<int>, std::vector<double>> info_dict1;
+    std::map<std::vector<int>, std::vector<double>> info_dict2;
+
+    std::map<std::vector<int>, Eigen::Matrix4d> odom_dict1;
+    std::map<std::vector<int>, Eigen::matrix4d> odom_dict2;
 
     std::vector<std::vector<Eigen::Vector3d>> feature_local_list;
     // NOTE {"R1":{1:[[x1,y1,z1],[x2,y2...]],2:...},"R2":...}
@@ -145,13 +146,18 @@ public:
         for (auto each_link : data->links)
         {
             std::vector<int> fromto{each_link.fromId, each_link.toId};
-            Eigen::VectorXd infos(6);
-            std::vector<double> odom_link{each_link.transform.translation.x, each_link.transform.translation.y, each_link.transform.translation.z,
-                                          each_link.transform.rotation.x, each_link.transform.rotation.y, each_link.transform.rotation.z, each_link.transform.rotation.w};
-            infos << each_link.information[0], each_link.information[7], each_link.information[14],
-                each_link.information[21], each_link.information[28], each_link.information[35];
+            std::vector<double> infos{each_link.information[0], each_link.information[7], each_link.information[14],
+                                      each_link.information[21], each_link.information[28], each_link.information[35]};
+
+            Eigen::Vector3d odom_translation(each_link.transform.translation.x, each_link.transform.translation.y, each_link.transform.translation.z);
+            Eigen::Quaterniond odom_orientation(each_link.transform.rotation.w, each_link.transform.rotation.x, each_link.transform.rotation.y, each_link.transform.rotation.z);
+
+            Eigen::Vector4d transfer_affine;
+            transfer_affine.block(0, 0, 3, 3) = odom_orientation;
+            transfer_affine.block(0, 3, 3, 1) = odom_translation;
+
             info_dict1[fromto] = infos;
-            odom_dict1[fromto] = odom_link;
+            odom_dict1[fromto] = transfer_affine;
         }
     }
 
@@ -162,14 +168,17 @@ public:
         for (auto each_link : data->links)
         {
             std::vector<int> fromto{each_link.fromId, each_link.toId};
-            std::vector<double> odom_link{each_link.transform.translation.x, each_link.transform.translation.y, each_link.transform.translation.z,
-                                          each_link.transform.rotation.x, each_link.transform.rotation.y, each_link.transform.rotation.z, each_link.transform.rotation.w};
+            Eigen::Vector3d odom_translation(each_link.transform.translation.x, each_link.transform.translation.y, each_link.transform.translation.z);
+            Eigen::Quaterniond odom_orientation(each_link.transform.rotation.w, each_link.transform.rotation.x, each_link.transform.rotation.y, each_link.transform.rotation.z);
 
-            Eigen::VectorXd infos(6);
-            infos << each_link.information[0], each_link.information[7], each_link.information[14],
-                each_link.information[21], each_link.information[28], each_link.information[35];
+            Eigen::Vector4d transfer_affine;
+            transfer_affine.block(0, 0, 3, 3) = odom_orientation;
+            transfer_affine.block(0, 3, 3, 1) = odom_translation;
+
+            std::vector<double> infos{each_link.information[0], each_link.information[7], each_link.information[14],
+                                      each_link.information[21], each_link.information[28], each_link.information[35]};
             info_dict2[fromto] = infos;
-            odom_dict2[fromto] = odom_link;
+            odom_dict2[fromto] = transfer_affine;
         }
     }
 
@@ -284,12 +293,50 @@ public:
     }
 
     void compute_BA(std::vector<std::vector<Eigen::Vector3d>> local_pcds, std::vector<Eigen::VectorXd> local_sigma, std::vector<Eigen::VectorXd> hyp_sigma,
-                    std::vector<std::vector<double>> local_pose, std::vector<std::vector<double>> hyp_pose)
+                    std::vector<Eigen::Vector4d> local_pose, std::vector<Eigen::Vector4d> hyp_pose, std::string who_detect,
+                    std::vector<int> local_ids, std::vector<int> hyp_ids)
     {
-        auto initial_pose_noise = noiseModel::Diagonal::Sigmas((Vector(6) << Vector3::Constant(0.0), Vector3::Constant(0.0)).finished());
+
+        auto initial_pose_noise = noiseModjel::Diagonal::Sigmas((Vector(6) << Vector3::Constant(0.0), Vector3::Constant(0.0)).finished());
         auto measurementNoise = noiseModel::Isotropic::Sigma(2, 1.0);
         NonlinearFactorGraph graph;
-        graph.addPrior(Symbol('x', 0), local_pose[0], initial_pose_noise);
+        // Poseの定義
+        // std::vector<Pose3> input_local_poses;
+        // std::vector<Pose3> input_hyp_poses;
+        // std::vector<Pose3> local_odom;
+        // std::vector<Pose3> hyp_odom;
+
+        // std::map<std::vector<int>, Eigen::Matrix4d> *odom_local_ptr{nullptr};
+        // std::map<std::vector<int>, std::vector<double>> *info_local_ptr{nullptr};
+        // std::map<std::vector<int>, Eigen::Matrix4d> *odom_hyp_ptr{nullptr};
+        // std::map<std::vector<int>, std::vector<double>> *info_hyp_ptr{nullptr};
+
+        // if (who_detect == "R1")
+        // {
+        //     odom_local_ptr = &odom_dict1;
+        //     info_local_ptr=&info_dict1;
+        //     odom_hyp_ptr = &odom_dict2;
+        //     info_hyp_ptr=&info_dict2;
+        // }else{
+        //     odom_local_ptr = &odom_dict2;
+        //     info_local_ptr=&info_dict2;
+        //     odom_hyp_ptr = &odom_dict1;
+        //     info_hyp_ptr=&info_dict1;
+        // }
+
+        // for (int idx{0}; idx < local_ids.size())
+        // {
+        //     int current_id=idx+
+        //     input_local_poses.push_back(Pose3(local_pose[idx]));
+        //     if (idx != 0)
+        //     {
+        //         local_odom.push_back(Pose3((*odom_local_ptr)[{local_ids[idx],local_ids[idx-1]}]))
+
+        //     }
+        // }
+
+        graph.addPrior(Symbol('x', 0), input_local_poses[0], initial_pose_noise);
+
         std::vector<Symbol> pose_symbol;
     }
     // NOTE [[x,y,z,qx,qy,qz,qw],[..]]
