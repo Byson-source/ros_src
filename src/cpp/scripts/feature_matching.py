@@ -95,7 +95,7 @@ def orbmatch(fileName1, fileName2, previous_features=False):
                         table_number=6,  # 12
                         key_size=14,     # 20
                         multi_probe_level=1)  # 2
-    search_params = dict(checks=50)
+    search_params = dict(checks=100)
 
     flann = cv2.FlannBasedMatcher(index_params, search_params)
 
@@ -106,7 +106,7 @@ def orbmatch(fileName1, fileName2, previous_features=False):
         rospy.loginfo("Can't detect enough features...")
     else:
         # マッチング結果を描画
-        ratio_thresh = 0.8
+        ratio_thresh = 0.7
         good_matches = []
         for mt in knn_matches:
 
@@ -233,7 +233,7 @@ def derive_duplicated_indexes(indexes, values):
     for i in range(len(indexes)):
         sorted_index.append(indexes[i])
         sorted_index.append(values[i])
-        # rospy.logwarn(str(indexes[i])+"->"+str(values[i]))
+        rospy.logwarn(str(indexes[i])+"->"+str(values[i]))
 
     valid_img_index = [sorted_index[0], sorted_index[1]]
     for hogehoge in range(2, len(sorted_index)):
@@ -242,7 +242,7 @@ def derive_duplicated_indexes(indexes, values):
 
         if hogehoge > 2:
             survived_index, local_survivor = derive_duplicated_index(
-                second_kpt, first_kpt, new_map.keys())
+                second_kpt, first_kpt, feature_map.keys())
         else:
             survived_index, local_survivor = derive_duplicated_index(
                 second_kpt, first_kpt)
@@ -254,7 +254,7 @@ def derive_duplicated_indexes(indexes, values):
                 if hogehoge == len(sorted_index)-2:
                     # NOTE バンドル調整不可（共通の特徴点を持つ三枚以上の画像が存在しない）
                     rospy.logerr("Can't find corresponding features...Quit...")
-                    return 0, 0, False
+                    return 0, 0, [], False,
 
                 rospy.logdebug(
                     "There is no common features...Trying next pairs...")
@@ -295,11 +295,16 @@ def derive_duplicated_indexes(indexes, values):
     for first_keys, first_values in new_map_list[0].items():
         first_info.append(first_values[0])
     answer_info = [first_info]
+    valid_index = 1
     for dictionary in new_map_list:
         other_map = []
         for other_keys, other_values in dictionary.items():
             other_map.append(other_values[1])
         answer_info.append(other_map)
+        rospy.logwarn(other_map)
+        rospy.logerror(
+            str(valid_img_index[valid_index-1]+"->"+str(valid_img_index[valid_index])))
+        valid_index += 1
     return answer_info, valid_img_index, survived_index, True
 
 

@@ -84,7 +84,6 @@ private:
 
     Eigen::Matrix4d transformation_result;
     Eigen::Matrix4d cam2robot;
-    Eigen::Matrix3d robot2cam;
 
     Eigen::Matrix3d draw_rotation;
     Eigen::Vector3d draw_t;
@@ -106,9 +105,10 @@ public:
         info_sub2 = n.subscribe("robot2/rtabmap/mapGraph", 10, &RO_Estimator::info_CB2, this);
         transformation_sub = n.subscribe("odometry_result", 1000, &RO_Estimator::odom_CB, this);
 
-        cam2robot << 0, -1, 0, 0,
-            0, 0, -1, 0,
-            1, 0, 0, 0;
+        cam2robot << 0.0, 0.0, 1.0, 0.0,
+            -1.0, 0.0, -1.0, 0.0,
+            0.0, -1.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 1.0;
 
         marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 10);
 
@@ -150,15 +150,14 @@ public:
                 infos << each_link.information[21], each_link.information[28], each_link.information[35],
                     each_link.information[0], each_link.information[7], each_link.information[14];
 
-                Eigen::Vector3d odom_translation(each_link.transform.translation.x, each_link.transform.translation.y, each_link.transform.translation.z);
+                Eigen::Translation3d odom_translation(each_link.transform.translation.x, each_link.transform.translation.y, each_link.transform.translation.z);
                 Eigen::Quaterniond odom_orientation(each_link.transform.rotation.w, each_link.transform.rotation.x, each_link.transform.rotation.y, each_link.transform.rotation.z);
 
-                Eigen::Matrix4d transfer_affine;
-                transfer_affine.block(0, 0, 3, 3) = odom_orientation.matrix();
-                transfer_affine.block(0, 3, 3, 1) = odom_translation;
+                Eigen::Affine3d transfer_affine;
+                transfer_affine = odom_translation * odom_orientation;
 
                 info_dict1[fromto] = infos;
-                odom_dict1[fromto] = transfer_affine;
+                odom_dict1[fromto] = transfer_affine.matrix();
             }
         }
     }
@@ -173,18 +172,17 @@ public:
             if (each_link.fromId + 1 == each_link.toId)
             {
                 std::vector<int> fromto{each_link.fromId, each_link.toId};
-                Eigen::Vector3d odom_translation(each_link.transform.translation.x, each_link.transform.translation.y, each_link.transform.translation.z);
+                Eigen::Translation3d odom_translation(each_link.transform.translation.x, each_link.transform.translation.y, each_link.transform.translation.z);
                 Eigen::Quaterniond odom_orientation(each_link.transform.rotation.w, each_link.transform.rotation.x, each_link.transform.rotation.y, each_link.transform.rotation.z);
 
-                Eigen::Matrix4d transfer_affine;
-                transfer_affine.block(0, 0, 3, 3) = odom_orientation.matrix();
-                transfer_affine.block(0, 3, 3, 1) = odom_translation;
+                Eigen::Affine3d transfer_affine;
+                transfer_affine = odom_translation * odom_orientation;
 
                 Eigen::VectorXd infos(6);
                 infos << each_link.information[21], each_link.information[28], each_link.information[35],
                     each_link.information[0], each_link.information[7], each_link.information[14];
                 info_dict2[fromto] = infos;
-                odom_dict2[fromto] = transfer_affine;
+                odom_dict2[fromto] = transfer_affine.matrix();
             }
         }
     }
@@ -269,7 +267,6 @@ public:
             data_->data[4], data_->data[5], data_->data[6], data_->data[7],
             data_->data[8], data_->data[9], data_->data[10], data_->data[11],
             0.0, 0.0, 0.0, 1.0;
-        loop_info = data_->index2value;
         valids = data_->valid_img;
         std::string who_detect = data_->who_detect;
         std::string another_one;
@@ -298,13 +295,56 @@ public:
         std::vector<double> local_pcd = data_->r_3d;
         std::vector<Eigen::Vector3d> local_pcds = turnout_point_coord(local_pcd);
         // NOTE BA
+
+        compute_BA(local_pcds, local_poses, hyp_poses, who_detect, locals, hyps, data_->index2value);
     }
 
     // NOTE GTSAMのsigmaはroll,pitch,yaw,x,y,z! なお、2Dの場合はx,y,theta
-    void compute_BA(std::vector<Eigen::Vector3d> local_pcd, std::vector<Eigen::VectorXd> local_sigma, std::vector<Eigen::VectorXd> hyp_sigma,
-                    std::vector<Eigen::Vector4d> local_pose, std::vector<Eigen::Vector4d> hyp_pose, std::string who_detect,
+    void compute_BA(std::vector<Eigen::Vector3d> local_pcd, std::vector<Eigen::Matrix4d> local_pose,
+                    std::vector<Eigen::Matrix4d> hyp_pose, std::string who_detect,
                     std::vector<int> local_ids, std::vector<int> hyp_ids, std::vector<int> loop_ids)
     {
+
+        ROS_WARN("This is point cloud coordinate");
+        for (auto pcdhoge : local_pcd)
+        {
+            std::cout << pcdhoge << std::endl;
+            std::cout << "======================" << std::endl;
+        }
+
+        ROS_WARN("This is local pose");
+        for (auto each : local_pose)
+        {
+            std::cout << each << std::endl;
+            std::cout << "======================" << std::endl;
+        }
+        std::cout << std::endl;
+
+        ROS_WARN("This is hyp pose");
+        for (auto each : hyp_pose)
+        {
+            std::cout << each << std::endl;
+            std::cout << "======================" << std::endl;
+        }
+        std::cout << std::endl;
+
+        ROS_WARN("Local id");
+        for (auto id : local_ids)
+        {
+            std::cout << id << std::endl;
+        }
+
+        ROS_WARN("hyp ids");
+        for (auto id : hyp_ids)
+        {
+            std::cout << id << std::endl;
+        }
+
+        ROS_WARN("loop id");
+        for (auto id : loop_ids)
+        {
+            std::cout << id << std::endl;
+        }
 
         auto initial_pose_noise = noiseModel::Diagonal::Sigmas((Vector(6) << Vector3::Constant(0.0), Vector3::Constant(0.0)).finished());
         auto measurementNoise = noiseModel::Isotropic::Sigma(2, 1.0);
@@ -460,8 +500,10 @@ public:
             // ３つ目の要素に差し掛かった時
             if (index % 3 == 0)
             {
-                Eigen::Vector3d kp_loc_r(point_coord[index - 3], point_coord[index - 2], point_coord[index - 1]);
-                kp_local.push_back(kp_loc_r);
+                Eigen::Vector4d kp_loc_r(point_coord[index - 3] / 1000, point_coord[index - 2] / 1000, point_coord[index - 1] / 1000, 1.0);
+                kp_loc_r = cam2robot * kp_loc_r;
+                Eigen::Vector3d input_loc(kp_loc_r[0], kp_loc_r[1], kp_loc_r[2]);
+                kp_local.push_back(input_loc);
                 // NOTE ポイントのカメラ座標
             }
         }
@@ -486,9 +528,9 @@ public:
 
         std::vector<Eigen::Matrix4d> answer_poses;
         Eigen::Matrix4d initial;
-        initial << 0, 0, 0, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
+        initial << 1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
             0, 0, 0, 1;
         answer_poses.push_back(initial);
 
@@ -508,13 +550,14 @@ public:
             Eigen::Matrix3d local_rot = local_quat.matrix();
             // x,y,z
             local_xyz = local_xyz - origin_xyz;
+            Eigen::Translation3d local_xyz_(local_xyz.x(), local_xyz.y(), local_xyz.z());
             // rot
             local_rot = origin_rot.transpose() * local_rot;
+            Eigen::Quaterniond hoge{local_rot};
 
-            Eigen::Matrix4d answer_pose;
-            answer_pose.block(0, 0, 3, 3) = local_rot;
-            answer_pose.block(0, 3, 3, 1) = local_xyz;
-            answer_poses.push_back(answer_pose);
+            Eigen::Affine3d answer_pose = local_xyz_ * hoge;
+
+            answer_poses.push_back(answer_pose.matrix());
         }
         return answer_poses;
     }
@@ -522,12 +565,17 @@ public:
     std::vector<Eigen::Matrix4d> turnout_hyps_pose(Eigen::Matrix4d odom_trans, std::vector<int> hyp_pairs, std::string robot_name)
     {
         std::vector<Eigen::Matrix4d> hyps_local_poses = turnout_Localpose(hyp_pairs, robot_name);
+        // for (auto posehoge : hyps_local_poses)
+        // {
+        //     std::cout << posehoge << std::endl;
+        //     std::cout << "===========================" << std::endl;
+        // }
         std::vector<Eigen::Vector3d> t_s;
         std::vector<Eigen::Matrix3d> r_s;
         std::vector<Eigen::Matrix4d> answers;
 
         Eigen::Matrix3d rotation_mat = odom_trans.block(0, 0, 3, 3);
-        Eigen::Vector3d translation_vec = odom_trans.block(3, 0, 3, 1);
+        Eigen::Vector3d translation_vec = odom_trans.block(0, 3, 3, 1);
 
         for (auto each : hyps_local_poses)
         {
@@ -541,12 +589,13 @@ public:
         for (int iteration{0}; iteration < t_s.size(); ++iteration)
         {
             Eigen::Vector3d ans_trans = rotation_mat * t_s[iteration] + translation_vec;
-            Eigen::Matrix3d ans_rot = rotation_mat * r_s[iteration];
-            Eigen::Matrix4d answer;
+            Eigen::Translation3d ans_trans_(ans_trans.x(), ans_trans.y(), ans_trans.z());
+            // Eigen::Matrix3d ans_rot = rotation_mat * r_s[iteration];
+            Eigen::Matrix3d ans_rot = Eigen::Matrix3d::Identity();
+            Eigen::Quaterniond ans_rot_{ans_rot};
+            Eigen::Affine3d answer = ans_trans_ * ans_rot_;
 
-            answer.block(0, 0, 3, 3) = ans_rot;
-            answer.block(0, 3, 3, 1) = ans_trans;
-            answers.push_back(answer);
+            answers.push_back(answer.matrix());
         }
 
         return answers;
@@ -561,71 +610,71 @@ public:
             return img_number / 2;
     }
 
-    Eigen::Vector3d turnout_T(Eigen::Vector3d transfer, std::string who_is_detect)
-    {
-        Eigen::Vector3d r1_to_r2;
-        Eigen::Vector3d origin2r1;
-        Eigen::Vector3d origin2r2;
+    // Eigen::Vector3d turnout_T(Eigen::Vector3d transfer, std::string who_is_detect)
+    // {
+    //     Eigen::Vector3d r1_to_r2;
+    //     Eigen::Vector3d origin2r1;
+    //     Eigen::Vector3d origin2r2;
 
-        int r1_img_index, r2_img_index;
-        Eigen::Vector3d transfer_1_to_2;
-        if (who_is_detect == "R1")
-        {
-            r1_img_index = (loop_info[0] - 1) * 0.5 + 1;
-            r2_img_index = loop_info[1] / 2;
-            transfer_1_to_2 = transfer;
-        }
-        else
-        {
-            r1_img_index = (loop_info[1] - 1) * 0.5 + 1;
-            r2_img_index = loop_info[0] / 2;
-            transfer_1_to_2 = Eigen::Vector3d::Zero() - transfer;
-        }
-        origin2r1 << path_1[mapPath_dict[r1_img_index - 1]][0], path_1[mapPath_dict[r1_img_index - 1]][1], path_1[mapPath_dict[r1_img_index - 1]][2];
+    //     int r1_img_index, r2_img_index;
+    //     Eigen::Vector3d transfer_1_to_2;
+    //     if (who_is_detect == "R1")
+    //     {
+    //         r1_img_index = (loop_info[0] - 1) * 0.5 + 1;
+    //         r2_img_index = loop_info[1] / 2;
+    //         transfer_1_to_2 = transfer;
+    //     }
+    //     else
+    //     {
+    //         r1_img_index = (loop_info[1] - 1) * 0.5 + 1;
+    //         r2_img_index = loop_info[0] / 2;
+    //         transfer_1_to_2 = Eigen::Vector3d::Zero() - transfer;
+    //     }
+    //     origin2r1 << path_1[mapPath_dict[r1_img_index - 1]][0], path_1[mapPath_dict[r1_img_index - 1]][1], path_1[mapPath_dict[r1_img_index - 1]][2];
 
-        origin2r2 << path_2[mapPath_dict_2[r2_img_index - 1]][0], path_2[mapPath_dict_2[r2_img_index - 1]][1], path_2[mapPath_dict_2[r2_img_index - 1]][2];
+    //     origin2r2 << path_2[mapPath_dict_2[r2_img_index - 1]][0], path_2[mapPath_dict_2[r2_img_index - 1]][1], path_2[mapPath_dict_2[r2_img_index - 1]][2];
 
-        Eigen::Vector3d ans_t = transfer_1_to_2 - (origin2r2 - origin2r1);
-        return ans_t;
-    }
+    //     Eigen::Vector3d ans_t = transfer_1_to_2 - (origin2r2 - origin2r1);
+    //     return ans_t;
+    // }
 
     // NOTE R_o2o'=R_o2a * R_a2b * R_b2o'
-    Eigen::Quaterniond turnout_R(Eigen::Matrix3d rotation_matrix, std::string who_is_detect)
-    {
-        Eigen::Quaterniond r1_q;
-        Eigen::Quaterniond r2_q;
+    // Eigen::Quaterniond turnout_R(Eigen::Matrix3d rotation_matrix, std::string who_is_detect)
+    // {
+    //     Eigen::Quaterniond r1_q;
+    //     Eigen::Quaterniond r2_q;
 
-        int r1_img_index, r2_img_index;
-        Eigen::Quaterniond rotation_1TO2;
+    //     int r1_img_index, r2_img_index;
+    //     Eigen::Quaterniond rotation_1TO2;
 
-        if (who_is_detect == "R1")
-        {
-            rotation_1TO2 = rotation_matrix;
-            r1_img_index = (loop_info[0] - 1) * 0.5 + 1;
-            r2_img_index = loop_info[1] / 2;
-        }
-        else
-        {
-            rotation_1TO2 = rotation_matrix.transpose();
-            r1_img_index = (loop_info[1] - 1) * 0.5 + 1;
-            r2_img_index = loop_info[0] / 2;
-        }
+    //     if (who_is_detect == "R1")
+    //     {
+    //         rotation_1TO2 = rotation_matrix;
+    //         r1_img_index = (loop_info[0] - 1) * 0.5 + 1;
+    //         r2_img_index = loop_info[1] / 2;
+    //     }
+    //     else
+    //     {
+    //         rotation_1TO2 = rotation_matrix.transpose();
+    //         r1_img_index = (loop_info[1] - 1) * 0.5 + 1;
+    //         r2_img_index = loop_info[0] / 2;
+    //     }
 
-        r1_q.x() = path_1[mapPath_dict[r1_img_index - 1]][3];
-        r1_q.y() = path_1[mapPath_dict[r1_img_index - 1]][4];
-        r1_q.z() = path_1[mapPath_dict[r1_img_index - 1]][5];
-        r1_q.w() = path_1[mapPath_dict[r1_img_index - 1]][6];
+    //     r1_q.x() = path_1[mapPath_dict[r1_img_index - 1]][3];
+    //     r1_q.y() = path_1[mapPath_dict[r1_img_index - 1]][4];
+    //     r1_q.z() = path_1[mapPath_dict[r1_img_index - 1]][5];
+    //     r1_q.w() = path_1[mapPath_dict[r1_img_index - 1]][6];
 
-        r2_q.x() = path_2[mapPath_dict_2[r2_img_index - 1]][3];
-        r2_q.y() = path_2[mapPath_dict_2[r2_img_index - 1]][4];
-        r2_q.z() = path_2[mapPath_dict_2[r2_img_index - 1]][5];
-        r2_q.w() = path_2[mapPath_dict_2[r2_img_index - 1]][6];
+    //     r2_q.x() = path_2[mapPath_dict_2[r2_img_index - 1]][3];
+    //     r2_q.y() = path_2[mapPath_dict_2[r2_img_index - 1]][4];
+    //     r2_q.z() = path_2[mapPath_dict_2[r2_img_index - 1]][5];
+    //     r2_q.w() = path_2[mapPath_dict_2[r2_img_index - 1]][6];
 
-        // NOTE クオータニオンの掛け算の方向は左側
-        // Eigen::Matrix3d R2_origin2node = (r2_q.normalized()).toRotationMatrix();
-        Eigen::Quaterniond q_r1_to_r2 = (r2_q.inverse()) * rotation_1TO2 * r1_q;
-        return q_r1_to_r2.normalized();
-    }
+    //     // NOTE クオータニオンの掛け算の方向は左側
+    //     // Eigen::Matrix3d R2_origin2node = (r2_q.normalized()).toRotationMatrix();
+    //     Eigen::Quaterniond q_r1_to_r2 = (r2_q.inverse()) * rotation_1TO2 * r1_q;
+    //     return q_r1_to_r2.normalized();
+    // }
 };
 
 int main(int argc, char **argv)
