@@ -247,6 +247,17 @@ def derive_duplicated_indexes(indexes, values):
             survived_index, local_survivor = derive_duplicated_index(
                 second_kpt, first_kpt)
 
+        rospy.logwarn(survived_index)
+        rospy.logwarn(
+            "--------------------------------------------------------------")
+        rospy.logwarn(local_survivor)
+        rospy.logwarn(
+            "--------------------------------------------------------------")
+        rospy.logwarn(feature_map)
+        rospy.logwarn(
+            "--------------------------------------------------------------")
+        rospy.logwarn(feature_map_)
+
         # NOTE 共通の特徴点が見つからなかった時
         if len(survived_index) < 4:
             # NOTE ペアから抽出した特徴点の中に共通のものが見いだせない時、その次のペアを試す。
@@ -302,8 +313,9 @@ def derive_duplicated_indexes(indexes, values):
             other_map.append(other_values[1])
         answer_info.append(other_map)
         rospy.logwarn(other_map)
-        rospy.logerror(
-            str(valid_img_index[valid_index-1]+"->"+str(valid_img_index[valid_index])))
+        rospy.logerr(valid_img_index[valid_index-1])
+        rospy.logerr("↓")
+        rospy.logerr(valid_img_index[valid_index])
         valid_index += 1
     return answer_info, valid_img_index, survived_index, True
 
