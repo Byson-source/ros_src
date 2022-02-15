@@ -247,17 +247,6 @@ def derive_duplicated_indexes(indexes, values):
             survived_index, local_survivor = derive_duplicated_index(
                 second_kpt, first_kpt)
 
-        rospy.logwarn(survived_index)
-        rospy.logwarn(
-            "--------------------------------------------------------------")
-        rospy.logwarn(local_survivor)
-        rospy.logwarn(
-            "--------------------------------------------------------------")
-        rospy.logwarn(feature_map)
-        rospy.logwarn(
-            "--------------------------------------------------------------")
-        rospy.logwarn(feature_map_)
-
         # NOTE 共通の特徴点が見つからなかった時
         if len(survived_index) < 4:
             # NOTE ペアから抽出した特徴点の中に共通のものが見いだせない時、その次のペアを試す。
@@ -265,7 +254,7 @@ def derive_duplicated_indexes(indexes, values):
                 if hogehoge == len(sorted_index)-2:
                     # NOTE バンドル調整不可（共通の特徴点を持つ三枚以上の画像が存在しない）
                     rospy.logerr("Can't find corresponding features...Quit...")
-                    return 0, 0, [], False,
+                    return 0, 0, False,
 
                 rospy.logdebug(
                     "There is no common features...Trying next pairs...")
@@ -292,32 +281,39 @@ def derive_duplicated_indexes(indexes, values):
         feature_map = new_map
         survived_backup = survived_index
     # 上位のdictの間引きを行う
-    new_map_list = []
-    new_map = {}
+    new_map = []
 
-    for dictionary in dict_list:
-        new = {}
-        for dict_keyidx, dict_value in dictionary.items():
-            if dict_keyidx in survived_index:
-                new[dict_keyidx] = dict_value
-        new_map_list.append(new)
+    rospy.logerr(survived_index)
 
-    first_info = []
-    for first_keys, first_values in new_map_list[0].items():
-        first_info.append(first_values[0])
-    answer_info = [first_info]
-    valid_index = 1
-    for dictionary in new_map_list:
-        other_map = []
-        for other_keys, other_values in dictionary.items():
-            other_map.append(other_values[1])
-        answer_info.append(other_map)
-        rospy.logwarn(other_map)
-        rospy.logerr(valid_img_index[valid_index-1])
-        rospy.logerr("↓")
-        rospy.logerr(valid_img_index[valid_index])
-        valid_index += 1
-    return answer_info, valid_img_index, survived_index, True
+    for srv in survived_index:
+        new_map.append(dict_list[0][srv][0])
+        # 最初の画像の
+    rospy.logwarn(new_map)
+    return new_map, valid_img_index, True
+
+    # for dictionary in dict_list:
+    #     new = {}
+    #     for dict_keyidx, dict_value in dictionary.items():
+    #         if dict_keyidx in survived_index:
+    #             new[dict_keyidx] = dict_value
+    #     new_map_list.append(new)
+
+    # first_info = []
+    # for first_keys, first_values in new_map_list[0].items():
+    #     first_info.append(first_values[0])
+    # answer_info = [first_info]
+    # valid_index = 1
+    # for dictionary in new_map_list:
+    #     other_map = []
+    #     for other_keys, other_values in dictionary.items():
+    #         other_map.append(other_values[1])
+    #     answer_info.append(other_map)
+    #     rospy.logwarn(other_map)
+    #     rospy.logerr(valid_img_index[valid_index-1])
+    #     rospy.logerr("↓")
+    #     rospy.logerr(valid_img_index[valid_index])
+    #     valid_index += 1
+    # return answer_info, valid_img_index, survived_index, True
 
 
 def loop_CB(data):
@@ -329,7 +325,7 @@ def loop_CB(data):
     for index, element in loop_dict.items():
         referred, referred_hyp = 0, 0
         good_ = 0
-        feature_map_list, valid_img, survived = [], [], []
+        feature_map, valid_img = [], []
         # 各検知の写真の枚数
         if index == "R1":
 
@@ -337,14 +333,14 @@ def loop_CB(data):
             if element["num"] > 1:
                 referred = data.r1_index[0]
                 referred_hyp = data.r1_value[0]
-                feature_map_list, valid_img, survived, good_ = derive_duplicated_indexes(
+                feature_map, valid_img, good_ = derive_duplicated_indexes(
                     data.r1_index, data.r1_value)
         else:
             element["num"] = len(data.r2_index)
             if element["num"] > 1:
                 referred = data.r2_index[0]
                 referred_hyp = data.r2_value[0]
-                feature_map_list, valid_img, survived, good_ = derive_duplicated_indexes(
+                feature_map, valid_img, good_ = derive_duplicated_indexes(
                     data.r2_index, data.r2_value)
 
         answer = HomogeneousArray()
@@ -363,7 +359,7 @@ def loop_CB(data):
             # element["R1"][iter], element["R2"][iter] = [], []
             indice = 0
             r_feature = []
-            for each_kpt in feature_map_list[0]:
+            for each_kpt in feature_map:
                 r_feature.append(each_kpt)
 
             point_coord = []
@@ -394,7 +390,7 @@ def loop_CB(data):
                 #     info.me = "R2"
 
                 # feature_pub.publish(info)
-            rospy.logwarn(point_coord)
+            # rospy.logwarn(point_coord)
             answer.r_3d = point_coord
 
             source_color = o3d.io.read_image(
