@@ -314,6 +314,28 @@ public:
 
         std::cout << "===================" << std::endl;
 
+        for (const auto [key, index] : loop_2d)
+        {
+            std::cout << key << std::endl;
+            std::cout << "----------------------" << std::endl;
+            for (auto val : index)
+            {
+                std::cout << val << std::endl;
+            }
+        }
+
+        std::cout << "================================" << std::endl;
+
+        for (const auto [key, index] : hyp_2d)
+        {
+            std::cout << "----------------------" << std::endl;
+            std::cout << key << std::endl;
+            for (auto val : index)
+            {
+                std::cout << val << std::endl;
+            }
+        }
+
         auto initial_pose_noise = noiseModel::Diagonal::Sigmas((Vector(6) << Vector3::Constant(0.0), Vector3::Constant(0.0)).finished());
         auto measurementNoise = noiseModel::Isotropic::Sigma(2, 1.0);
 
@@ -367,13 +389,14 @@ public:
             pose_symbol.push_back(Symbol('x', index_count));
 
             std::cout << "3==========================================================" << std::endl;
-            for (int pixel_id{0}; pixel_id < hyp_2d[index_count].size(); ++pixel_id)
+            for (int pixel_id{0}; pixel_id < hyp_2d[0].size(); ++pixel_id)
             {
                 Point2 measurement_ = hyp_2d[index_count][pixel_id];
                 graph.emplace_shared<GenericProjectionFactor<Pose3, Point3, Cal3_S2>>(
                     measurement_, measurementNoise, Symbol('x', index_count), Symbol('l', pixel_id), K);
             }
             index_count += 1;
+            std::cout << index_count << std::endl;
         }
 
         // Loop Closure constraint
@@ -390,12 +413,31 @@ public:
         std::cout << "4==========================================================" << std::endl;
 
         Values initialEstimate;
+        Eigen::Translation<double, 3> z_noise(0, 0, 0.001);
+        Eigen::Quaterniond no_rot{Eigen::Matrix3d::Identity()};
+        Eigen::Affine3d slight_noise = z_noise * no_rot;
         // local_ids.insert(local_ids.end(), hyp_ids.begin(), hyp_ids.end());
         for (size_t j{0}; j < local_ids.size(); ++j)
-            initialEstimate.insert(Symbol('x', j), Pose3(local_pose[j]));
+        {
+            if ((j > 0) & (local_pose[j - 1] == local_pose[j]))
+            {
+                local_pose[j] = slight_noise.matrix() * local_pose[j];
+                initialEstimate.insert(Symbol('x', j), Pose3(local_pose[j]));
+            }
+            else
+                initialEstimate.insert(Symbol('x', j), Pose3(local_pose[j]));
+        }
 
         for (size_t j{0}; j < hyp_ids.size(); ++j)
-            initialEstimate.insert(Symbol('x', j + local_ids.size()), Pose3(hyp_pose[j]));
+        {
+            if ((j > 0) & (hyp_pose[j - 1] == hyp_pose[j]))
+            {
+                hyp_pose[j] = slight_noise.matrix() * hyp_pose[j];
+                initialEstimate.insert(Symbol('x', j + local_ids.size()), Pose3(hyp_pose[j]));
+            }
+            else
+                initialEstimate.insert(Symbol('x', j + local_ids.size()), Pose3(hyp_pose[j]));
+        }
 
         for (size_t j{0}; j < local_pcd.size(); ++j)
             initialEstimate.insert<Point3>(Symbol('l', j), Point3(local_pcd[j]));

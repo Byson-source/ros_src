@@ -179,6 +179,23 @@ def add_error(input_list, x, y):
         errored_list.append(list_)
     return errored_list
 
+# NOTE　検出先の写真のidがかぶらないようにする。
+
+
+def avoid_duplication(hypothesises):
+    rospy.logerr(hypothesises)
+    memory = []
+    for hypothesis in hypothesises:
+        if not hypothesis in memory:
+            memory.append(hypothesis)
+        else:
+            alternative = hypothesis+2
+            memory.append(alternative)
+
+    rospy.logerr(memory)
+
+    return memory
+
 
 def derive_duplicated_index(list1, list2, sorted_keys=None):
 
@@ -226,6 +243,7 @@ def derive_duplicated_index(list1, list2, sorted_keys=None):
 
 def derive_duplicated_indexes(indexes, values):
     survived_index, survived_backup = [], []
+    values = avoid_duplication(values)
 
     second_kpt, feature_map, good = orbmatch(indexes[0], values[0])
     sorted_index, dict_list = [], [feature_map]
@@ -298,6 +316,27 @@ def derive_duplicated_indexes(indexes, values):
     return pack, valid_img_index, True
 
 
+def arrange_ids(length):
+    list1 = []
+    list2 = []
+    for val in range(length):
+        if val % 2 == 0:
+            list1.append(val)
+        else:
+            list2.append(val)
+    map_id = {}
+    input_keyhoge = 0
+    for val in list1:
+        map_id[val] = input_keyhoge
+        input_keyhoge += 1
+
+    for val in list2:
+        map_id[val] = input_keyhoge
+        input_keyhoge += 1
+
+    return map_id
+
+
 def loop_CB(data):
 
     loop_dict = {"R1": {"R1": {}, "R2": {}},
@@ -327,6 +366,8 @@ def loop_CB(data):
 
         answer = HomogeneousArray()
         info = FeatureArray()
+        rospy.loginfo("valid img is")
+        rospy.logwarn(valid_img)
 
         if index == "R1":
             answer.who_detect = "R1"
@@ -334,6 +375,7 @@ def loop_CB(data):
             answer.who_detect = "R2"
 
         if good_ and element["num"] > 1:
+            kpt_map = arrange_ids(len(feature_map))
             # element["R1"][iter], element["R2"][iter] = [], []
             for kpt in range(len(feature_map)):
                 # r_feature = []
@@ -353,14 +395,15 @@ def loop_CB(data):
                 # rospy.logerr(point_coord)
                 # 何枚目なのか
                 info.img_coord = img_coord
-                odd = 0
                 if kpt % 2 == 0:
                     info.me = "loop"
-                    info.id = int(kpt/2)
                 else:
                     info.me = "hyp"
-                    info.id = int(len(feature_map)/2)+odd
-                    odd += 1
+                rospy.loginfo("Here is id")
+                rospy.loginfo(info.id)
+                rospy.loginfo(valid_img[kpt])
+
+                info.id = kpt_map[kpt]
                 feature_pub.publish(info)
 
             source_color = o3d.io.read_image(
