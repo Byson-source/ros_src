@@ -79,7 +79,9 @@ private:
     std::map<std::vector<int>, Eigen::Matrix4d> odom_dict2;
     // NOTE {"R1":{1:[[x1,y1,z1],[x2,y2...]],2:...},"R2":...}
 
-    int info_index{0};
+    std::map<int, std::vector<std::vector<double>>> hyp_2d
+
+        int info_index{0};
     int info_index_2{0};
 
     Eigen::Matrix4d transformation_result;
@@ -98,7 +100,7 @@ public:
         rt_pub = n.advertise<cpp::RO_Array>("RT_result", 50);
         // BA_pub = n.advertise
 
-        // feature_sub = n.subscribe("features", 20, &RO_Estimator::RO_CB, this);
+        feature_sub = n.subscribe("features", 20, &RO_Estimator::RO_CB, this);
         path_sub1 = n.subscribe("robot1/rtabmap/mapPath", 10, &RO_Estimator::path1_CB, this);
         path_sub2 = n.subscribe("robot2/rtabmap/mapPath", 10, &RO_Estimator::path2_CB, this);
         info_sub1 = n.subscribe("robot1/rtabmap/mapGraph", 10, &RO_Estimator::info_CB1, this);
@@ -547,6 +549,29 @@ public:
             return (img_number - 1) / 2 + 1;
         else
             return img_number / 2;
+    }
+
+    void RO_CB(const cpp::FeatureArray::ConstPtr &data)
+    {
+
+        // int who_detect = data->who_detect;
+        // loop_info = data->index2value;
+        std::vector<Eigen::Vector2d> img_coord;
+
+        // std::vector<Eigen::Vector3d> kp_loc;
+
+        for (size_t index{1}; index < data->r1.size() + 1; ++index)
+        {
+            // ３つ目の要素に差し掛かった時
+            if (index % 3 == 0)
+            {
+                // Eigen::Vector3d kp_loc(data->r_3d[index - 3], data->r_3d[index - 2], data->r_3d[index - 1]);
+                // kp_loc.push_back(kp_loc);
+                // NOTE ポイントのカメラ座標
+                Eigen::Vector2d r_coord(data->r1_imgcoord[index - 3], data->r1_imgcoord[index - 2]);
+                img_coord.push_back(r_coord);
+            }
+        }
     }
 };
 

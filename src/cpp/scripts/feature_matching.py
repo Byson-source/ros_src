@@ -8,7 +8,7 @@ import pyrealsense2 as rs2
 import os
 from rtabmap_ros.msg import Info
 from cpp.msg import MultiArray
-# from cpp.msg import FeatureArray
+from cpp.msg import FeatureArray
 from cpp.msg import HomogeneousArray
 # NOTE 例えばr12の場合、r1がloopを検知した画像ペアのうち、r2が撮った写真上の特徴点の情報を格納している
 # NOTE 写真一枚ごと
@@ -280,13 +280,22 @@ def derive_duplicated_indexes(indexes, values):
         survived_backup = survived_index
     # 上位のdictの間引きを行う
     new_map = []
-
-    rospy.logerr(survived_index)
+    second_map = []
+    # rospy.logerr(survived_index)
 
     for srv in survived_index:
         new_map.append(dict_list[0][srv][0])
+        second_map.append(dict_list[0][srv][1])
+
+    pack = [new_map, second_map]
+
+    for dictionary_index in range(1, len(dict_list)):
+        new_map = []
+        for srv in survived_index:
+            new_map.append(dict_list[dictionary_index][srv][1])
+        pack.append(new_map)
         # 最初の画像の
-    return new_map, valid_img_index, True
+    return pack, valid_img_index, True
 
 
 def loop_CB(data):
@@ -317,41 +326,34 @@ def loop_CB(data):
                     data.r2_index, data.r2_value)
 
         answer = HomogeneousArray()
-        # info = FeatureArray()
+        info = FeatureArray()
 
         if index == "R1":
-            # filter
-            # info.who_detect = "R1"
             answer.who_detect = "R1"
         else:
-            # info.who_detect = "R2"
             answer.who_detect = "R2"
 
         if good_ and element["num"] > 1:
-            # for iter in range(len(feature_map_list)):
             # element["R1"][iter], element["R2"][iter] = [], []
-            r_feature = []
-            for each_kpt in feature_map:
-                r_feature.append(each_kpt)
+            for kpt in range(len(feature_map)):
+                # r_feature = []
+                # for each_kpt in feature_map[kpt]:
+                #     r_feature.append(each_kpt)
+                r_feature = feature_map[kpt]
+                img_coord = []
+                indice = valid_img[kpt]
 
-            point_coord = []
+                for point in range(len(r_feature)):
+                    if(container[indice][int(r_feature[point][1]), int(r_feature[point][0])] != 0):
 
-            indice = valid_img[0]
+                        img_coord.append(int(r_feature[point][0]))
+                        img_coord.append(int(r_feature[point][1]))
+                        img_coord.append(0)
 
-            for point in range(len(r_feature)):
-                if(container[indice][int(r_feature[point][1]), int(r_feature[point][0])] != 0):
-
-                    depth_r = container[indice][int(
-                        r_feature[point][1]), int(r_feature[point][0])]
-
-                    result = rs2.rs2_deproject_pixel_to_point(
-                        intrinsics, [int(r_feature[point][0]), int(r_feature[point][1])], depth_r)
-
-                    for k in range(3):
-                        point_coord.append(result[k])
-
-            rospy.logerr(point_coord)
-            answer.r_3d = point_coord
+                # rospy.logerr(point_coord)
+                info.id = indice
+                info.img_coord = img_coord
+                feature_pub.publish(info)
 
             source_color = o3d.io.read_image(
                 home+"all_rgb/"+str(referred)+".jpg")
@@ -390,6 +392,18 @@ def loop_CB(data):
                 answer.index2value = [valid_img[0], valid_img[1]]
                 answer.valid_img = valid_img
 
+                point_coord = []
+                for initial_kpt in feature_map[0]:
+                    depth_r = container[valid_img[0]][int(
+                        initial_kpt[1]), int(initial_kpt[0])]
+
+                    result = rs2.rs2_deproject_pixel_to_point(
+                        intrinsics, [int(initial_kpt[0]), int(initial_kpt[1])], depth_r)
+
+                    for k in range(3):
+                        point_coord.append(result[k])
+                answer.r_3d = point_coord
+
                 odometry_pub.publish(answer)
 
 
@@ -424,7 +438,7 @@ if __name__ == '__main__':
 
     # /////////////////////////////////////////////////////////////////////////
     loop_sub = rospy.Subscriber("result", MultiArray, loop_CB)
-    # feature_pub = rospy.Publisher("features", FeatureArray, queue_size=10)
+    feature_pub = rospy.Publisher("features", FeatureArray, queue_size=10)
     odometry_pub = rospy.Publisher(
         "odometry_result", HomogeneousArray, queue_size=10)
 
