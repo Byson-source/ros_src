@@ -74,8 +74,8 @@ private:
     std::map<int, int> mapPath_dict_2;
     std::map<std::vector<int>, Eigen::VectorXd> info_dict1;
     std::map<std::vector<int>, Eigen::VectorXd> info_dict2;
-    std::map<std::vector<int>, std::vector<double>> info1_spare;
-    std::map<std::vector<int>, std::vector<double>> info2_spare;
+    // std::map<std::vector<int>, std::vector<double>> info1_spare;
+    // std::map<std::vector<int>, std::vector<double>> info2_spare;
 
     std::map<std::vector<int>, Eigen::Matrix4d> odom_dict1;
     std::map<std::vector<int>, Eigen::Matrix4d> odom_dict2;
@@ -143,7 +143,7 @@ public:
 
                 info_dict1[fromto] = infos;
                 odom_dict1[fromto] = transfer_affine.matrix();
-                info1_spare[fromto] = info_spare;
+                // info1_spare[fromto] = info_spare;
             }
         }
     }
@@ -172,7 +172,7 @@ public:
                     each_link.information[0], each_link.information[7], each_link.information[14];
                 info_dict2[fromto] = infos;
                 odom_dict2[fromto] = transfer_affine.matrix();
-                info2_spare[fromto] = info_spare;
+                // info2_spare[fromto] = info_spare;
             }
         }
     }
@@ -268,30 +268,51 @@ public:
                     std::vector<int> local_ids, std::vector<int> hyp_ids,
                     std::vector<Eigen::Matrix4d> local_pose, std::vector<Eigen::Matrix4d> hyp_pose)
     {
-
-        for (const auto [key, ind] : hyp_2d)
         {
-            std::cout << key << std::endl;
-            for (auto in : ind)
+
+            ROS_WARN("This is point cloud coordinate");
+            for (auto pcdhoge : local_pcd)
             {
-                std::cout << in << std::endl;
+                std::cout << pcdhoge << std::endl;
+                std::cout << "======================" << std::endl;
+            }
+
+            ROS_WARN("This is local pose");
+            for (auto each : local_pose)
+            {
+                std::cout << each << std::endl;
+                std::cout << "======================" << std::endl;
             }
             std::cout << std::endl;
-        }
-        std::cout << "================================" << std::endl;
 
-        for (const auto [key, ind] : loop_2d)
-        {
-            std::cout << key << std::endl;
-            for (auto in : ind)
+            ROS_WARN("This is hyp pose");
+            for (auto each : hyp_pose)
             {
-                std::cout << in << std::endl;
+                std::cout << each << std::endl;
+                std::cout << "======================" << std::endl;
             }
             std::cout << std::endl;
+
+            ROS_WARN("Local id");
+            for (auto id : local_ids)
+            {
+                std::cout << id << std::endl;
+            }
+
+            ROS_WARN("hyp ids");
+            for (auto id : hyp_ids)
+            {
+                std::cout << id << std::endl;
+            }
+
+            ROS_WARN("loop id");
+            for (auto id : local_ids)
+            {
+                std::cout << id << std::endl;
+            }
         }
 
-        std::cout
-            << "===================" << std::endl;
+        std::cout << "===================" << std::endl;
 
         auto initial_pose_noise = noiseModel::Diagonal::Sigmas((Vector(6) << Vector3::Constant(0.0), Vector3::Constant(0.0)).finished());
         auto measurementNoise = noiseModel::Isotropic::Sigma(2, 1.0);
@@ -302,7 +323,6 @@ public:
         std::map<std::vector<int>, Eigen::VectorXd> *info_local_ptr{nullptr};
         std::map<std::vector<int>, Eigen::Matrix4d> *odom_hyp_ptr{nullptr};
         std::map<std::vector<int>, Eigen::VectorXd> *info_hyp_ptr{nullptr};
-        std::map<std::vector<int>, std::vector<double>> *hypinfo_spare{nullptr};
         std::string else_one;
 
         if (who_detect == "R1")
@@ -311,8 +331,6 @@ public:
             info_local_ptr = &info_dict1;
             odom_hyp_ptr = &odom_dict2;
             info_hyp_ptr = &info_dict2;
-            // localinfo_spare = &info1_spare;
-            hypinfo_spare = &info2_spare;
             else_one = "R2";
         }
         else
@@ -321,8 +339,6 @@ public:
             info_local_ptr = &info_dict2;
             odom_hyp_ptr = &odom_dict1;
             info_hyp_ptr = &info_dict1;
-            // localinfo_spare = &info2_spare;
-            hypinfo_spare = &info1_spare;
             else_one = "R1";
         }
 
@@ -330,71 +346,34 @@ public:
 
         graph.addPrior(Symbol('x', 0), initial_local_pose, initial_pose_noise);
         std::vector<Symbol> pose_symbol;
+        int index_count{0};
 
         for (size_t idx{0}; idx < local_ids.size(); ++idx)
         {
-            // if (idx > 0)
-            // {
-            //     if (odom_local_ptr->count({translate_index(local_ids[idx - 1], who_detect), translate_index(local_ids[idx], who_detect)}))
-            //     {
-            //         Pose3 odometry((*odom_local_ptr)[{translate_index(local_ids[idx - 1], who_detect), translate_index(local_ids[idx], who_detect)}]);
-            //         auto odometryNoise = noiseModel::Diagonal::Variances((*info_local_ptr)[{translate_index(local_ids[idx - 1], who_detect), translate_index(local_ids[idx], who_detect)}]);
-            //         graph.emplace_shared<BetweenFactor<Pose3>>(Symbol('x', idx - 1), Symbol('x', idx), odometry, odometryNoise);
-            //     }
-            //     else
-            //     {
-            //         ROS_WARN("One of odom constraints missing its sequential indexes...");
-            //         exit(1);
-            //     }
-            // }
+            pose_symbol.push_back(Symbol('x', index_count));
 
-            // Projection regisration
-            // Pose definition
-            pose_symbol.push_back(Symbol('x', idx));
-            // for (auto pixel : idx)
-            for (int pixel_id{0}; pixel_id < loop_2d[idx].size(); ++pixel_id)
+            for (int pixel_id{0}; pixel_id < loop_2d[0].size(); ++pixel_id)
             {
-                Point2 measurement = loop_2d[idx][pixel_id];
+                Point2 measurement = loop_2d[index_count][pixel_id];
                 graph.emplace_shared<GenericProjectionFactor<Pose3, Point3, Cal3_S2>>(
-                    measurement, measurementNoise, Symbol('x', idx), Symbol('l', pixel_id), K);
+                    measurement, measurementNoise, Symbol('x', index_count), Symbol('l', pixel_id), K);
             }
+            index_count += 1;
         }
 
         // hyp
         for (size_t idx{0}; idx < hyp_ids.size(); ++idx)
         {
-            // if (idx > 0)
-            // {
-            //     Eigen::Matrix4d apart_odom;
-            //     Eigen::VectorXd apart_info(6);
-            //     // std::cout << "==========================================================" << std::endl;
-            //     turnout_apartid_odom_info(translate_index(hyp_ids[0], else_one), translate_index(hyp_ids[idx], else_one),
-            //                               apart_odom, apart_info, hypinfo_spare, odom_hyp_ptr);
-            //     Pose3 odometry(apart_odom);
-
-            //     auto odometryNoise = noiseModel::Diagonal::Sigmas((Vector(6) << Vector3::Constant(0.1), Vector3::Constant(0.3))
-            //                                                           .finished());
-
-            //     graph.emplace_shared<BetweenFactor<Pose3>>(Symbol('x', local_ids.size() + idx), Symbol('x', local_ids.size() + idx - 1), odometry, odometryNoise);
-            // }
-            pose_symbol.push_back(Symbol('x', local_ids.size() + idx));
+            pose_symbol.push_back(Symbol('x', index_count));
 
             std::cout << "3==========================================================" << std::endl;
-            for (int pixel_id{0}; pixel_id < loop_2d[idx].size(); ++pixel_id)
+            for (int pixel_id{0}; pixel_id < hyp_2d[index_count].size(); ++pixel_id)
             {
-                std::cout << idx + local_ids.size() << std::endl;
-                // Point2 measurement(300.5, 150.1);
-
-                Point2 measurement_ = hyp_2d[idx + local_ids.size()][pixel_id];
-
-                // if ((idx == local_ids.size() - 1) && (pixel_id == loop_2d[idx].size() - 1))
-                // {
-                //     graph.emplace_shared<GenericProjectionFactor<Pose3, Point3, Cal3_S2>>(
-                //         measurement, measurementNoise, Symbol('x', local_ids.size() + idx), Symbol('l', pixel_id), K);
-                // }
+                Point2 measurement_ = hyp_2d[index_count][pixel_id];
                 graph.emplace_shared<GenericProjectionFactor<Pose3, Point3, Cal3_S2>>(
-                    measurement_, measurementNoise, Symbol('x', local_ids.size() + idx), Symbol('l', pixel_id), K);
+                    measurement_, measurementNoise, Symbol('x', index_count), Symbol('l', pixel_id), K);
             }
+            index_count += 1;
         }
 
         // Loop Closure constraint
@@ -402,7 +381,7 @@ public:
                                                        Vector3::Constant(0.3))
                                                           .finished());
 
-        graph.emplace_shared<BetweenFactor<Pose3>>(Symbol('x', 0), Symbol('x', local_ids.size()), Pose3(transformation_result), loopNoise);
+        // graph.emplace_shared<BetweenFactor<Pose3>>(Symbol('x', 0), Symbol('x', local_ids.size()), Pose3(transformation_result), loopNoise);
 
         auto pointNoise = noiseModel::Isotropic::Sigma(3, 0.1);
         graph.addPrior(Symbol('l', 0), local_pcd[0], pointNoise);
