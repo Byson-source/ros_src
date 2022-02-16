@@ -208,8 +208,13 @@ public:
 
         cpp::RO_Array pose_result;
         int who_detect = data_->who_detect;
+
+        ROS_INFO("Hello");
+
         Eigen::Vector3d ans_t = turnout_T(transfer_, who_detect);
+        ROS_INFO("Hello");
         Eigen::Quaterniond ans_r = turnout_R(rotation_, who_detect);
+        ROS_INFO("Hello");
 
         std::vector<double> R{ans_r.w(), ans_r.x(), ans_r.y(), ans_r.z()};
         std::vector<double> t{ans_t[0], ans_t[1], ans_t[2]};
