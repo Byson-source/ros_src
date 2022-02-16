@@ -36,8 +36,10 @@
 #include <gtsam/slam/BetweenFactor.h>
 #include <gtsam/sam/BearingRangeFactor.h>
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
+#include <gtsam/nonlinear/NonlinearEquality.h>
 #include <gtsam/nonlinear/DoglegOptimizer.h>
 #include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
+#include <gtsam/slam/StereoFactor.h>
 #include <gtsam/nonlinear/Marginals.h>
 #include <gtsam/nonlinear/Values.h>
 
@@ -46,7 +48,7 @@ using namespace gtsam;
 class RO_Estimator
 {
 private:
-    Cal3_S2::shared_ptr K{new Cal3_S2(617.5604248046, 617.3798828, 0.0, 317.55502, 244.730865)};
+    // Cal3_S2::shared_ptr K{new Cal3_S2(617.5604248046, 617.3798828, 0.0, 317.55502, 244.730865)};
 
     ros::NodeHandle n;
     ros::Subscriber feature_sub;
@@ -104,7 +106,7 @@ public:
         transformation_sub = n.subscribe("odometry_result", 1000, &RO_Estimator::odom_CB, this);
 
         cam2robot << 0.0, 0.0, 1.0, 0.0,
-            -1.0, 0.0, -1.0, 0.0,
+            -1.0, 0.0, 0.0, 0.0,
             0.0, -1.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 1.0;
     }
@@ -221,13 +223,15 @@ public:
         std::vector<int> locals;
         for (int idx{0}; idx < valids.size(); ++idx)
         {
-            if (idx % 2 == 1)
+            if (idx % 2 == 0)
                 locals.push_back(valids[idx]);
             else
                 hyps.push_back(valids[idx]);
         }
 
-        // NOTE turnout necessary robot's poses
+        Values initial_estimate;
+
+        // // NOTE turnout necessary robot's poses
         std::vector<Eigen::Matrix4d> local_poses = turnout_Localpose(locals, who_detect);
 
         std::vector<Eigen::Matrix4d> hyp_poses = turnout_hyps_pose(transformation_result, hyps, another_one);
@@ -388,6 +392,8 @@ public:
         auto pointNoise = noiseModel::Isotropic::Sigma(3, 0.1);
         graph.addPrior(Symbol('l', 0), local_pcd[0], pointNoise);
 
+        graph.print("Factor Graph:\n");
+
         Values initialEstimate;
         local_ids.insert(local_ids.end(), hyp_ids.begin(), hyp_ids.end());
         for (size_t j{0}; j < local_ids.size(); ++j)
@@ -431,12 +437,14 @@ public:
 
         std::vector<Eigen::Vector3d> kp_local;
 
+        // ROS_INFO("Next stage");
         for (size_t index{1}; index < point_coord.size() + 1; ++index)
         {
             // ３つ目の要素に差し掛かった時
             if (index % 3 == 0)
             {
                 Eigen::Vector4d kp_loc_r(point_coord[index - 3] / 1000, point_coord[index - 2] / 1000, point_coord[index - 1] / 1000, 1.0);
+                // std::cout << kp_loc_r << std::endl;
                 kp_loc_r = cam2robot * kp_loc_r;
                 Eigen::Vector3d input_loc(kp_loc_r[0], kp_loc_r[1], kp_loc_r[2]);
                 kp_local.push_back(input_loc);

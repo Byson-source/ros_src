@@ -273,8 +273,6 @@ def derive_duplicated_indexes(indexes, values):
             next_second.append(feature_map_[
                 local_survivor[hogeee]][1])
 
-        # rospy.logerr(feature_map)
-        # rospy.logwarn(new_map)
         dict_list.append(new_map)
 
         second_kpt = next_second
@@ -288,32 +286,7 @@ def derive_duplicated_indexes(indexes, values):
     for srv in survived_index:
         new_map.append(dict_list[0][srv][0])
         # 最初の画像の
-    rospy.logwarn(new_map)
     return new_map, valid_img_index, True
-
-    # for dictionary in dict_list:
-    #     new = {}
-    #     for dict_keyidx, dict_value in dictionary.items():
-    #         if dict_keyidx in survived_index:
-    #             new[dict_keyidx] = dict_value
-    #     new_map_list.append(new)
-
-    # first_info = []
-    # for first_keys, first_values in new_map_list[0].items():
-    #     first_info.append(first_values[0])
-    # answer_info = [first_info]
-    # valid_index = 1
-    # for dictionary in new_map_list:
-    #     other_map = []
-    #     for other_keys, other_values in dictionary.items():
-    #         other_map.append(other_values[1])
-    #     answer_info.append(other_map)
-    #     rospy.logwarn(other_map)
-    #     rospy.logerr(valid_img_index[valid_index-1])
-    #     rospy.logerr("↓")
-    #     rospy.logerr(valid_img_index[valid_index])
-    #     valid_index += 1
-    # return answer_info, valid_img_index, survived_index, True
 
 
 def loop_CB(data):
@@ -357,12 +330,12 @@ def loop_CB(data):
         if good_ and element["num"] > 1:
             # for iter in range(len(feature_map_list)):
             # element["R1"][iter], element["R2"][iter] = [], []
-            indice = 0
             r_feature = []
             for each_kpt in feature_map:
                 r_feature.append(each_kpt)
 
             point_coord = []
+
             indice = valid_img[0]
 
             for point in range(len(r_feature)):
@@ -377,20 +350,7 @@ def loop_CB(data):
                     for k in range(3):
                         point_coord.append(result[k])
 
-                # if iter == len(feature_map_list)-1:
-                #     info.signal = 1
-                # else:
-                #     info.signal = 0
-
-                # info.r_3d = point_coord
-
-                # if ((index == "R1" and iter % 2 == 1) or (index == "R2" and iter % 2 == 0)):
-                #     info.me = "R1"
-                # else:
-                #     info.me = "R2"
-
-                # feature_pub.publish(info)
-            # rospy.logwarn(point_coord)
+            rospy.logerr(point_coord)
             answer.r_3d = point_coord
 
             source_color = o3d.io.read_image(
