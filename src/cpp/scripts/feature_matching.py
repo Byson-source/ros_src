@@ -353,12 +353,14 @@ def loop_CB(data):
                 # rospy.logerr(point_coord)
                 # 何枚目なのか
                 info.img_coord = img_coord
+                odd = 0
                 if kpt % 2 == 0:
                     info.me = "loop"
-                    info.id = kpt
+                    info.id = int(kpt/2)
                 else:
                     info.me = "hyp"
-                    info.id = kpt+int(len(feature_map)/2)
+                    info.id = int(len(feature_map)/2)+odd
+                    odd += 1
                 feature_pub.publish(info)
 
             source_color = o3d.io.read_image(
