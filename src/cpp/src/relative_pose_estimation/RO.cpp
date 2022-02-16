@@ -57,8 +57,6 @@ private:
 
     int status{0};
 
-    int status{0};
-
     Eigen::Matrix4d transformation_result;
     Eigen::Matrix3d cam2robot;
     Eigen::Matrix3d robot2cam;
