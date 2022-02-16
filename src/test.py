@@ -19,4 +19,4 @@ def arrange(length):
     print(map)
 
 
-arrange(13)
+arrange(5)

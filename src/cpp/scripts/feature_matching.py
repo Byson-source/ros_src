@@ -201,7 +201,7 @@ def derive_duplicated_index(list1, list2, sorted_keys=None):
 
     error_list = [0]
 
-    for i in range(3):
+    for i in range(1):
         error_list.append(i+1)
         error_list.append(-i-1)
 
@@ -374,8 +374,11 @@ def loop_CB(data):
         else:
             answer.who_detect = "R2"
 
+        depth_checker = []
+
         if good_ and element["num"] > 1:
             kpt_map = arrange_ids(len(feature_map))
+            rospy.logwarn(kpt_map)
             # element["R1"][iter], element["R2"][iter] = [], []
             for kpt in range(len(feature_map)):
                 # r_feature = []
@@ -386,11 +389,17 @@ def loop_CB(data):
                 indice = valid_img[kpt]
 
                 for point in range(len(r_feature)):
-                    if(container[indice][int(r_feature[point][1]), int(r_feature[point][0])] != 0):
+                    if point in depth_checker:
+                        # NOTE 一度depthが0と判定されたものは以降数えない
+                        rospy.loginfo(point)
+                        continue
+                    elif(container[indice][int(r_feature[point][1]), int(r_feature[point][0])] != 0):
 
                         img_coord.append(int(r_feature[point][0]))
                         img_coord.append(int(r_feature[point][1]))
                         img_coord.append(0)
+                    else:
+                        depth_checker.append(point)
 
                 # rospy.logerr(point_coord)
                 # 何枚目なのか
@@ -399,9 +408,6 @@ def loop_CB(data):
                     info.me = "loop"
                 else:
                     info.me = "hyp"
-                rospy.loginfo("Here is id")
-                rospy.loginfo(info.id)
-                rospy.loginfo(valid_img[kpt])
 
                 info.id = kpt_map[kpt]
                 feature_pub.publish(info)
