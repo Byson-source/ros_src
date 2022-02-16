@@ -322,8 +322,8 @@ public:
         rotation_ = cam2robot.block(0, 0, 3, 3) * rotation_ * (cam2robot.block(0, 0, 3, 3)).transpose();
         transfer_ = cam2robot.block(0, 0, 3, 3) * transfer_;
 
-        Eigen::Vector3d ans_t = turnout_T(transfer_, who_detect);
-        Eigen::Quaterniond ans_r = turnout_R(rotation_, who_detect);
+        Eigen::Vector3d ans_t = turnout_T(transfer_, who_detect, valids);
+        Eigen::Quaterniond ans_r = turnout_R(rotation_, who_detect, valids);
 
         status = 1;
 
@@ -738,7 +738,7 @@ public:
             loop_2d[id] = img_coord;
     }
 
-    Eigen::Vector3d turnout_T(Eigen::Vector3d transfer, std::string who_is_detect)
+    Eigen::Vector3d turnout_T(Eigen::Vector3d transfer, std::string who_is_detect, std::vector<int> valid)
     {
         Eigen::Vector3d r1_to_r2;
         Eigen::Vector3d origin2r1;
@@ -748,14 +748,14 @@ public:
         Eigen::Vector3d transfer_1_to_2;
         if (who_is_detect == "R1")
         {
-            r1_img_index = (loop_info[0] - 1) * 0.5 + 1;
-            r2_img_index = loop_info[1] / 2;
+            r1_img_index = (valid[0] - 1) * 0.5 + 1;
+            r2_img_index = valid[1] / 2;
             transfer_1_to_2 = transfer;
         }
         else
         {
-            r1_img_index = (loop_info[1] - 1) * 0.5 + 1;
-            r2_img_index = loop_info[0] / 2;
+            r1_img_index = (valid[1] - 1) * 0.5 + 1;
+            r2_img_index = valid[0] / 2;
             transfer_1_to_2 = Eigen::Vector3d::Zero() - transfer;
         }
         origin2r1 << path_1[mapPath_dict[r1_img_index]][0], path_1[mapPath_dict[r1_img_index]][1], path_1[mapPath_dict[r1_img_index]][2];
@@ -766,7 +766,7 @@ public:
         return ans_t;
     }
 
-    Eigen::Quaterniond turnout_R(Eigen::Matrix3d rotation_matrix, std::string who_is_detect)
+    Eigen::Quaterniond turnout_R(Eigen::Matrix3d rotation_matrix, std::string who_is_detect, std::vector<int> valid)
     {
         Eigen::Quaterniond r1_q;
         Eigen::Quaterniond r2_q;
@@ -777,14 +777,14 @@ public:
         if (who_is_detect == "R1")
         {
             rotation_1TO2 = rotation_matrix;
-            r1_img_index = (loop_info[0] - 1) * 0.5 + 1;
-            r2_img_index = loop_info[1] / 2;
+            r1_img_index = (valid[0] - 1) * 0.5 + 1;
+            r2_img_index = valid[1] / 2;
         }
         else
         {
             rotation_1TO2 = rotation_matrix.transpose();
-            r1_img_index = (loop_info[1] - 1) * 0.5 + 1;
-            r2_img_index = loop_info[0] / 2;
+            r1_img_index = (valid[1] - 1) * 0.5 + 1;
+            r2_img_index = valid[0] / 2;
         }
 
         r1_q.x() = path_1[mapPath_dict[r1_img_index]][3];
