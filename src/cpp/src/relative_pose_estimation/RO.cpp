@@ -48,7 +48,7 @@ using namespace gtsam;
 class RO_Estimator
 {
 private:
-    // Cal3_S2::shared_ptr K{new Cal3_S2(617.5604248046, 617.3798828, 0.0, 317.55502, 244.730865)};
+    Cal3_S2::shared_ptr K{new Cal3_S2(617.5604248046, 617.3798828, 0.0, 317.55502, 244.730865)};
 
     ros::NodeHandle n;
     ros::Subscriber feature_sub;
@@ -64,7 +64,7 @@ private:
 
     visualization_msgs::Marker points, line_strip, line_list;
 
-    std::vector<int> loop_info;
+    std::string loop_info;
     // NOTE xyz / xyzw
     std::vector<std::vector<double>> path_1;
     std::vector<std::vector<double>> path_2;
@@ -79,13 +79,15 @@ private:
     std::map<std::vector<int>, Eigen::Matrix4d> odom_dict2;
     // NOTE {"R1":{1:[[x1,y1,z1],[x2,y2...]],2:...},"R2":...}
 
-    std::map<int, std::vector<std::vector<double>>> hyp_2d
+    std::map<int, std::vector<Eigen::Vector2d>> hyp_2d;
+    std::map<int, std::vector<Eigen::Vector2d>> loop_2d;
 
-        int info_index{0};
+    int info_index{0};
     int info_index_2{0};
 
     Eigen::Matrix4d transformation_result;
     Eigen::Matrix4d cam2robot;
+    Eigen::Matrix3d robot2cam;
 
     Eigen::Matrix3d draw_rotation;
     Eigen::Vector3d draw_t;
@@ -111,6 +113,8 @@ public:
             -1.0, 0.0, 0.0, 0.0,
             0.0, -1.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 1.0;
+
+        robot2cam = (cam2robot.block(0, 0, 3, 3)).transpose();
     }
     // FIXME odomの拘束条件しか考慮しない
     void info_CB1(const rtabmap_ros::MapGraph::ConstPtr &data)
@@ -219,8 +223,6 @@ public:
         else
             another_one = "R1";
 
-        transformation_result = cam2robot * transformation_result;
-
         std::vector<int> hyps;
         std::vector<int> locals;
         for (int idx{0}; idx < valids.size(); ++idx)
@@ -236,27 +238,31 @@ public:
         // // NOTE turnout necessary robot's poses
         std::vector<Eigen::Matrix4d> local_poses = turnout_Localpose(locals, who_detect);
 
+        std::cout << "==========================================================" << std::endl;
+        std::cout << "==========================================================" << std::endl;
+        std::cout << "==========================================================" << std::endl;
+        std::cout << "==========================================================" << std::endl;
+
         std::vector<Eigen::Matrix4d> hyp_poses = turnout_hyps_pose(transformation_result, hyps, another_one);
 
         std::vector<double> local_pcd = data_->r_3d;
         std::vector<Eigen::Vector3d> local_pcds = turnout_point_coord(local_pcd);
         // NOTE BA
 
-        compute_BA(local_pcds, local_poses, hyp_poses, who_detect, locals, hyps, data_->index2value);
+        compute_BA(local_pcds, Eigen::Matrix4d::Identity(), who_detect, hyp_2d, loop_2d, locals, hyps, local_poses, hyp_poses);
+
+        hyp_2d.clear();
+        loop_2d.clear();
     }
 
     // NOTE GTSAMのsigmaはroll,pitch,yaw,x,y,z! なお、2Dの場合はx,y,theta
-    void compute_BA(std::vector<Eigen::Vector3d> local_pcd, std::vector<Eigen::Matrix4d> local_pose,
-                    std::vector<Eigen::Matrix4d> hyp_pose, std::string who_detect,
-                    std::vector<int> local_ids, std::vector<int> hyp_ids, std::vector<int> loop_ids)
+    void compute_BA(std::vector<Eigen::Vector3d> local_pcd, Eigen::Matrix4d initial_pose,
+                    std::string who_detect,
+                    std::map<int, std::vector<Eigen::Vector2d>> hyp_2d,
+                    std::map<int, std::vector<Eigen::Vector2d>> loop_2d,
+                    std::vector<int> local_ids, std::vector<int> hyp_ids,
+                    std::vector<Eigen::Matrix4d> local_pose, std::vector<Eigen::Matrix4d> hyp_pose)
     {
-
-        ROS_WARN("This is point cloud coordinate");
-        for (auto pcdhoge : local_pcd)
-        {
-            std::cout << pcdhoge << std::endl;
-            std::cout << "======================" << std::endl;
-        }
 
         ROS_WARN("This is local pose");
         for (auto each : local_pose)
@@ -265,31 +271,11 @@ public:
             std::cout << "======================" << std::endl;
         }
         std::cout << std::endl;
-
         ROS_WARN("This is hyp pose");
         for (auto each : hyp_pose)
         {
             std::cout << each << std::endl;
             std::cout << "======================" << std::endl;
-        }
-        std::cout << std::endl;
-
-        ROS_WARN("Local id");
-        for (auto id : local_ids)
-        {
-            std::cout << id << std::endl;
-        }
-
-        ROS_WARN("hyp ids");
-        for (auto id : hyp_ids)
-        {
-            std::cout << id << std::endl;
-        }
-
-        ROS_WARN("loop id");
-        for (auto id : loop_ids)
-        {
-            std::cout << id << std::endl;
         }
 
         auto initial_pose_noise = noiseModel::Diagonal::Sigmas((Vector(6) << Vector3::Constant(0.0), Vector3::Constant(0.0)).finished());
@@ -320,14 +306,13 @@ public:
             else_one = "R1";
         }
 
-        Pose3 initial_local_pose(local_pose[0]);
+        Pose3 initial_local_pose(initial_pose);
 
         graph.addPrior(Symbol('x', 0), initial_local_pose, initial_pose_noise);
         std::vector<Symbol> pose_symbol;
 
         for (size_t idx{0}; idx < local_ids.size(); ++idx)
         {
-            // local_odom.push_back(Pose3((*odom_local_ptr)[{local_ids[idx], local_ids[idx - 1]}]));
             if (idx > 0)
             {
                 if (odom_local_ptr->count({translate_index(local_ids[idx - 1], who_detect), translate_index(local_ids[idx], who_detect)}))
@@ -345,23 +330,19 @@ public:
 
             // Projection regisration
             // Pose definition
-            Pose3 individual_pose(local_pose[idx]);
-            PinholeCamera<Cal3_S2> camera(individual_pose, *K);
             pose_symbol.push_back(Symbol('x', idx));
-
-            for (size_t j = 0; j < local_pcd.size(); ++j)
+            // for (auto pixel : idx)
+            for (int pixel_id{0}; pixel_id < loop_2d[idx].size(); ++pixel_id)
             {
-                Point2 measurement = camera.project(local_pcd[j]);
+                Point2 measurement = loop_2d[idx][pixel_id];
                 graph.emplace_shared<GenericProjectionFactor<Pose3, Point3, Cal3_S2>>(
-                    measurement, measurementNoise, Symbol('x', idx), Symbol('l', j), K);
+                    measurement, measurementNoise, Symbol('x', idx), Symbol('l', pixel_id), K);
             }
         }
 
         // hyp
-        std::map<int, int> index_memo;
         for (size_t idx{0}; idx < hyp_ids.size(); ++idx)
         {
-            index_memo[hyp_ids[idx]] = local_ids.size() + idx;
             if (idx > 0)
             {
                 Eigen::Matrix4d apart_odom;
@@ -369,19 +350,18 @@ public:
                 turnout_apartid_odom_info(translate_index(hyp_ids[0], else_one), translate_index(hyp_ids[idx], else_one),
                                           apart_odom, apart_info, info_hyp_ptr, odom_hyp_ptr);
                 Pose3 odometry(apart_odom);
+
                 auto odometryNoise = noiseModel::Diagonal::Variances(apart_info);
+
                 graph.emplace_shared<BetweenFactor<Pose3>>(Symbol('x', local_ids.size() + idx), Symbol('x', local_ids.size() + idx - 1), odometry, odometryNoise);
             }
-
-            Pose3 individual_pose(hyp_pose[idx]);
-            PinholeCamera<Cal3_S2> camera(individual_pose, *K);
             pose_symbol.push_back(Symbol('x', local_ids.size() + idx));
 
-            for (size_t j = 0; j < local_pcd.size(); ++j)
+            for (int pixel_id{0}; pixel_id < hyp_2d[local_ids.size() + idx].size(); ++pixel_id)
             {
-                Point2 measurement = camera.project(local_pcd[j]);
+                Point2 measurement = loop_2d[idx + local_ids.size()][pixel_id];
                 graph.emplace_shared<GenericProjectionFactor<Pose3, Point3, Cal3_S2>>(
-                    measurement, measurementNoise, Symbol('x', local_ids.size() + idx), Symbol('l', j), K);
+                    measurement, measurementNoise, Symbol('x', local_ids.size() + idx), Symbol('l', pixel_id), K);
             }
         }
         // Loop Closure constraint
@@ -389,7 +369,7 @@ public:
                                                        Vector3::Constant(0.3))
                                                           .finished());
 
-        graph.emplace_shared<BetweenFactor<Pose3>>(Symbol('x', loop_ids[0]), Symbol('x', index_memo[loop_ids[1]]), Pose3(transformation_result), loopNoise);
+        graph.emplace_shared<BetweenFactor<Pose3>>(Symbol('x', 0), Symbol('x', local_ids.size()), Pose3(transformation_result), loopNoise);
 
         auto pointNoise = noiseModel::Isotropic::Sigma(3, 0.1);
         graph.addPrior(Symbol('l', 0), local_pcd[0], pointNoise);
@@ -397,9 +377,12 @@ public:
         graph.print("Factor Graph:\n");
 
         Values initialEstimate;
-        local_ids.insert(local_ids.end(), hyp_ids.begin(), hyp_ids.end());
+        // local_ids.insert(local_ids.end(), hyp_ids.begin(), hyp_ids.end());
         for (size_t j{0}; j < local_ids.size(); ++j)
             initialEstimate.insert(Symbol('x', j), Pose3(local_pose[j]));
+
+        for (size_t j{0}; j < hyp_ids.size(); ++j)
+            initialEstimate.insert(Symbol('x', j + local_ids.size()), Pose3(hyp_pose[j]));
 
         for (size_t j{0}; j < local_pcd.size(); ++j)
             initialEstimate.insert<Point3>(Symbol('l', j), Point3(local_pcd[j]));
@@ -430,6 +413,7 @@ public:
 
             goal_info = goal_info + cov;
         }
+        goal_odom = goal_odom * cam2robot.transpose();
         goal_info << 1 / (goal_info[0]), 1 / (goal_info[1]), 1 / (goal_info[2]),
             1 / (goal_info[3]), 1 / (goal_info[4]), 1 / (goal_info[5]);
     }
@@ -447,7 +431,8 @@ public:
             {
                 Eigen::Vector4d kp_loc_r(point_coord[index - 3] / 1000, point_coord[index - 2] / 1000, point_coord[index - 1] / 1000, 1.0);
                 // std::cout << kp_loc_r << std::endl;
-                kp_loc_r = cam2robot * kp_loc_r;
+                // NOTE GTSAMはcameraのcoordinate frameなのでそのままにしておく
+                // kp_loc_r = cam2robot * kp_loc_r;
                 Eigen::Vector3d input_loc(kp_loc_r[0], kp_loc_r[1], kp_loc_r[2]);
                 kp_local.push_back(input_loc);
                 // NOTE ポイントのカメラ座標
@@ -484,8 +469,10 @@ public:
         int path_idx{(*mapPath_dict_ptr)[local_origin_id - 1]};
 
         Eigen::Vector3d origin_xyz((*path_ptr)[path_idx][0], (*path_ptr)[path_idx][1], (*path_ptr)[path_idx][2]);
+        std::cout << origin_xyz << std::endl;
         Eigen::Quaterniond origin_quat((*path_ptr)[path_idx][6], (*path_ptr)[path_idx][3], (*path_ptr)[path_idx][4], (*path_ptr)[path_idx][5]);
         Eigen::Matrix3d origin_rot = origin_quat.matrix();
+        std::cout << origin_rot << std::endl;
 
         for (int id{1}; id < local_pairs.size(); ++id)
         {
@@ -494,14 +481,18 @@ public:
             Eigen::Vector3d local_xyz((*path_ptr)[local_path_idx][0], (*path_ptr)[local_path_idx][1], (*path_ptr)[local_path_idx][2]);
             Eigen::Quaterniond local_quat((*path_ptr)[local_path_idx][6], (*path_ptr)[local_path_idx][3], (*path_ptr)[local_path_idx][4], (*path_ptr)[local_path_idx][5]);
             Eigen::Matrix3d local_rot = local_quat.matrix();
-            // x,y,z
-            local_xyz = local_xyz - origin_xyz;
-            Eigen::Translation3d local_xyz_(local_xyz.x(), local_xyz.y(), local_xyz.z());
+
             // rot
             local_rot = origin_rot.transpose() * local_rot;
+            local_rot = robot2cam * local_rot * robot2cam.transpose();
+
+            local_xyz = robot2cam * (local_xyz - origin_xyz);
+            Eigen::Translation3d local_xyz_(local_xyz.x(), local_xyz.y(), local_xyz.z());
             Eigen::Quaterniond hoge{local_rot};
 
             Eigen::Affine3d answer_pose = local_xyz_ * hoge;
+
+            // NOTE gtsamのcoordinate franeに座標変換
 
             answer_poses.push_back(answer_pose.matrix());
         }
@@ -511,31 +502,37 @@ public:
     std::vector<Eigen::Matrix4d> turnout_hyps_pose(Eigen::Matrix4d odom_trans, std::vector<int> hyp_pairs, std::string robot_name)
     {
         std::vector<Eigen::Matrix4d> hyps_local_poses = turnout_Localpose(hyp_pairs, robot_name);
+        for (auto hyps_pose : hyps_local_poses)
+        {
+            std::cout << hyps_pose << std::endl;
+        }
         std::vector<Eigen::Vector3d> t_s;
         std::vector<Eigen::Matrix3d> r_s;
         std::vector<Eigen::Matrix4d> answers;
 
         Eigen::Matrix3d rotation_mat = odom_trans.block(0, 0, 3, 3);
+
         Eigen::Vector3d translation_vec = odom_trans.block(0, 3, 3, 1);
 
         for (auto each : hyps_local_poses)
         {
             Eigen::Vector3d each_translation = each.block(0, 3, 3, 1);
             Eigen::Matrix3d each_rot = each.block(0, 0, 3, 3);
+            std::cout << each_rot << std::endl;
 
             t_s.push_back(each_translation);
             r_s.push_back(each_rot);
         }
-
+        std::cout << "====================================================" << std::endl;
         for (int iteration{0}; iteration < t_s.size(); ++iteration)
         {
             Eigen::Vector3d ans_trans = rotation_mat * t_s[iteration] + translation_vec;
             Eigen::Translation3d ans_trans_(ans_trans.x(), ans_trans.y(), ans_trans.z());
-            // Eigen::Matrix3d ans_rot = rotation_mat * r_s[iteration];
-            Eigen::Matrix3d ans_rot = Eigen::Matrix3d::Identity();
+
+            Eigen::Matrix3d ans_rot = rotation_mat * r_s[iteration];
+
             Eigen::Quaterniond ans_rot_{ans_rot};
             Eigen::Affine3d answer = ans_trans_ * ans_rot_;
-
             answers.push_back(answer.matrix());
         }
 
@@ -553,25 +550,26 @@ public:
 
     void RO_CB(const cpp::FeatureArray::ConstPtr &data)
     {
-
-        // int who_detect = data->who_detect;
-        // loop_info = data->index2value;
+        int id = data->id;
+        loop_info = data->me;
         std::vector<Eigen::Vector2d> img_coord;
 
         // std::vector<Eigen::Vector3d> kp_loc;
 
-        for (size_t index{1}; index < data->r1.size() + 1; ++index)
+        for (size_t index{1}; index < data->img_coord.size() + 1; ++index)
         {
-            // ３つ目の要素に差し掛かった時
             if (index % 3 == 0)
             {
-                // Eigen::Vector3d kp_loc(data->r_3d[index - 3], data->r_3d[index - 2], data->r_3d[index - 1]);
-                // kp_loc.push_back(kp_loc);
                 // NOTE ポイントのカメラ座標
-                Eigen::Vector2d r_coord(data->r1_imgcoord[index - 3], data->r1_imgcoord[index - 2]);
+                Eigen::Vector2d r_coord(data->img_coord[index - 3], data->img_coord[index - 2]);
                 img_coord.push_back(r_coord);
             }
         }
+
+        if (loop_info == "hyp")
+            hyp_2d[id] = img_coord;
+        else
+            loop_2d[id] = img_coord;
     }
 };
 

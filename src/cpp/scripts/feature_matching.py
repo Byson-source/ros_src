@@ -184,7 +184,7 @@ def derive_duplicated_index(list1, list2, sorted_keys=None):
 
     error_list = [0]
 
-    for i in range(1):
+    for i in range(3):
         error_list.append(i+1)
         error_list.append(-i-1)
 
@@ -351,8 +351,14 @@ def loop_CB(data):
                         img_coord.append(0)
 
                 # rospy.logerr(point_coord)
-                info.id = indice
+                # 何枚目なのか
                 info.img_coord = img_coord
+                if kpt % 2 == 0:
+                    info.me = "loop"
+                    info.id = kpt
+                else:
+                    info.me = "hyp"
+                    info.id = kpt+int(len(feature_map)/2)
                 feature_pub.publish(info)
 
             source_color = o3d.io.read_image(
@@ -389,7 +395,6 @@ def loop_CB(data):
                     for value_ in value:
                         odom_result.append(value_)
                 answer.data = odom_result
-                answer.index2value = [valid_img[0], valid_img[1]]
                 answer.valid_img = valid_img
 
                 point_coord = []
