@@ -493,7 +493,6 @@ public:
         // {
         pose_symbol.push_back(Symbol('x', index_count));
 
-        // std::cout << "3==========================================================" << std::endl;
         for (int pixel_id{0}; pixel_id < loop_2d[0].size(); ++pixel_id)
         {
             std::cout << hyp_2d[index_count][pixel_id] << std::endl;
@@ -517,7 +516,6 @@ public:
         graph.addPrior(Symbol('l', 0), local_pcd[0], pointNoise);
 
         // graph.print("Factor Graph:\n");
-        // std::cout << "4==========================================================" << std::endl;
 
         Values initialEstimate;
         Eigen::Translation<double, 3> z_noise(0, 0, 0.001);
@@ -553,8 +551,6 @@ public:
 
         Values result = LevenbergMarquardtOptimizer(graph, initialEstimate).optimize();
         // result.print("Final results:\n");
-        // std::cout << "initial error = " << graph.error(initialEstimate) << std::endl;
-        // std::cout << "final error = " << graph.error(result) << std::endl;
         // Marginals marginals(graph, result);
         return result.at<Pose3>(Symbol('x', 2)).matrix();
         // TODO hypの方はひとまずオドメトリによる拘束条件のみに限定して考える。余裕があればProx loop, loop closureによる影響も考慮すると良い。
@@ -754,6 +750,7 @@ public:
         }
         else
         {
+
             r1_img_index = (valid[1] - 1) * 0.5 + 1;
             r2_img_index = valid[0] / 2;
             transfer_1_to_2 = Eigen::Vector3d::Zero() - transfer;
@@ -785,6 +782,8 @@ public:
             rotation_1TO2 = rotation_matrix.transpose();
             r1_img_index = (valid[1] - 1) * 0.5 + 1;
             r2_img_index = valid[0] / 2;
+            r1_img_index = (loop_info[1] - 1) * 0.5 + 1;
+            r2_img_index = loop_info[0] / 2;
         }
 
         r1_q.x() = path_1[mapPath_dict[r1_img_index]][3];
