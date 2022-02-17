@@ -418,20 +418,20 @@ def loop_CB(data):
             answer.who_detect = "R2"
 
         depth_checker = []
-        whether_success = 1
 
         if good_ and element["num"] > 1:
             kpt_map = arrange_ids(len(feature_map))
             rospy.logwarn(kpt_map)
             # element["R1"][iter], element["R2"][iter] = [], []
             for kpt in range(len(feature_map)):
+                whether_success = 1
                 # r_feature = []
                 # for each_kpt in feature_map[kpt]:
                 #     r_feature.append(each_kpt)
                 r_feature = feature_map[kpt]
                 img_coord = []
                 indice = valid_img[kpt]
-                rospy.logwarn(r_feature)
+                rospy.loginfo(r_feature)
 
                 for point in range(len(r_feature)):
                     if point in depth_checker:
@@ -449,9 +449,11 @@ def loop_CB(data):
 
                 # rospy.logerr(point_coord)
                 # 何枚目なのか
+                rospy.logwarn(img_coord)
                 if(len(img_coord) < 6):
                     whether_success = 0
                     break
+
                 info.img_coord = img_coord
                 if kpt % 2 == 0:
                     info.me = "loop"

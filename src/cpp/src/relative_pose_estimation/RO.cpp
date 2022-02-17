@@ -352,68 +352,68 @@ public:
                                std::vector<int> local_ids, std::vector<int> hyp_ids,
                                std::vector<Eigen::Matrix4d> local_pose, std::vector<Eigen::Matrix4d> hyp_pose)
     {
-        // ROS_WARN("This is point cloud coordinate");
-        // for (auto pcdhoge : local_pcd)
-        // {
-        //     std::cout << pcdhoge << std::endl;
-        //     std::cout << "======================" << std::endl;
-        // }
+        ROS_WARN("This is point cloud coordinate");
+        for (auto pcdhoge : local_pcd)
+        {
+            std::cout << pcdhoge << std::endl;
+            std::cout << "======================" << std::endl;
+        }
 
-        // ROS_WARN("This is local pose");
-        // for (auto each : local_pose)
-        // {
-        //     std::cout << each << std::endl;
-        //     std::cout << "======================" << std::endl;
-        // }
-        // std::cout << std::endl;
+        ROS_WARN("This is local pose");
+        for (auto each : local_pose)
+        {
+            std::cout << each << std::endl;
+            std::cout << "======================" << std::endl;
+        }
+        std::cout << std::endl;
 
-        // ROS_WARN("This is hyp pose");
-        // for (auto each : hyp_pose)
-        // {
-        //     std::cout << each << std::endl;
-        //     std::cout << "======================" << std::endl;
-        // }
-        // std::cout << std::endl;
+        ROS_WARN("This is hyp pose");
+        for (auto each : hyp_pose)
+        {
+            std::cout << each << std::endl;
+            std::cout << "======================" << std::endl;
+        }
+        std::cout << std::endl;
 
-        // ROS_WARN("Local id");
-        // for (auto id : local_ids)
-        // {
-        //     std::cout << id << std::endl;
-        // }
+        ROS_WARN("Local id");
+        for (auto id : local_ids)
+        {
+            std::cout << id << std::endl;
+        }
 
-        // ROS_WARN("hyp ids");
-        // for (auto id : hyp_ids)
-        // {
-        //     std::cout << id << std::endl;
-        // }
+        ROS_WARN("hyp ids");
+        for (auto id : hyp_ids)
+        {
+            std::cout << id << std::endl;
+        }
 
-        // ROS_WARN("loop id");
-        // for (auto id : local_ids)
-        // {
-        //     std::cout << id << std::endl;
-        // }
+        ROS_WARN("loop id");
+        for (auto id : local_ids)
+        {
+            std::cout << id << std::endl;
+        }
 
-        // for (const auto [key, index] : loop_2d)
-        // {
-        //     std::cout << key << std::endl;
-        //     std::cout << "----------------------" << std::endl;
-        //     for (auto val : index)
-        //     {
-        //         std::cout << val << std::endl;
-        //     }
-        // }
+        for (const auto [key, index] : loop_2d)
+        {
+            std::cout << key << std::endl;
+            std::cout << "----------------------" << std::endl;
+            for (auto val : index)
+            {
+                std::cout << val << std::endl;
+            }
+        }
 
-        // std::cout << "================================" << std::endl;
+        std::cout << "================================" << std::endl;
 
-        // for (const auto [key, index] : hyp_2d)
-        // {
-        //     std::cout << "----------------------" << std::endl;
-        //     std::cout << key << std::endl;
-        //     for (auto val : index)
-        //     {
-        //         std::cout << val << std::endl;
-        //     }
-        // }
+        for (const auto [key, index] : hyp_2d)
+        {
+            std::cout << "----------------------" << std::endl;
+            std::cout << key << std::endl;
+            for (auto val : index)
+            {
+                std::cout << val << std::endl;
+            }
+        }
 
         auto initial_pose_noise = noiseModel::Diagonal::Sigmas((Vector(6) << Vector3::Constant(0.1), Vector3::Constant(0.3)).finished());
         auto measurementNoise = noiseModel::Isotropic::Sigma(2, 0.3);
