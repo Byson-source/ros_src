@@ -67,8 +67,6 @@ public:
         // REVIEW rtabmapのstmの決め方
         parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kMemSTMSize(), "10"));
 
-        // UFile::erase(database_path);
-        // REVIEW 何故か強制シャットダウンする。.ros/rtabmap.dbを消すと治った？？
         rtabmap.init(parameters, database_path);
 
         loop_pub = n.advertise<cpp::MultiArray>("result", 10);
