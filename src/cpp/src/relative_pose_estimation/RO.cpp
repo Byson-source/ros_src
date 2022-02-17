@@ -467,9 +467,9 @@ public:
                     Eigen::Affine3d answer_tr = quat_rot * tr_;
 
                     // Pose3 odometry((*odom_local_ptr)[{translate_index(local_ids[idx - 1], who_detect), translate_index(local_ids[idx], who_detect)}]);
-                    Pose3 odometry(answer_tr.matrix());
-                    auto odometryNoise = noiseModel::Diagonal::Variances((*info_local_ptr)[{translate_index(local_ids[idx - 1], who_detect), translate_index(local_ids[idx], who_detect)}]);
-                    graph.emplace_shared<BetweenFactor<Pose3>>(Symbol('x', index_count - 1), Symbol('x', index_count), odometry, odometryNoise);
+                    // Pose3 odometry(answer_tr.matrix());
+                    // auto odometryNoise = noiseModel::Diagonal::Variances((*info_local_ptr)[{translate_index(local_ids[idx - 1], who_detect), translate_index(local_ids[idx], who_detect)}]);
+                    // graph.emplace_shared<BetweenFactor<Pose3>>(Symbol('x', index_count - 1), Symbol('x', index_count), odometry, odometryNoise);
                 }
                 else
                 {
@@ -507,7 +507,7 @@ public:
 
         // // Loop Closure constraint
         auto loopNoise = noiseModel::Diagonal::Sigmas((Vector(6) << Vector3::Constant(0.1),
-                                                       Vector3::Constant(0.3))
+                                                       Vector3::Constant(0.1))
                                                           .finished());
 
         graph.emplace_shared<BetweenFactor<Pose3>>(Symbol('x', 0), Symbol('x', local_ids.size()), Pose3(transformation_result), loopNoise);
@@ -552,6 +552,7 @@ public:
         Values result = LevenbergMarquardtOptimizer(graph, initialEstimate).optimize();
         // result.print("Final results:\n");
         // Marginals marginals(graph, result);
+        std::cout << result.at<Pose3>(Symbol('x', 2)).matrix() << std::endl;
         return result.at<Pose3>(Symbol('x', 2)).matrix();
         // TODO hypの方はひとまずオドメトリによる拘束条件のみに限定して考える。余裕があればProx loop, loop closureによる影響も考慮すると良い。
     }
