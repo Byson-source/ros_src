@@ -448,6 +448,7 @@ public:
         graph.addPrior(Symbol('x', 0), initial_local_pose, initial_pose_noise);
         std::vector<Symbol> pose_symbol;
         int index_count{0};
+        // local
 
         for (size_t idx{0}; idx < local_ids.size(); ++idx)
         {
@@ -495,7 +496,6 @@ public:
 
         for (int pixel_id{0}; pixel_id < loop_2d[0].size(); ++pixel_id)
         {
-            std::cout << hyp_2d[index_count][pixel_id] << std::endl;
             Point2 measurement_ = hyp_2d[index_count][pixel_id];
             std::cout << measurement_ << std::endl;
             graph.emplace_shared<GenericProjectionFactor<Pose3, Point3, Cal3_S2>>(

@@ -48,10 +48,6 @@ else:
             kp1_loc.append((int(x1), int(y1)))
             kp2_loc.append((int(x2), int(y2)))
 
-    src_pts = np.float32(
-        [kp1[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
-    dst_pts = np.float32(
-        [kp2[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
     print(len(kp1_loc))
     loc1_, loc2_ = [], []
     features_map = {}
@@ -63,7 +59,10 @@ else:
         features_map[detection_index] = [
             loc1_[-1], loc2_[-1]]
         detection_index += 1
-    print(features_map)
+    # src_pts = np.float32(
+    #     [kp1[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+    # dst_pts = np.float32(
+    #     [kp2[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
 
     # try:
     #     M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 1)

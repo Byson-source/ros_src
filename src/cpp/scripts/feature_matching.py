@@ -126,6 +126,31 @@ def orbmatch(fileName1, fileName2, previous_features=False):
                 kp1_loc.append((int(x1), int(y1)))
                 kp2_loc.append((int(x2), int(y2)))
 
+        loc1_, loc2_ = [], []
+        features_map = {}
+        detection_index = 0
+        for index_, element in enumerate(kp1_loc):
+            # true_mask.append(good_matches[index_])
+            loc1_.append(list(kp1_loc[index_]))
+            loc2_.append(list(kp2_loc[index_]))
+            features_map[detection_index] = [
+                loc1_[-1], loc2_[-1]]
+            detection_index += 1
+
+        img_matches = np.empty(
+            (max(img1.shape[0], img2.shape[0]), img1.shape[1]+img2.shape[1], 3), dtype=np.uint8)
+
+        img3 = cv2.drawMatches(img1, kp1, img2, kp2, good_matches, img_matches,
+                               flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+
+        cv2.imwrite(
+            "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/feature_match/"+str(fileName1)+"->"+str(fileName2)+".jpg", img3)
+        if previous_features:
+            return loc1_, loc2_, features_map, 1
+        else:
+            return loc2_, features_map, 1
+
+        # return [], [], 0
         ############################################################################
         # NOTE RANSAC
         # src_pts = np.float32(
@@ -156,16 +181,8 @@ def orbmatch(fileName1, fileName2, previous_features=False):
         #     img3 = cv2.drawMatches(img1, kp1, img2, kp2, true_mask, img_matches,
         #                            flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
 
-                # img_rect = cv2.circle(
-                #     img1, (int(loc1[0][0][0]), int(loc1[0][0][1])), 3, (255, 0, 255), thickness=1)
-            cv2.imwrite(
-                "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/feature_match/"+str(fileName1)+"->"+str(fileName2)+".jpg", img3)
-            if previous_features:
-                return loc1_, loc2_, features_map, 1
-            else:
-                return loc2_, features_map, 1
-
-        return [], [], 0
+        # img_rect = cv2.circle(
+        #     img1, (int(loc1[0][0][0]), int(loc1[0][0][1])), 3, (255, 0, 255), thickness=1)
 
 
 def add_error(input_list, x, y):
@@ -202,7 +219,7 @@ def derive_duplicated_index(list1, list2, sorted_keys=None):
 
     error_list = []
 
-    for i in range():
+    for i in range(2):
         error_list.append(i+1)
         error_list.append(-i-1)
 
@@ -273,21 +290,21 @@ def derive_duplicated_indexes(indexes, values):
         else:
             survived_index, local_survivor = derive_duplicated_index(
                 second_kpt, first_kpt)
-        rospy.logwarn("Survived index!")
-        rospy.logwarn("==============================")
-        rospy.logwarn(survived_index)
-        rospy.logwarn("==============================")
-        rospy.logwarn("first map")
-        rospy.logwarn("==============================")
-        rospy.logwarn(feature_map)
-        rospy.logwarn("==============================")
-        rospy.logwarn("local index")
-        rospy.logwarn("==============================")
-        rospy.logwarn(local_survivor)
-        rospy.logwarn("==============================")
-        rospy.logwarn("second map")
-        rospy.logwarn("==============================")
-        rospy.logwarn(feature_map_)
+        # rospy.logwarn("Survived index!")
+        # rospy.logwarn("==============================")
+        # rospy.logwarn(survived_index)
+        # rospy.logwarn("==============================")
+        # rospy.logwarn("first map")
+        # rospy.logwarn("==============================")
+        # rospy.logwarn(feature_map)
+        # rospy.logwarn("==============================")
+        # rospy.logwarn("local index")
+        # rospy.logwarn("==============================")
+        # rospy.logwarn(local_survivor)
+        # rospy.logwarn("==============================")
+        # rospy.logwarn("second map")
+        # rospy.logwarn("==============================")
+        # rospy.logwarn(feature_map_)
 
         # NOTE 共通の特徴点が見つからなかった時
         if len(survived_index) < 3:
@@ -324,7 +341,7 @@ def derive_duplicated_indexes(indexes, values):
     new_map = []
     second_map = []
 
-    print(dict_list)
+    # print(dict_list)
     # rospy.logerr(survived_index)
 
     for srv in survived_index:
@@ -401,6 +418,7 @@ def loop_CB(data):
             answer.who_detect = "R2"
 
         depth_checker = []
+        whether_success = 1
 
         if good_ and element["num"] > 1:
             kpt_map = arrange_ids(len(feature_map))
@@ -413,10 +431,12 @@ def loop_CB(data):
                 r_feature = feature_map[kpt]
                 img_coord = []
                 indice = valid_img[kpt]
+                rospy.logwarn(r_feature)
 
                 for point in range(len(r_feature)):
                     if point in depth_checker:
                         # NOTE 一度depthが0と判定されたものは以降数えない
+                        rospy.loginfo("This index's depth is 0")
                         rospy.loginfo(point)
                         continue
                     elif(container[indice][int(r_feature[point][1]), int(r_feature[point][0])] != 0):
@@ -429,6 +449,9 @@ def loop_CB(data):
 
                 # rospy.logerr(point_coord)
                 # 何枚目なのか
+                if(len(img_coord) < 6):
+                    whether_success = 0
+                    break
                 info.img_coord = img_coord
                 if kpt % 2 == 0:
                     info.me = "loop"
@@ -438,55 +461,57 @@ def loop_CB(data):
                 info.id = kpt_map[kpt]
                 feature_pub.publish(info)
 
-            source_color = o3d.io.read_image(
-                home+"all_rgb/"+str(referred)+".jpg")
-            source_depth = o3d.io.read_image(
-                home+"depth/"+str(referred)+".png")
-            target_color = o3d.io.read_image(
-                home+"all_rgb/"+str(referred_hyp)+".jpg")
-            target_depth = o3d.io.read_image(
-                home+"depth/"+str(referred_hyp)+".png")
+            # NOTE 点群が三つ以上観測されたら
+            if(whether_success == 1):
+                source_color = o3d.io.read_image(
+                    home+"all_rgb/"+str(referred)+".jpg")
+                source_depth = o3d.io.read_image(
+                    home+"depth/"+str(referred)+".png")
+                target_color = o3d.io.read_image(
+                    home+"all_rgb/"+str(referred_hyp)+".jpg")
+                target_depth = o3d.io.read_image(
+                    home+"depth/"+str(referred_hyp)+".png")
 
-            source_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
-                source_color, source_depth)
-            target_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
-                target_color, target_depth)
+                source_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
+                    source_color, source_depth)
+                target_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
+                    target_color, target_depth)
 
-            option = o3d.pipelines.odometry.OdometryOption()
-            # option.max_depth=10
-            odo_init = np.identity(4)
+                option = o3d.pipelines.odometry.OdometryOption()
+                # option.max_depth=10
+                odo_init = np.identity(4)
 
-            [success_hybrid_term, trans_hybrid_term,
-                info] = o3d.pipelines.odometry.compute_rgbd_odometry(
-                source_rgbd_image, target_rgbd_image,
-                pinhole_camera_intrinsic, odo_init,
-                o3d.pipelines.odometry.RGBDOdometryJacobianFromHybridTerm(), option)
+                [success_hybrid_term, trans_hybrid_term,
+                    info] = o3d.pipelines.odometry.compute_rgbd_odometry(
+                    source_rgbd_image, target_rgbd_image,
+                    pinhole_camera_intrinsic, odo_init,
+                    o3d.pipelines.odometry.RGBDOdometryJacobianFromHybridTerm(), option)
 
-            odom_result = []
+                odom_result = []
 
-            if not success_hybrid_term:
-                rospy.loginfo("Can not compute RGBD Odometry...")
-            else:
-                print(trans_hybrid_term)
-                for value in trans_hybrid_term:
-                    for value_ in value:
-                        odom_result.append(value_)
-                answer.data = odom_result
-                answer.valid_img = valid_img
+                if not success_hybrid_term:
+                    rospy.loginfo("Can not compute RGBD Odometry...")
+                else:
+                    print(trans_hybrid_term)
+                    for value in trans_hybrid_term:
+                        for value_ in value:
+                            odom_result.append(value_)
+                    answer.data = odom_result
+                    answer.valid_img = valid_img
 
-                point_coord = []
-                for initial_kpt in feature_map[0]:
-                    depth_r = container[valid_img[0]][int(
-                        initial_kpt[1]), int(initial_kpt[0])]
+                    point_coord = []
+                    for initial_kpt in feature_map[0]:
+                        depth_r = container[valid_img[0]][int(
+                            initial_kpt[1]), int(initial_kpt[0])]
 
-                    result = rs2.rs2_deproject_pixel_to_point(
-                        intrinsics, [int(initial_kpt[0]), int(initial_kpt[1])], depth_r)
+                        result = rs2.rs2_deproject_pixel_to_point(
+                            intrinsics, [int(initial_kpt[0]), int(initial_kpt[1])], depth_r)
 
-                    for k in range(3):
-                        point_coord.append(result[k])
-                answer.r_3d = point_coord
+                        for k in range(3):
+                            point_coord.append(result[k])
+                    answer.r_3d = point_coord
 
-                odometry_pub.publish(answer)
+                    odometry_pub.publish(answer)
 
 
 if __name__ == '__main__':
