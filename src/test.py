@@ -1,22 +1,94 @@
-def arrange(length):
-    list1 = []
-    list2 = []
-    for val in range(length):
-        if val % 2 == 0:
-            list1.append(val)
-        else:
-            list2.append(val)
-    map = {}
-    input = 0
-    for val in list1:
-        map[val] = input
-        input += 1
+import cv2
+import numpy as np
+rgb_path = "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/all_rgb/"
+img1 = cv2.imread(rgb_path+"120.jpg")
+img2 = cv2.imread(rgb_path+"105.jpg")
 
-    for val in list2:
-        map[val] = input
-        input += 1
+# ORB検出器生成
+orb = cv2.ORB_create(10000)
 
-    print(map)
+kp1, des1 = orb.detectAndCompute(img1, None)
+kp2, des2 = orb.detectAndCompute(img2, None)
 
+kp1_loc, kp2_loc = [], []
 
-arrange(5)
+FLANN_INDEX_LSH = 6
+index_params = dict(algorithm=FLANN_INDEX_LSH,
+                    table_number=6,  # 12
+                    key_size=14,     # 20
+                    multi_probe_level=1)  # 2
+search_params = dict(checks=100)
+
+flann = cv2.FlannBasedMatcher(index_params, search_params)
+
+# マッチング
+try:
+    knn_matches = flann.knnMatch(des1, des2, k=2)
+except cv2.error:
+    print("Can't detect enough features...")
+else:
+    # マッチング結果を描画
+    ratio_thresh = 0.7
+    good_matches = []
+    for mt in knn_matches:
+
+        if len(mt) < 2:
+            continue
+        m, n = mt[0], mt[1]
+
+        # print(type(x1))
+        if m.distance < ratio_thresh * n.distance:
+            good_matches.append(m)
+            img1_idx = m.queryIdx
+            img2_idx = m.trainIdx
+
+            (x1, y1) = kp1[img1_idx].pt
+            (x2, y2) = kp2[img2_idx].pt
+
+            kp1_loc.append((int(x1), int(y1)))
+            kp2_loc.append((int(x2), int(y2)))
+
+    src_pts = np.float32(
+        [kp1[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+    dst_pts = np.float32(
+        [kp2[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+    print(len(kp1_loc))
+    loc1_, loc2_ = [], []
+    features_map = {}
+    detection_index = 0
+    for index_, element in enumerate(kp1_loc):
+        # true_mask.append(good_matches[index_])
+        loc1_.append(list(kp1_loc[index_]))
+        loc2_.append(list(kp2_loc[index_]))
+        features_map[detection_index] = [
+            loc1_[-1], loc2_[-1]]
+        detection_index += 1
+    print(features_map)
+
+    # try:
+    #     M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 1)
+    #     print(len(mask))
+    # except cv2.error:
+    #     print("Not enough features...")
+    # else:
+    #     mask = mask.ravel().tolist()
+    #     loc1_, loc2_, true_mask = [], [], []
+    #     features_map = {}
+    #     detection_index = 0
+    #     for index_, element in enumerate(mask):
+    #         if element == 1:
+    #             true_mask.append(good_matches[index_])
+    #             loc1_.append(list(kp1_loc[index_]))
+    #             loc2_.append(list(kp2_loc[index_]))
+    #             features_map[detection_index] = [
+    #                 loc1_[-1], loc2_[-1]]
+    #             detection_index += 1
+
+    #     img_matches = np.empty(
+    #         (max(img1.shape[0], img2.shape[0]), img1.shape[1]+img2.shape[1], 1), dtype=np.uint8)
+    #     img3 = cv2.drawMatches(img1, kp1, img2, kp2, good_matches, img_matches,
+    #                            flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+
+    # cv2.imshow("result", img3)
+    # cv2.waitKey(0)
+    # print(kp1)

@@ -126,39 +126,40 @@ def orbmatch(fileName1, fileName2, previous_features=False):
                 kp1_loc.append((int(x1), int(y1)))
                 kp2_loc.append((int(x2), int(y2)))
 
-        src_pts = np.float32(
-            [kp1[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
-        dst_pts = np.float32(
-            [kp2[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+        ############################################################################
+        # NOTE RANSAC
+        # src_pts = np.float32(
+        #     [kp1[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+        # dst_pts = np.float32(
+        #     [kp2[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
 
-        try:
-            M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 1)
-        except cv2.error:
-            rospy.loginfo("Not enough features...")
-        else:
-            mask = mask.ravel().tolist()
-            loc1_, loc2_, true_mask = [], [], []
-            features_map = {}
-            detection_index = 0
-            for index_, element in enumerate(mask):
-                if element == 1:
-                    true_mask.append(good_matches[index_])
-                    loc1_.append(list(kp1_loc[index_]))
-                    loc2_.append(list(kp2_loc[index_]))
-                    features_map[detection_index] = [
-                        loc1_[-1], loc2_[-1]]
-                    detection_index += 1
+        # try:
+        #     M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 1)
+        # except cv2.error:
+        #     rospy.loginfo("Not enough features...")
+        # else:
+        #     mask = mask.ravel().tolist()
+        #     loc1_, loc2_, true_mask = [], [], []
+        #     features_map = {}
+        #     detection_index = 0
+        #     for index_, element in enumerate(mask):
+        #         if element == 1:
+        #             true_mask.append(good_matches[index_])
+        #             loc1_.append(list(kp1_loc[index_]))
+        #             loc2_.append(list(kp2_loc[index_]))
+        #             features_map[detection_index] = [
+        #                 loc1_[-1], loc2_[-1]]
+        #             detection_index += 1
 
-            img_matches = np.empty(
-                (max(img1.shape[0], img2.shape[0]), img1.shape[1]+img2.shape[1], 3), dtype=np.uint8)
-            img3 = cv2.drawMatches(img1, kp1, img2, kp2, true_mask, img_matches,
-                                   flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+        #     img_matches = np.empty(
+        #         (max(img1.shape[0], img2.shape[0]), img1.shape[1]+img2.shape[1], 3), dtype=np.uint8)
+        #     img3 = cv2.drawMatches(img1, kp1, img2, kp2, true_mask, img_matches,
+        #                            flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
 
-            if(len(loc1_) > 9):
                 # img_rect = cv2.circle(
                 #     img1, (int(loc1[0][0][0]), int(loc1[0][0][1])), 3, (255, 0, 255), thickness=1)
-                cv2.imwrite(
-                    "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/feature_match/"+str(fileName1)+"->"+str(fileName2)+".jpg", img3)
+            cv2.imwrite(
+                "/home/ayumi/Documents/tohoku_uni/CLOVERs/images/feature_match/"+str(fileName1)+"->"+str(fileName2)+".jpg", img3)
             if previous_features:
                 return loc1_, loc2_, features_map, 1
             else:
@@ -199,9 +200,9 @@ def avoid_duplication(hypothesises):
 
 def derive_duplicated_index(list1, list2, sorted_keys=None):
 
-    error_list = [0]
+    error_list = []
 
-    for i in range(1):
+    for i in range():
         error_list.append(i+1)
         error_list.append(-i-1)
 
@@ -244,6 +245,14 @@ def derive_duplicated_index(list1, list2, sorted_keys=None):
 def derive_duplicated_indexes(indexes, values):
     survived_index, survived_backup = [], []
     values = avoid_duplication(values)
+    # NOTE 枚数が多い場合減らす
+    list_val, list_ind = [], []
+
+    if len(indexes) > 3:
+        list_ind = [indexes[i] for i in range(3)]
+        list_val = [values[i] for i in range(3)]
+        indexes = list_ind
+        values = list_val
 
     second_kpt, feature_map, good = orbmatch(indexes[0], values[0])
     sorted_index, dict_list = [], [feature_map]
@@ -264,9 +273,24 @@ def derive_duplicated_indexes(indexes, values):
         else:
             survived_index, local_survivor = derive_duplicated_index(
                 second_kpt, first_kpt)
+        rospy.logwarn("Survived index!")
+        rospy.logwarn("==============================")
+        rospy.logwarn(survived_index)
+        rospy.logwarn("==============================")
+        rospy.logwarn("first map")
+        rospy.logwarn("==============================")
+        rospy.logwarn(feature_map)
+        rospy.logwarn("==============================")
+        rospy.logwarn("local index")
+        rospy.logwarn("==============================")
+        rospy.logwarn(local_survivor)
+        rospy.logwarn("==============================")
+        rospy.logwarn("second map")
+        rospy.logwarn("==============================")
+        rospy.logwarn(feature_map_)
 
         # NOTE 共通の特徴点が見つからなかった時
-        if len(survived_index) < 4:
+        if len(survived_index) < 3:
             # NOTE ペアから抽出した特徴点の中に共通のものが見いだせない時、その次のペアを試す。
             if len(dict_list) == 1:
                 if hogehoge == len(sorted_index)-2:
@@ -274,7 +298,7 @@ def derive_duplicated_indexes(indexes, values):
                     rospy.logerr("Can't find corresponding features...Quit...")
                     return 0, 0, False,
 
-                rospy.logdebug(
+                rospy.logwarn(
                     "There is no common features...Trying next pairs...")
                 second_kpt, feature_map, dict_list[0] = second_kpt_, feature_map_, feature_map
                 continue
@@ -299,6 +323,8 @@ def derive_duplicated_indexes(indexes, values):
     # 上位のdictの間引きを行う
     new_map = []
     second_map = []
+
+    print(dict_list)
     # rospy.logerr(survived_index)
 
     for srv in survived_index:

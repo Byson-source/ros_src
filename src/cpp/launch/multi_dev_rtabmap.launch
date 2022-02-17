@@ -21,9 +21,9 @@
 
     <node pkg="cpp" name="feature_matcher" type="feature_matching.py" output="screen"/>
     <node pkg="cpp" name="RO_node" type="RO_estimator" output="screen"/>
-    <node pkg="cpp" name="gui" type="gui" output="screen"/>
+    <!-- <node pkg="cpp" name="gui" type="gui" output="screen"/>
 
-    <node pkg="rviz" type="rviz" name="rviz" required="true" args="-d /opt/ros/noetic/share/rviz/fuse_cloud.rviz" output="screen"/>
+    <node pkg="rviz" type="rviz" name="rviz" required="true" args="-d /opt/ros/noetic/share/rviz/fuse_cloud.rviz" output="screen"/> -->
 
 
 </launch>
