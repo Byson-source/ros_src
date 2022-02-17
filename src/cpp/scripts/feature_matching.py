@@ -131,11 +131,16 @@ def orbmatch(fileName1, fileName2, previous_features=False):
         detection_index = 0
         for index_, element in enumerate(kp1_loc):
             # true_mask.append(good_matches[index_])
-            loc1_.append(list(kp1_loc[index_]))
-            loc2_.append(list(kp2_loc[index_]))
-            features_map[detection_index] = [
-                loc1_[-1], loc2_[-1]]
-            detection_index += 1
+            first_img_kpt = list(kp1_loc[index_])
+            second_img_kpt = list(kp2_loc[index_])
+            # NOTEどちらか一方の特徴点の深度が0だったら抽出しない。
+            if(container[fileName1][int(first_img_kpt[1]), int(first_img_kpt[0])] != 0 and
+               container[fileName2][int(second_img_kpt[1]), int(second_img_kpt[0])] != 0):
+                loc1_.append(first_img_kpt)
+                loc2_.append(second_img_kpt)
+                features_map[detection_index] = [
+                    loc1_[-1], loc2_[-1]]
+                detection_index += 1
 
         img_matches = np.empty(
             (max(img1.shape[0], img2.shape[0]), img1.shape[1]+img2.shape[1], 3), dtype=np.uint8)
@@ -219,7 +224,7 @@ def derive_duplicated_index(list1, list2, sorted_keys=None):
 
     error_list = []
 
-    for i in range(2):
+    for i in range(4):
         error_list.append(i+1)
         error_list.append(-i-1)
 
@@ -417,8 +422,6 @@ def loop_CB(data):
         else:
             answer.who_detect = "R2"
 
-        depth_checker = []
-
         if good_ and element["num"] > 1:
             kpt_map = arrange_ids(len(feature_map))
             rospy.logwarn(kpt_map)
@@ -430,29 +433,18 @@ def loop_CB(data):
                 #     r_feature.append(each_kpt)
                 r_feature = feature_map[kpt]
                 img_coord = []
-                indice = valid_img[kpt]
                 rospy.loginfo(r_feature)
 
                 for point in range(len(r_feature)):
-                    if point in depth_checker:
-                        # NOTE 一度depthが0と判定されたものは以降数えない
-                        rospy.loginfo("This index's depth is 0")
-                        rospy.loginfo(point)
-                        continue
-                    elif(container[indice][int(r_feature[point][1]), int(r_feature[point][0])] != 0):
+                    # elif(container[indice][int(r_feature[point][1]), int(r_feature[point][0])] != 0):
 
-                        img_coord.append(int(r_feature[point][0]))
-                        img_coord.append(int(r_feature[point][1]))
-                        img_coord.append(0)
-                    else:
-                        depth_checker.append(point)
+                    img_coord.append(int(r_feature[point][0]))
+                    img_coord.append(int(r_feature[point][1]))
+                    img_coord.append(0)
 
                 # rospy.logerr(point_coord)
                 # 何枚目なのか
                 rospy.logwarn(img_coord)
-                if(len(img_coord) < 6):
-                    whether_success = 0
-                    break
 
                 info.img_coord = img_coord
                 if kpt % 2 == 0:
@@ -464,56 +456,55 @@ def loop_CB(data):
                 feature_pub.publish(info)
 
             # NOTE 点群が三つ以上観測されたら
-            if(whether_success == 1):
-                source_color = o3d.io.read_image(
-                    home+"all_rgb/"+str(referred)+".jpg")
-                source_depth = o3d.io.read_image(
-                    home+"depth/"+str(referred)+".png")
-                target_color = o3d.io.read_image(
-                    home+"all_rgb/"+str(referred_hyp)+".jpg")
-                target_depth = o3d.io.read_image(
-                    home+"depth/"+str(referred_hyp)+".png")
+            source_color = o3d.io.read_image(
+                home+"all_rgb/"+str(referred)+".jpg")
+            source_depth = o3d.io.read_image(
+                home+"depth/"+str(referred)+".png")
+            target_color = o3d.io.read_image(
+                home+"all_rgb/"+str(referred_hyp)+".jpg")
+            target_depth = o3d.io.read_image(
+                home+"depth/"+str(referred_hyp)+".png")
 
-                source_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
-                    source_color, source_depth)
-                target_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
-                    target_color, target_depth)
+            source_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
+                source_color, source_depth)
+            target_rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
+                target_color, target_depth)
 
-                option = o3d.pipelines.odometry.OdometryOption()
-                # option.max_depth=10
-                odo_init = np.identity(4)
+            option = o3d.pipelines.odometry.OdometryOption()
+            # option.max_depth=10
+            odo_init = np.identity(4)
 
-                [success_hybrid_term, trans_hybrid_term,
-                    info] = o3d.pipelines.odometry.compute_rgbd_odometry(
-                    source_rgbd_image, target_rgbd_image,
-                    pinhole_camera_intrinsic, odo_init,
-                    o3d.pipelines.odometry.RGBDOdometryJacobianFromHybridTerm(), option)
+            [success_hybrid_term, trans_hybrid_term,
+                info] = o3d.pipelines.odometry.compute_rgbd_odometry(
+                source_rgbd_image, target_rgbd_image,
+                pinhole_camera_intrinsic, odo_init,
+                o3d.pipelines.odometry.RGBDOdometryJacobianFromHybridTerm(), option)
 
-                odom_result = []
+            odom_result = []
 
-                if not success_hybrid_term:
-                    rospy.loginfo("Can not compute RGBD Odometry...")
-                else:
-                    print(trans_hybrid_term)
-                    for value in trans_hybrid_term:
-                        for value_ in value:
-                            odom_result.append(value_)
-                    answer.data = odom_result
-                    answer.valid_img = valid_img
+            if not success_hybrid_term:
+                rospy.loginfo("Can not compute RGBD Odometry...")
+            else:
+                print(trans_hybrid_term)
+                for value in trans_hybrid_term:
+                    for value_ in value:
+                        odom_result.append(value_)
+                answer.data = odom_result
+                answer.valid_img = valid_img
 
-                    point_coord = []
-                    for initial_kpt in feature_map[0]:
-                        depth_r = container[valid_img[0]][int(
-                            initial_kpt[1]), int(initial_kpt[0])]
+                point_coord = []
+                for initial_kpt in feature_map[0]:
+                    depth_r = container[valid_img[0]][int(
+                        initial_kpt[1]), int(initial_kpt[0])]
 
-                        result = rs2.rs2_deproject_pixel_to_point(
-                            intrinsics, [int(initial_kpt[0]), int(initial_kpt[1])], depth_r)
+                    result = rs2.rs2_deproject_pixel_to_point(
+                        intrinsics, [int(initial_kpt[0]), int(initial_kpt[1])], depth_r)
 
-                        for k in range(3):
-                            point_coord.append(result[k])
-                    answer.r_3d = point_coord
+                    for k in range(3):
+                        point_coord.append(result[k])
+                answer.r_3d = point_coord
 
-                    odometry_pub.publish(answer)
+                odometry_pub.publish(answer)
 
 
 if __name__ == '__main__':
