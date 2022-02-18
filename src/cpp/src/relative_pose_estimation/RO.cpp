@@ -322,22 +322,22 @@ public:
         rotation_ = cam2robot.block(0, 0, 3, 3) * rotation_ * (cam2robot.block(0, 0, 3, 3)).transpose();
         transfer_ = cam2robot.block(0, 0, 3, 3) * transfer_;
 
-        Eigen::Vector3d ans_t = turnout_T(transfer_, who_detect, valids);
-        Eigen::Quaterniond ans_r = turnout_R(rotation_, who_detect, valids);
+        Eigen::Affine3d ans_r = turnout_R(rotation_, who_detect, valids, transfer_);
 
         status = 1;
 
         cpp::RO_Array pose_result;
-        std::vector<double> R{ans_r.w(), ans_r.x(), ans_r.y(), ans_r.z()};
-        std::vector<double> t{ans_t[0], ans_t[1], ans_t[2]};
+        Eigen::Quaterniond for_publish_rot{ans_r.rotation()};
+        std::vector<double> R{for_publish_rot.w(), for_publish_rot.x(), for_publish_rot.y(), for_publish_rot.z()};
+        std::vector<double> t{ans_r.translation()[0], ans_r.translation()[1], ans_r.translation()[2]};
 
         pose_result.translation = t;
         pose_result.euler = R;
 
         rt_pub.publish(pose_result);
 
-        draw_rotation = ans_r.matrix();
-        draw_t = ans_t;
+        draw_rotation = ans_r.rotation();
+        draw_t = ans_r.translation();
         status = 1;
 
         hyp_2d.clear();
@@ -551,8 +551,8 @@ public:
 
         Values result = LevenbergMarquardtOptimizer(graph, initialEstimate).optimize();
         // result.print("Final results:\n");
-        // Marginals marginals(graph, result);
         std::cout << result.at<Pose3>(Symbol('x', 2)).matrix() << std::endl;
+        Marginals marginals(graph, result);
         return result.at<Pose3>(Symbol('x', 2)).matrix();
         // TODO hypの方はひとまずオドメトリによる拘束条件のみに限定して考える。余裕があればProx loop, loop closureによる影響も考慮すると良い。
     }
@@ -735,56 +735,77 @@ public:
             loop_2d[id] = img_coord;
     }
 
-    Eigen::Vector3d turnout_T(Eigen::Vector3d transfer, std::string who_is_detect, std::vector<int> valid)
+    void turnout_T(std::string who_is_detect, std::vector<int> valid,
+                   Eigen::Translation3d &translation_1, Eigen::Translation3d &translation_2)
     {
-        Eigen::Vector3d r1_to_r2;
-        Eigen::Vector3d origin2r1;
-        Eigen::Vector3d origin2r2;
-
         int r1_img_index, r2_img_index;
-        Eigen::Vector3d transfer_1_to_2;
         if (who_is_detect == "R1")
         {
             r1_img_index = (valid[0] - 1) * 0.5 + 1;
             r2_img_index = valid[1] / 2;
-            transfer_1_to_2 = transfer;
         }
         else
         {
-
             r1_img_index = (valid[1] - 1) * 0.5 + 1;
             r2_img_index = valid[0] / 2;
-            transfer_1_to_2 = Eigen::Vector3d::Zero() - transfer;
         }
-        origin2r1 << path_1[mapPath_dict[r1_img_index]][0], path_1[mapPath_dict[r1_img_index]][1], path_1[mapPath_dict[r1_img_index]][2];
 
-        origin2r2 << path_2[mapPath_dict_2[r2_img_index]][0], path_2[mapPath_dict_2[r2_img_index]][1], path_2[mapPath_dict_2[r2_img_index]][2];
+        Eigen::Translation<double, 3> origin2r1(path_1[mapPath_dict[r1_img_index]][0], path_1[mapPath_dict[r1_img_index]][1], path_1[mapPath_dict[r1_img_index]][2]);
+        Eigen::Translation<double, 3> origin2r2(path_2[mapPath_dict_2[r2_img_index]][0], path_2[mapPath_dict_2[r2_img_index]][1], path_2[mapPath_dict_2[r2_img_index]][2]);
 
-        Eigen::Vector3d ans_t = transfer_1_to_2 - (origin2r2 - origin2r1);
-        return ans_t;
+        translation_1 = origin2r1;
+        translation_2 = origin2r2;
+        // Eigen::Vector3d r1_to_r2;
+        // Eigen::Vector3d origin2r1;
+        // Eigen::Vector3d origin2r2;
+
+        // int r1_img_index, r2_img_index;
+        // Eigen::Vector3d transfer_1_to_2;
+        // if (who_is_detect == "R1")
+        // {
+        //     r1_img_index = (valid[0] - 1) * 0.5 + 1;
+        //     r2_img_index = valid[1] / 2;
+        //     transfer_1_to_2 = transfer;
+        // }
+        // else
+        // {
+
+        //     r1_img_index = (valid[1] - 1) * 0.5 + 1;
+        //     r2_img_index = valid[0] / 2;
+        //     transfer_1_to_2 = Eigen::Vector3d::Zero() - transfer;
+        // }
+        // origin2r1 << path_1[mapPath_dict[r1_img_index]][0], path_1[mapPath_dict[r1_img_index]][1], path_1[mapPath_dict[r1_img_index]][2];
+
+        // origin2r2 << path_2[mapPath_dict_2[r2_img_index]][0], path_2[mapPath_dict_2[r2_img_index]][1], path_2[mapPath_dict_2[r2_img_index]][2];
+
+        // Eigen::Vector3d ans_t = transfer_1_to_2 - (origin2r2 - origin2r1);
+        // return ans_t;
     }
 
-    Eigen::Quaterniond turnout_R(Eigen::Matrix3d rotation_matrix, std::string who_is_detect, std::vector<int> valid)
+    Eigen::Affine3d turnout_R(Eigen::Matrix3d rotation_matrix, std::string who_is_detect, std::vector<int> valid,
+                              Eigen::Vector3d transfer)
     {
+        Eigen::Translation3d origin2r1, origin2r2;
+        Eigen::Translation3d transfer_aff(transfer.x(), transfer.y(), transfer.z());
+        turnout_T(who_is_detect, valid, origin2r1, origin2r2);
+
         Eigen::Quaterniond r1_q;
         Eigen::Quaterniond r2_q;
 
         int r1_img_index, r2_img_index;
-        Eigen::Quaterniond rotation_1TO2;
+        Eigen::Quaterniond rotation_1TO2{rotation_matrix};
+        Eigen::Affine3d relative_measurement = rotation_1TO2 * transfer_aff;
 
         if (who_is_detect == "R1")
         {
-            rotation_1TO2 = rotation_matrix;
             r1_img_index = (valid[0] - 1) * 0.5 + 1;
             r2_img_index = valid[1] / 2;
         }
         else
         {
-            rotation_1TO2 = rotation_matrix.transpose();
+            relative_measurement = relative_measurement.inverse();
             r1_img_index = (valid[1] - 1) * 0.5 + 1;
             r2_img_index = valid[0] / 2;
-            r1_img_index = (loop_info[1] - 1) * 0.5 + 1;
-            r2_img_index = loop_info[0] / 2;
         }
 
         r1_q.x() = path_1[mapPath_dict[r1_img_index]][3];
@@ -797,10 +818,46 @@ public:
         r2_q.z() = path_2[mapPath_dict_2[r2_img_index]][5];
         r2_q.w() = path_2[mapPath_dict_2[r2_img_index]][6];
 
-        // NOTE クオータニオンの掛け算の方向は左側
-        // Eigen::Matrix3d R2_origin2node = (r2_q.normalized()).toRotationMatrix();
-        Eigen::Quaterniond q_r1_to_r2 = (r2_q.inverse()) * rotation_1TO2 * r1_q;
-        return q_r1_to_r2.normalized();
+        Eigen::Affine3d origin_to_r1 = origin2r1 * r1_q;
+        Eigen::Affine3d origin_to_r2 = origin2r2 * r2_q;
+        relative_measurement = origin_to_r1 * relative_measurement * (origin_to_r2.inverse());
+
+        return relative_measurement;
+        // Eigen::Quaterniond r1_q;
+        // Eigen::Quaterniond r2_q;
+
+        // int r1_img_index, r2_img_index;
+        // Eigen::Quaterniond rotation_1TO2;
+
+        // if (who_is_detect == "R1")
+        // {
+        //     rotation_1TO2 = rotation_matrix;
+        //     r1_img_index = (valid[0] - 1) * 0.5 + 1;
+        //     r2_img_index = valid[1] / 2;
+        // }
+        // else
+        // {
+        //     rotation_1TO2 = rotation_matrix.transpose();
+        //     r1_img_index = (valid[1] - 1) * 0.5 + 1;
+        //     r2_img_index = valid[0] / 2;
+        //     r1_img_index = (loop_info[1] - 1) * 0.5 + 1;
+        //     r2_img_index = loop_info[0] / 2;
+        // }
+
+        // r1_q.x() = path_1[mapPath_dict[r1_img_index]][3];
+        // r1_q.y() = path_1[mapPath_dict[r1_img_index]][4];
+        // r1_q.z() = path_1[mapPath_dict[r1_img_index]][5];
+        // r1_q.w() = path_1[mapPath_dict[r1_img_index]][6];
+
+        // r2_q.x() = path_2[mapPath_dict_2[r2_img_index]][3];
+        // r2_q.y() = path_2[mapPath_dict_2[r2_img_index]][4];
+        // r2_q.z() = path_2[mapPath_dict_2[r2_img_index]][5];
+        // r2_q.w() = path_2[mapPath_dict_2[r2_img_index]][6];
+
+        // // NOTE クオータニオンの掛け算の方向は左側
+        // // Eigen::Matrix3d R2_origin2node = (r2_q.normalized()).toRotationMatrix();
+        // Eigen::Quaterniond q_r1_to_r2 = (r2_q.inverse()) * rotation_1TO2 * r1_q;
+        // return q_r1_to_r2.normalized();
     }
 };
 
