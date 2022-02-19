@@ -29,7 +29,8 @@ container = {}
 bridge = CvBridge()
 intrinsics = rs2.intrinsics()
 
-pinhole_camera_intrinsic=o3d.io.read_pinhole_camera_intrinsic("/home/ayumi/Open3D/examples/test_data/realsense.json")
+pinhole_camera_intrinsic = o3d.io.read_pinhole_camera_intrinsic(
+    "/home/ayumi/Open3D/examples/test_data/realsense.json")
 
 
 def depthCB1(depth1, id):
@@ -43,6 +44,7 @@ def depthCB1(depth1, id):
                 str(depth_img)+".png", cv2_img)
 
     container[depth_img] = cv2_img
+
     depth_img += 2
 
 
@@ -55,6 +57,7 @@ def depthCB2(depth2, id):
     # print(depth_array.shape)
 
     container[depth_img2] = img
+    rospy.loginfo(container.keys())
 
     cv2.imwrite("/home/ayumi/Documents/tohoku_uni/CLOVERs/images/depth/" +
                 str(depth_img2)+".png", img)
@@ -153,7 +156,7 @@ def orbmatch(fileName1, fileName2):
             img3 = cv2.drawMatches(img1, kp1, img2, kp2, true_mask, img_matches,
                                    flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
 
-            if(len(loc1) > 9):
+            if(len(loc1) > 2):
                 # img_rect = cv2.circle(
                 #     img1, (int(loc1[0][0][0]), int(loc1[0][0][1])), 3, (255, 0, 255), thickness=1)
                 cv2.imwrite(
@@ -194,7 +197,7 @@ def loop_CB(data):
             indice1, indice2, good = 0, 0, 0
             r1_feature, r2_feature = [], []
 
-            answer=HomogeneousArray()
+            answer = HomogeneousArray()
             info = FeatureArray()
             if index == "R1":
                 # filter
@@ -204,7 +207,7 @@ def loop_CB(data):
                 indice1, indice2 = data.r1_index[iter], data.r1_value[iter]
                 info.index2value = [indice1, indice2]
                 info.who_detect = 1
-                answer.who_detect=1
+                answer.who_detect = 1
             else:
                 r2_feature, r1_feature, good = orbmatch(
                     data.r2_index[iter], data.r2_value[iter])
@@ -212,7 +215,7 @@ def loop_CB(data):
                 indice2, indice1 = data.r2_index[iter], data.r2_value[iter]
                 info.index2value = [indice2, indice1]
                 info.who_detect = 2
-                answer.who_detect=2
+                answer.who_detect = 2
 
             r1_coord, r2_coord = [], []
             # NOTE feature iterations
@@ -256,7 +259,7 @@ def loop_CB(data):
                 feature_pub.publish(info)
         # Loop sequence終了
 
-        if element["num"]>0:
+        if element["num"] > 0:
 
             print("referred is"+str(referred))
             print("referred_hyp is "+str(referred_hyp))
@@ -279,12 +282,12 @@ def loop_CB(data):
             odo_init = np.identity(4)
 
             [success_hybrid_term, trans_hybrid_term,
-            info] = o3d.pipelines.odometry.compute_rgbd_odometry(
-            source_rgbd_image, target_rgbd_image,
-            pinhole_camera_intrinsic, odo_init,
-            o3d.pipelines.odometry.RGBDOdometryJacobianFromHybridTerm(), option)
+             info] = o3d.pipelines.odometry.compute_rgbd_odometry(
+                source_rgbd_image, target_rgbd_image,
+                pinhole_camera_intrinsic, odo_init,
+                o3d.pipelines.odometry.RGBDOdometryJacobianFromHybridTerm(), option)
 
-            odom_result=[]
+            odom_result = []
 
             if not success_hybrid_term:
                 rospy.loginfo("Can not compute RGBD Odometry...")
@@ -293,8 +296,9 @@ def loop_CB(data):
                 for value in trans_hybrid_term:
                     for value_ in value:
                         odom_result.append(value_)
-                answer.data=odom_result
+                answer.data = odom_result
                 odometry_pub.publish(answer)
+
 
 if __name__ == '__main__':
     # node_name = os.path.basename(sys.argv[0]).split('.')[0]
@@ -328,6 +332,7 @@ if __name__ == '__main__':
     # /////////////////////////////////////////////////////////////////////////
     loop_sub = rospy.Subscriber("result", MultiArray, loop_CB)
     feature_pub = rospy.Publisher("features", FeatureArray, queue_size=10)
-    odometry_pub=rospy.Publisher("odometry_result",HomogeneousArray,queue_size=10)
+    odometry_pub = rospy.Publisher(
+        "odometry_result", HomogeneousArray, queue_size=10)
 
     rospy.spin()

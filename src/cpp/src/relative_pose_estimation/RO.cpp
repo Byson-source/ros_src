@@ -1,4 +1,3 @@
-
 // TODO 各ノードのposeを受けとり、t=0どうしのR,tを逆算すること、また、共分散行列も
 // TODO かさみ付き平均を適用して最適なR,tも求める
 #include <iostream>
@@ -111,9 +110,6 @@ public:
         points.color.a = 1.0;
         line_list.color.r = 1.0;
         line_list.color.a = 1.0;
-        // img_to_cam_coordinate << 0.0, 0.0, 1.0,
-        //     -1.0, 0.0, 0.0,
-        //     0.0, -1.0, 0.0;
     }
 
     void path1_CB(const nav_msgs::Path::ConstPtr &path)
@@ -131,6 +127,7 @@ public:
             pose.push_back(val.pose.orientation.w);
             path_1.push_back(pose);
         }
+
         mapPath_dict[info_index] = path_1.size() - 1;
         info_index += 1;
 
@@ -152,7 +149,6 @@ public:
             pose.push_back(val.pose.orientation.w);
             path_2.push_back(pose);
         }
-        std::cout << path_2.size() << std::endl;
         mapPath_dict_2[info_index_2] = path_2.size() - 1;
         info_index_2 += 1;
         if (status)
@@ -196,8 +192,6 @@ public:
             data_->data[8], data_->data[9], data_->data[10], data_->data[11],
             0.0, 0.0, 0.0, 1.0;
 
-        // transformation_result=cam2robot*transformation_result;
-
         Eigen::Vector3d transfer_;
         Eigen::Matrix3d rotation_;
         transfer_ = transformation_result.block(0, 3, 3, 1);
@@ -211,108 +205,78 @@ public:
 
         ROS_INFO("Hello");
 
-        Eigen::Vector3d ans_t = turnout_T(transfer_, who_detect);
-        ROS_INFO("Hello");
-        Eigen::Quaterniond ans_r = turnout_R(rotation_, who_detect);
-        ROS_INFO("Hello");
+        Eigen::Translation3d translation_vec(transfer_.x(), transfer_.y(), transfer_.z());
+        Eigen::Affine3d ans_r = turnout_R(rotation_, who_detect, translation_vec);
 
-        std::vector<double> R{ans_r.w(), ans_r.x(), ans_r.y(), ans_r.z()};
-        std::vector<double> t{ans_t[0], ans_t[1], ans_t[2]};
+        Eigen::Quaterniond for_publish_rot{ans_r.rotation()};
+
+        std::vector<double> R{for_publish_rot.w(), for_publish_rot.x(), for_publish_rot.y(), for_publish_rot.z()};
+        std::vector<double> t{ans_r.translation()[0], ans_r.translation()[1], ans_r.translation()[2]};
 
         pose_result.translation = t;
         pose_result.euler = R;
 
         rt_pub.publish(pose_result);
 
-        draw_rotation = ans_r.matrix();
-        draw_t = ans_t;
+        draw_rotation = ans_r.rotation();
+        draw_t = ans_r.translation();
         status = 1;
     }
 
     void RO_CB(const cpp::FeatureArray::ConstPtr &data)
     {
-        if ((data->r1.size() > 30) && (data->signal == 0))
+        if ((data->r1.size() > 4) && (data->signal == 0))
         // NOTE特徴点が10個以上ないとだめ
         {
 
             int who_detect = data->who_detect;
             loop_info = data->index2value;
-            std::vector<Eigen::Vector3d> img_coord_1;
-            std::vector<Eigen::Vector3d> img_coord_2;
-
-            std::vector<Eigen::Vector3d> kp_loc_r1_s;
-            std::vector<Eigen::Vector3d> kp_loc_r2_s;
-
-            for (size_t index{1}; index < data->r1.size() + 1; ++index)
-            {
-                // ３つ目の要素に差し掛かった時
-                if (index % 3 == 0)
-                {
-                    Eigen::Vector3d kp_loc_r1(data->r1[index - 3], data->r1[index - 2], data->r1[index - 1]);
-                    Eigen::Vector3d kp_loc_r2(data->r2[index - 3], data->r2[index - 2], data->r2[index - 1]);
-                    kp_loc_r1_s.push_back(kp_loc_r1);
-                    kp_loc_r2_s.push_back(kp_loc_r2);
-                    // NOTE ポイントのカメラ座標
-                    Eigen::Vector3d r1_coord(data->r1_imgcoord[index - 3], data->r1_imgcoord[index - 2], 0);
-                    Eigen::Vector3d r2_coord(data->r2_imgcoord[index - 3], data->r2_imgcoord[index - 2], 0);
-                    img_coord_1.push_back(r1_coord);
-                    img_coord_2.push_back(r2_coord);
-                }
-            }
-        }
-        else
-        {
-
-            // NOTE BA
         }
     }
 
-    Eigen::Vector3d turnout_T(Eigen::Vector3d transfer, int who_is_detect)
+    void turnout_T(int who_is_detect, Eigen::Translation3d &translation_1, Eigen::Translation3d &translation_2)
     {
-        Eigen::Vector3d r1_to_r2;
-        Eigen::Vector3d origin2r1;
-        Eigen::Vector3d origin2r2;
 
         int r1_img_index, r2_img_index;
-        Eigen::Vector3d transfer_1_to_2;
         if (who_is_detect == 1)
         {
             r1_img_index = (loop_info[0] - 1) * 0.5 + 1;
             r2_img_index = loop_info[1] / 2;
-            transfer_1_to_2 = transfer;
         }
         else
         {
             r1_img_index = (loop_info[1] - 1) * 0.5 + 1;
             r2_img_index = loop_info[0] / 2;
-            transfer_1_to_2 = Eigen::Vector3d::Zero() - transfer;
         }
-        origin2r1 << path_1[mapPath_dict[r1_img_index]][0], path_1[mapPath_dict[r1_img_index]][1], path_1[mapPath_dict[r1_img_index]][2];
 
-        origin2r2 << path_2[mapPath_dict_2[r2_img_index]][0], path_2[mapPath_dict_2[r2_img_index]][1], path_2[mapPath_dict_2[r2_img_index]][2];
+        Eigen::Translation<double, 3> origin2r1(path_1[mapPath_dict[r1_img_index]][0], path_1[mapPath_dict[r1_img_index]][1], path_1[mapPath_dict[r1_img_index]][2]);
+        Eigen::Translation<double, 3> origin2r2(path_2[mapPath_dict_2[r2_img_index]][0], path_2[mapPath_dict_2[r2_img_index]][1], path_2[mapPath_dict_2[r2_img_index]][2]);
 
-        Eigen::Vector3d ans_t = transfer_1_to_2 - (origin2r2 - origin2r1);
-        return ans_t;
+        translation_1 = origin2r1;
+        translation_2 = origin2r2;
     }
 
     // NOTE R_o2o'=R_o2a * R_a2b * R_b2o'
-    Eigen::Quaterniond turnout_R(Eigen::Matrix3d rotation_matrix, int who_is_detect)
+    Eigen::Affine3d turnout_R(Eigen::Matrix3d rotation_matrix, int who_is_detect, Eigen::Translation3d transfer)
     {
+        Eigen::Translation3d origin2r1, origin2r2;
+        turnout_T(who_is_detect, origin2r1, origin2r2);
+
         Eigen::Quaterniond r1_q;
         Eigen::Quaterniond r2_q;
 
         int r1_img_index, r2_img_index;
-        Eigen::Quaterniond rotation_1TO2;
+        Eigen::Quaterniond rotation_1TO2{rotation_matrix};
+        Eigen::Affine3d relative_measurement = rotation_1TO2 * transfer;
 
         if (who_is_detect == 1)
         {
-            rotation_1TO2 = rotation_matrix;
             r1_img_index = (loop_info[0] - 1) * 0.5 + 1;
             r2_img_index = loop_info[1] / 2;
         }
         else
         {
-            rotation_1TO2 = rotation_matrix.transpose();
+            relative_measurement = relative_measurement.inverse();
             r1_img_index = (loop_info[1] - 1) * 0.5 + 1;
             r2_img_index = loop_info[0] / 2;
         }
@@ -327,10 +291,17 @@ public:
         r2_q.z() = path_2[mapPath_dict_2[r2_img_index]][5];
         r2_q.w() = path_2[mapPath_dict_2[r2_img_index]][6];
 
-        // NOTE クオータニオンの掛け算の方向は左側
-        // Eigen::Matrix3d R2_origin2node = (r2_q.normalized()).toRotationMatrix();
-        Eigen::Quaterniond q_r1_to_r2 = (r2_q.inverse()) * rotation_1TO2 * r1_q;
-        return q_r1_to_r2.normalized();
+        std::cout << "--------------------------------" << std::endl;
+        Eigen::Affine3d origin_to_r1 = origin2r1 * r1_q;
+        std::cout << origin_to_r1.matrix() << std::endl;
+        Eigen::Affine3d origin_to_r2 = origin2r2 * r2_q;
+        std::cout << origin_to_r2.matrix() << std::endl;
+        std::cout << relative_measurement.matrix() << std::endl;
+        relative_measurement = origin_to_r1 * relative_measurement * (origin_to_r2.inverse());
+
+        std::cout << "=============================================" << std::endl;
+
+        return relative_measurement;
     }
 };
 
