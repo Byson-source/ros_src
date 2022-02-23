@@ -45,6 +45,7 @@ def callback(rgb, id):
     cv2_img = bridge.imgmsg_to_cv2(rgb, "bgr8")
 # FIXME Maybe should change to (640,480)
     cv2_img = cv2.resize(cv2_img, dsize=(640, 480))
+    # rospy.logerr(img_number)
 
     # REVIEW 再開
     if already_loop == 1:
@@ -67,6 +68,7 @@ def callback(rgb, id):
 
 def callback2(rgb, id):
     global img_number2, stock, condition
+    # rospy.logerr(img_number2)
 
     cv2_img = bridge.imgmsg_to_cv2(rgb, "bgr8")
 # FIXME Maybe should change to (640,480)
@@ -98,6 +100,7 @@ def switch_CB(loop):
     # loop終了
     global already_loop
     already_loop = 1
+    rospy.loginfo("already_loop is 1")
 
     # NOTE Erase detected images
     # rospy.loginfo("file start is "+str(start2end["start"]))

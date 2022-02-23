@@ -131,6 +131,12 @@ public:
         mapPath_dict[info_index] = path_1.size() - 1;
         info_index += 1;
 
+        // Eigen::Quaterniond robot1_quat(path_1[path_1.size() - 1][6], path_1[path_1.size() - 1][3], path_1[path_1.size() - 1][4], path_1[path_1.size() - 1][5]);
+        // Eigen::Matrix3d robot1_pose{robot1_quat};
+        // Eigen::Vector3d euler_result = robot1_pose.eulerAngles(0, 1, 2);
+
+        // std::cout << euler_result << std::endl;
+
         // std::vector<double> pose;
     }
 
@@ -226,7 +232,6 @@ public:
     void RO_CB(const cpp::FeatureArray::ConstPtr &data)
     {
         if ((data->r1.size() > 4) && (data->signal == 0))
-        // NOTE特徴点が10個以上ないとだめ
         {
 
             int who_detect = data->who_detect;
@@ -286,20 +291,24 @@ public:
         r1_q.z() = path_1[mapPath_dict[r1_img_index]][5];
         r1_q.w() = path_1[mapPath_dict[r1_img_index]][6];
 
+        Eigen::Matrix3d test_rot{r1_q};
+        // std::cout << test_rot.eulerAngles(0, 1, 2) << std::endl;
+        // std::cout << test_rot << std::endl;
+
         r2_q.x() = path_2[mapPath_dict_2[r2_img_index]][3];
         r2_q.y() = path_2[mapPath_dict_2[r2_img_index]][4];
         r2_q.z() = path_2[mapPath_dict_2[r2_img_index]][5];
         r2_q.w() = path_2[mapPath_dict_2[r2_img_index]][6];
 
-        std::cout << "--------------------------------" << std::endl;
+        // std::cout << "--------------------------------" << std::endl;
         Eigen::Affine3d origin_to_r1 = origin2r1 * r1_q;
-        std::cout << origin_to_r1.matrix() << std::endl;
+        // std::cout << origin_to_r1.matrix() << std::endl;
         Eigen::Affine3d origin_to_r2 = origin2r2 * r2_q;
-        std::cout << origin_to_r2.matrix() << std::endl;
-        std::cout << relative_measurement.matrix() << std::endl;
+        // std::cout << origin_to_r2.matrix() << std::endl;
         relative_measurement = origin_to_r1 * relative_measurement * (origin_to_r2.inverse());
+        // std::cout << relative_measurement.matrix() << std::endl;
 
-        std::cout << "=============================================" << std::endl;
+        // std::cout << "=============================================" << std::endl;
 
         return relative_measurement;
     }
