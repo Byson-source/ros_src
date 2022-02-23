@@ -57,7 +57,6 @@ def depthCB2(depth2, id):
     # print(depth_array.shape)
 
     container[depth_img2] = img
-    rospy.loginfo(len(container.keys()))
 
     cv2.imwrite("/home/ayumi/Documents/tohoku_uni/CLOVERs/images/depth/" +
                 str(depth_img2)+".png", img)

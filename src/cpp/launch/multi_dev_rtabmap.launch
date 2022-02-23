@@ -8,21 +8,21 @@
     </group>
 
 
-    <!-- <group ns="robot2">
+    <group ns="robot2">
 
         <include file="$(find cpp)/launch/for_multi_dev_rtabmap.launch">
             <arg name="for_frame" value="robot2/" />
             <arg name="topic_name" value="/robot2" />
         </include>
-    </group> -->
+    </group>
 
-    <!-- <node pkg="cpp" name="image_extractor" type="image_extractor.py" output="screen"/>
+    <node pkg="cpp" name="image_extractor" type="image_extractor.py" output="screen"/>
     <node pkg="cpp" name="feature_matchor" type="feature_matching.py" output="screen"/>
     <node pkg="cpp" name="loop_closure_server" type="detection_checker" output="screen"/>
-    <node pkg="cpp" name="RO_node" type="RO_estimator" output="screen"/>
-    <node pkg="cpp" name="gui" type="gui" output="screen"/> -->
+    <node pkg="cpp" name="gui" type="gui" output="screen"/>
 
-    <node pkg="rviz" type="rviz" name="rviz" required="true" args="-d /opt/ros/noetic/share/rviz/fuse_cloud.rviz" output="screen"/>
+    <node pkg="cpp" name="RO_node" type="RO_estimator" output="screen"/>
+    <!-- <node pkg="rviz" type="rviz" name="rviz" required="true" args="-d /opt/ros/noetic/share/rviz/fuse_cloud.rviz" output="screen"/> -->
 
 
 </launch>

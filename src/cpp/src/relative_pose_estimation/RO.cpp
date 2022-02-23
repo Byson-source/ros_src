@@ -39,8 +39,10 @@ private:
     ros::Publisher BA_pub;
     ros::Publisher rt_pub;
     ros::Publisher marker_pub;
+    ros::Publisher robot1_path_pub;
 
-    visualization_msgs::Marker points, line_strip, line_list;
+    visualization_msgs::Marker points, line_list;
+    visualization_msgs::Marker points_2, line_list_2;
 
     std::vector<int> loop_info;
     // NOTE xyz / xyzw
@@ -86,30 +88,59 @@ public:
             1, 0, 0;
 
         marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 10);
+        robot1_path_pub = n.advertise<visualization_msgs::Marker>("robot1_path", 10);
+        // robot1's path
+        {
+            points_2.header.frame_id = line_list_2.header.frame_id = "robot1/map";
+            points_2.header.stamp = line_list_2.header.stamp = ros::Time::now();
+            points_2.ns = line_list_2.ns = "robot1";
+            points_2.action = line_list_2.action = visualization_msgs::Marker::ADD;
+            points_2.pose.orientation.w = line_list_2.pose.orientation.w = 1.0;
 
-        points.header.frame_id = line_list.header.frame_id = "robot1/map";
-        points.header.stamp = line_list.header.stamp = ros::Time::now();
-        points.ns = line_list.ns = "robot1";
-        points.action = line_list.action = visualization_msgs::Marker::ADD;
-        points.pose.orientation.w = line_list.pose.orientation.w = 1.0;
+            points_2.id = 0;
+            line_list_2.id = 2;
 
-        points.id = 0;
-        line_list.id = 2;
+            points_2.type = visualization_msgs::Marker::POINTS;
+            line_list_2.type = visualization_msgs::Marker::LINE_LIST;
 
-        points.type = visualization_msgs::Marker::POINTS;
-        line_list.type = visualization_msgs::Marker::LINE_LIST;
+            // POINTS markers use x and y scale for width/height respectively
+            points_2.scale.x = 0.2;
+            points_2.scale.y = 0.2;
 
-        // POINTS markers use x and y scale for width/height respectively
-        points.scale.x = 0.2;
-        points.scale.y = 0.2;
+            // LINE_STRIP/LINE_LIST markers use only the x component of scale, for the line width
+            line_list_2.scale.x = 0.1;
 
-        // LINE_STRIP/LINE_LIST markers use only the x component of scale, for the line width
-        line_list.scale.x = 0.1;
+            points_2.color.b = 1.0f;
+            points_2.color.a = 1.0;
+            line_list_2.color.b = 1.0;
+            line_list_2.color.a = 1.0;
+        }
+        // robot2's path
+        {
+            points.header.frame_id = line_list.header.frame_id = "robot1/map";
+            points.header.stamp = line_list.header.stamp = ros::Time::now();
+            points.ns = line_list.ns = "robot2";
+            points.action = line_list.action = visualization_msgs::Marker::ADD;
+            points.pose.orientation.w = line_list.pose.orientation.w = 1.0;
 
-        points.color.r = 1.0f;
-        points.color.a = 1.0;
-        line_list.color.r = 1.0;
-        line_list.color.a = 1.0;
+            points.id = 0;
+            line_list.id = 2;
+
+            points.type = visualization_msgs::Marker::POINTS;
+            line_list.type = visualization_msgs::Marker::LINE_LIST;
+
+            // POINTS markers use x and y scale for width/height respectively
+            points.scale.x = 0.2;
+            points.scale.y = 0.2;
+
+            // LINE_STRIP/LINE_LIST markers use only the x component of scale, for the line width
+            line_list.scale.x = 0.1;
+
+            points.color.r = 1.0f;
+            points.color.a = 1.0;
+            line_list.color.r = 1.0;
+            line_list.color.a = 1.0;
+        }
     }
 
     void path1_CB(const nav_msgs::Path::ConstPtr &path)
@@ -131,13 +162,31 @@ public:
         mapPath_dict[info_index] = path_1.size() - 1;
         info_index += 1;
 
-        // Eigen::Quaterniond robot1_quat(path_1[path_1.size() - 1][6], path_1[path_1.size() - 1][3], path_1[path_1.size() - 1][4], path_1[path_1.size() - 1][5]);
-        // Eigen::Matrix3d robot1_pose{robot1_quat};
-        // Eigen::Vector3d euler_result = robot1_pose.eulerAngles(0, 1, 2);
+        geometry_msgs::Point p;
+        geometry_msgs::Point p_prev;
+        points_2.points.clear();
+        line_list_2.points.clear();
+        for (size_t each{0}; each < path_1.size(); ++each)
+        {
+            Eigen::Vector3d p_mat(path_1[each][0], path_1[each][1], path_1[each][2]);
+            p.x = p_mat.x();
+            p.y = p_mat.y();
+            p.z = p_mat.z();
 
-        // std::cout << euler_result << std::endl;
+            points.points.push_back(p);
 
-        // std::vector<double> pose;
+            if (each > 0)
+            {
+                Eigen::Vector3d p_prev_mat(path_1[each - 1][0], path_1[each - 1][1], path_1[each - 1][2]);
+                line_list_2.points.push_back(p);
+                p_prev.x = p_prev_mat.x();
+                p_prev.y = p_prev_mat.y();
+                p_prev.z = p_prev_mat.z();
+                line_list_2.points.push_back(p_prev);
+            }
+        }
+        marker_pub.publish(points_2);
+        marker_pub.publish(line_list_2);
     }
 
     void path2_CB(const nav_msgs::Path::ConstPtr &path)
@@ -306,9 +355,9 @@ public:
         Eigen::Affine3d origin_to_r2 = origin2r2 * r2_q;
         // std::cout << origin_to_r2.matrix() << std::endl;
         relative_measurement = origin_to_r1 * relative_measurement * (origin_to_r2.inverse());
-        // std::cout << relative_measurement.matrix() << std::endl;
+        std::cout << relative_measurement.matrix() << std::endl;
 
-        // std::cout << "=============================================" << std::endl;
+        std::cout << "=============================================" << std::endl;
 
         return relative_measurement;
     }

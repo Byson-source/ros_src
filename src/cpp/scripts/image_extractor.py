@@ -100,7 +100,6 @@ def switch_CB(loop):
     # loop終了
     global already_loop
     already_loop = 1
-    rospy.loginfo("already_loop is 1")
 
     # NOTE Erase detected images
     # rospy.loginfo("file start is "+str(start2end["start"]))
