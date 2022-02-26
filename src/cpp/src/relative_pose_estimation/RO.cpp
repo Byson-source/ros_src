@@ -448,7 +448,7 @@ public:
         //     std::cout << val << std::endl;
         // }
 
-        auto initial_pose_noise = noiseModel::Diagonal::Sigmas((Vector(6) << Vector3::Constant(0.1), Vector3::Constant(0.3)).finished());
+        auto initial_pose_noise = noiseModel::Diagonal::Sigmas((Vector(6) << Vector3::Constant(0.0), Vector3::Constant(0.0)).finished());
         auto measurementNoise = noiseModel::Isotropic::Sigma(2, 0.3);
 
         NonlinearFactorGraph graph;
@@ -567,6 +567,7 @@ public:
         }
 
         // for (size_t j{0}; j < hyp_ids.size(); ++j)
+        Key last_symbol;
         for (size_t j{0}; j < 1; ++j)
 
         {
@@ -577,18 +578,19 @@ public:
             }
             else
                 initialEstimate.insert(Symbol('x', j + local_ids.size()), Pose3(hyp_pose[j]));
+            last_symbol = Symbol('x', j + local_ids.size());
         }
 
         for (size_t j{0}; j < local_pcd.size(); ++j)
             initialEstimate.insert<Point3>(Symbol('l', j), Point3(local_pcd[j]));
 
-        boost::shared_ptr<GaussianFactorGraph> gaussian = graph.linearize(initialEstimate);
-        VectorValues result = gaussian->optimizeDensely();
-        // std::cout << result.at<Pose3>(Symbol('x', 2)).matrix() << std::endl;
+        // boost::shared_ptr<GaussianFactorGraph> gaussian = graph.linearize(initialEstimate);
+        // VectorValues result = gaussian->optimizeDensely();
 
-        // Values result = LevenbergMarquardtOptimizer(graph, initialEstimate).optimize();
-        result.print("Final results:\n");
+        Values result = LevenbergMarquardtOptimizer(graph, initialEstimate).optimize();
         // std::cout << result.at<Pose3>(Symbol('x', 2)).matrix() << std::endl;
+        // result.print("Final results:\n");
+        std::cout << result.at<Pose3>(last_symbol).matrix() << std::endl;
         // Marginals marginals(graph, result);
         // std::cout << "======================Marginals==============================" << std::endl;
         // std::cout << marginals.marginalCovariance(pose_symbol[0]) << std::endl;
