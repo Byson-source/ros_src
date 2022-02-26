@@ -236,7 +236,7 @@ def choose_image(list_ind, list_val):
 
 def image_manager(list_ind, list_val):
     list_ind, list_val = decrease_image(list_ind, list_val)
-    list_ind, list_val = choose_image(list_ind, list_val)
+    # list_ind, list_val = choose_image(list_ind, list_val)
 
     return list_ind, list_val
 ###############################################################################
@@ -303,13 +303,6 @@ def derive_duplicated_indexes(indexes, values):
     survived_index, survived_backup = [], []
     # NOTE 枚数が多い場合減らす+大きく過去の写真を参照するようにする。
     indexes, values = image_manager(indexes, values)
-    # values = avoid_duplication(values)
-
-    # if len(indexes) > 3:
-    #     list_ind = [indexes[i] for i in range(3)]
-    #     list_val = [values[i] for i in range(3)]
-    #     indexes = list_ind
-    #     values = list_val
 
     second_kpt, feature_map, good = orbmatch(indexes[0], values[0])
     sorted_index, dict_list = [], [feature_map]
@@ -435,25 +428,25 @@ def loop_CB(data):
         if index == "R1":
             element["num"] = len(data.r1_index)
             if element["num"] > 1:
-                if(data.r1_index[-1] > 10) and (data.r1_value[-1] > 10):
-                    referred = data.r1_index[0]
-                    referred_hyp = data.r1_value[0]
-                    feature_map, valid_img, good_ = derive_duplicated_indexes(
-                        data.r1_index, data.r1_value)
-                else:
-                    rospy.logwarn("Indexes are too young... quit")
-                    good_ = 0
+                # if(data.r1_index[-1] > 10) and (data.r1_value[-1] > 10):
+                referred = data.r1_index[0]
+                referred_hyp = data.r1_value[0]
+                feature_map, valid_img, good_ = derive_duplicated_indexes(
+                    data.r1_index, data.r1_value)
+                # else:
+                #     rospy.logwarn("Indexes are too young... quit")
+                #     good_ = 0
         else:
             element["num"] = len(data.r2_index)
             if element["num"] > 1:
-                if(data.r2_index[-1] > 10) and (data.r2_value[-1] > 10):
-                    referred = data.r2_index[0]
-                    referred_hyp = data.r2_value[0]
-                    feature_map, valid_img, good_ = derive_duplicated_indexes(
-                        data.r2_index, data.r2_value)
-                else:
-                    rospy.logwarn("Indexes are too young... quit")
-                    good_ = 0
+                # if(data.r2_index[-1] > 10) and (data.r2_value[-1] > 10):
+                referred = data.r2_index[0]
+                referred_hyp = data.r2_value[0]
+                feature_map, valid_img, good_ = derive_duplicated_indexes(
+                    data.r2_index, data.r2_value)
+                # else:
+                #     rospy.logwarn("Indexes are too young... quit")
+                #     good_ = 0
 
         answer = HomogeneousArray()
         info = FeatureArray()
