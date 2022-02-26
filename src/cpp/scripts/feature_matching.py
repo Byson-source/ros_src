@@ -214,7 +214,7 @@ def decrease_image(list_ind, list_val):
         list_ind = [list_ind[i] for i in range(3)]
         list_val = [list_val[i] for i in range(3)]
 
-    list_ind = avoid_duplication(list_val)
+    list_val = avoid_duplication(list_val)
     return list_ind, list_val
 
 
@@ -303,6 +303,7 @@ def derive_duplicated_indexes(indexes, values):
     survived_index, survived_backup = [], []
     # NOTE 枚数が多い場合減らす+大きく過去の写真を参照するようにする。
     indexes, values = image_manager(indexes, values)
+    rospy.logwarn(indexes)
 
     second_kpt, feature_map, good = orbmatch(indexes[0], values[0])
     sorted_index, dict_list = [], [feature_map]
@@ -460,7 +461,7 @@ def loop_CB(data):
 
         if good_ and element["num"] > 1:
             kpt_map = arrange_ids(len(feature_map))
-            rospy.logwarn(kpt_map)
+            # rospy.logwarn(kpt_map)
             # element["R1"][iter], element["R2"][iter] = [], []
             for kpt in range(len(feature_map)):
                 whether_success = 1
@@ -469,7 +470,7 @@ def loop_CB(data):
                 #     r_feature.append(each_kpt)
                 r_feature = feature_map[kpt]
                 img_coord = []
-                rospy.loginfo(r_feature)
+                # rospy.loginfo(r_feature)
 
                 for point in range(len(r_feature)):
                     # elif(container[indice][int(r_feature[point][1]), int(r_feature[point][0])] != 0):
