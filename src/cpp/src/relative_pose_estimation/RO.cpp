@@ -584,14 +584,14 @@ public:
         for (size_t j{0}; j < local_pcd.size(); ++j)
             initialEstimate.insert<Point3>(Symbol('l', j), Point3(local_pcd[j]));
 
-        boost::shared_ptr<GaussianFactorGraph> gaussian = graph.linearize(initialEstimate);
-        VectorValues result = gaussian->optimizeDensely();
+        // boost::shared_ptr<GaussianFactorGraph> gaussian = graph.linearize(initialEstimate);
+        // VectorValues result = gaussian->optimizeDensely();
 
-        // Values result = LevenbergMarquardtOptimizer(graph, initialEstimate).optimize();
-        // std::cout << result.at<Pose3>(Symbol('x', 2)).matrix() << std::endl;
+        Values result = LevenbergMarquardtOptimizer(graph, initialEstimate).optimize();
+        // std::cout << result.at(last_symbol) << std::endl;
         result.print("Final results:\n");
-        // std::cout << result.at<Pose3>(last_symbol).matrix() << std::endl;
-        // Marginals marginals(graph, result);
+        std::cout << result.at<Pose3>(last_symbol).matrix() << std::endl;
+        Marginals marginals(graph, result);
         // std::cout << "======================Marginals==============================" << std::endl;
         // std::cout << marginals.marginalCovariance(pose_symbol[0]) << std::endl;
         // std::cout << std::endl;

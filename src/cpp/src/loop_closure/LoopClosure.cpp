@@ -61,7 +61,7 @@ public:
 
         rtabmap.setTimeThreshold(700.0f); // Time threshold : 700 ms, 0 ms means no limit
 
-        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRtabmapLoopThr(), "0.21"));
+        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRtabmapLoopThr(), "0.09"));
         parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRGBDEnabled(), "false"));
 
         // REVIEW rtabmapのstmの決め方

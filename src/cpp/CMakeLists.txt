@@ -40,8 +40,10 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 FIND_PACKAGE(OpenCV REQUIRED)
 find_package(PCL 1.3 REQUIRED COMPONENTS common io)
 find_package(Open3D HINTS ${CMAKE_INSTALL_PREFIX}/lib/cmake)
-find_package(GTSAMCMakeTools)
-find_package(GTSAM REQUIRED)
+find_package(g2o REQUIRED)
+
+# find_package(GTSAMCMakeTools)
+# find_package(GTSAM REQUIRED)
 
 
 link_directories(${PCL_LIBRARIES_DIRS})
@@ -68,7 +70,8 @@ ${RTABMap_INCLUDE_DIRS}
 ${OpenCV_INCLUDE_DIRS}
 ${PCL_INCLUDE_DIRS}
 ${Open3D_INCLUDE_DIRS}
-${GTSAM_INCLUDE_DIRS}
+${G2O_INCLUDE_DIRS}
+# ${GTSAM_INCLUDE_DIRS}
 )
 
 # libraries
@@ -332,14 +335,14 @@ add_dependencies(
   ${cpp_EXPORTED_TARGETS}
 )
 
-add_executable(RO_estimator 
-              src/relative_pose_estimation/RO.cpp)
+# add_executable(RO_estimator 
+#               src/relative_pose_estimation/RO.cpp)
 
-target_link_libraries(
-  RO_estimator
-  ${catkin_LIBRARIES}
-  gtsam
-  )
+# target_link_libraries(
+#   RO_estimator
+#   ${catkin_LIBRARIES}
+#   gtsam
+#   )
 # add_executable(gui src/gui/src/gui_2.cpp)
 # target_link_libraries(gui ${catkin_LIBRARIES})
 # add_dependencies(open3d_conversions_ex_sub ${open3d_conversions_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

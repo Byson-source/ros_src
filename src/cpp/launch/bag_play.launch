@@ -1,13 +1,13 @@
 <launch>
 
-    <node pkg="rosbag" type="play" name="rosbag_play1" args="/home/ayumi/Documents/tohoku_uni/CLOVERs/datasets/field_test/2022_0220_indoor/record_r1.bag">
+    <node pkg="rosbag" type="play" name="rosbag_play1" args="/home/ayumi/Documents/tohoku_uni/CLOVERs/datasets/field_test/2022_0212_indoor/record_r2.bag">
         <remap from="/camera/aligned_depth_to_color/camera_info" to="robot1/camera/aligned_depth_to_color/camera_info"/>
         <remap from="/camera/color/camera_info" to="robot1/camera/color/camera_info"/>
         <remap from="/camera/color/image_raw" to="robot1/camera/color/image_raw"/>
         <remap from="/camera/aligned_depth_to_color/image_raw" to="robot1/camera/aligned_depth_to_color/image_raw"/>
     </node>
 
-    <node pkg="rosbag" type="play" name="rosbag_play2" args="/home/ayumi/Documents/tohoku_uni/CLOVERs/datasets/field_test/2022_0220_indoor/record_b1.bag">
+    <node pkg="rosbag" type="play" name="rosbag_play2" args="/home/ayumi/Documents/tohoku_uni/CLOVERs/datasets/field_test/2022_0212_indoor/record_b2.bag">
         <remap from="/camera/aligned_depth_to_color/camera_info" to="robot2/camera/aligned_depth_to_color/camera_info"/>
         <remap from="/camera/color/camera_info" to="robot2/camera/color/camera_info"/>
         <remap from="/camera/color/image_raw" to="robot2/camera/color/image_raw"/>
