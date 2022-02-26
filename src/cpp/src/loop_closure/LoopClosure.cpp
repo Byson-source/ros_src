@@ -61,7 +61,7 @@ public:
 
         rtabmap.setTimeThreshold(700.0f); // Time threshold : 700 ms, 0 ms means no limit
 
-        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRtabmapLoopThr(), "0.20"));
+        parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRtabmapLoopThr(), "0.21"));
         parameters.insert(rtabmap::ParametersPair(rtabmap::Parameters::kRGBDEnabled(), "false"));
 
         // REVIEW rtabmapのstmの決め方
@@ -304,15 +304,15 @@ public:
 
                     if (judge(rtabmap.getLoopClosureId(), ans))
                     {
-                        printf(" #%d ptime(%fs) STM(%d) WM(%d) hyp(%d) value(%.2f) *LOOP %d->%d*\n",
-                               i,
-                               rtabmap.getLastProcessTime(),
-                               (int)rtabmap.getSTM().size(), // short-term memory
-                               (int)rtabmap.getWM().size(),  // working memory
-                               (int)rtabmap.getLoopClosureId(),
-                               (float)rtabmap.getLoopClosureValue(),
-                               nextIndex,
-                               (int)rtabmap.getLoopClosureId());
+                        // printf(" #%d ptime(%fs) STM(%d) WM(%d) hyp(%d) value(%.2f) *LOOP %d->%d*\n",
+                        //        i,
+                        //        rtabmap.getLastProcessTime(),
+                        //        (int)rtabmap.getSTM().size(), // short-term memory
+                        //        (int)rtabmap.getWM().size(),  // working memory
+                        //        (int)rtabmap.getLoopClosureId(),
+                        //        (float)rtabmap.getLoopClosureValue(),
+                        //        nextIndex,
+                        //        (int)rtabmap.getLoopClosureId());
 
                         io_num = std::to_string(nextIndex) + jpg;
                         // ロボット間の検知

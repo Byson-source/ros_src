@@ -354,8 +354,6 @@ public:
                 hyps.push_back(valids[idx]);
         }
 
-        Values initial_estimate;
-
         // // NOTE turnout necessary robot's poses
         std::vector<Eigen::Matrix4d> local_poses = turnout_Localpose(locals, who_detect);
 
@@ -365,52 +363,53 @@ public:
         std::vector<Eigen::Vector3d> local_pcds = turnout_point_coord(local_pcd);
         // NOTE BA
 
-        Eigen::Matrix4d goal_transformation = compute_BA(local_pcds, Eigen::Matrix4d::Identity(), who_detect, hyp_2d, loop_2d, locals, hyps, local_poses, hyp_poses);
+        compute_BA(local_pcds, Eigen::Matrix4d::Identity(), who_detect, hyp_2d, loop_2d, locals, hyps, local_poses, hyp_poses);
+        // Eigen::Matrix4d goal_transformation = compute_BA(local_pcds, Eigen::Matrix4d::Identity(), who_detect, hyp_2d, loop_2d, locals, hyps, local_poses, hyp_poses);
         // -----------------------------------------------------------------------------
-        Eigen::Vector3d transfer_;
-        Eigen::Matrix3d rotation_;
-        transfer_ = goal_transformation.block(0, 3, 3, 1);
-        rotation_ = goal_transformation.block(0, 0, 3, 3);
+        // Eigen::Vector3d transfer_;
+        // Eigen::Matrix3d rotation_;
+        // transfer_ = goal_transformation.block(0, 3, 3, 1);
+        // rotation_ = goal_transformation.block(0, 0, 3, 3);
 
-        rotation_ = cam2robot.block(0, 0, 3, 3) * rotation_ * (cam2robot.block(0, 0, 3, 3)).transpose();
-        transfer_ = cam2robot.block(0, 0, 3, 3) * transfer_;
+        // rotation_ = cam2robot.block(0, 0, 3, 3) * rotation_ * (cam2robot.block(0, 0, 3, 3)).transpose();
+        // transfer_ = cam2robot.block(0, 0, 3, 3) * transfer_;
 
-        Eigen::Affine3d ans_r = turnout_R(rotation_, who_detect, valids, transfer_);
+        // Eigen::Affine3d ans_r = turnout_R(rotation_, who_detect, valids, transfer_);
 
-        status = 1;
+        // status = 1;
 
-        cpp::RO_Array pose_result;
-        Eigen::Quaterniond for_publish_rot{ans_r.rotation()};
-        std::vector<double> R{for_publish_rot.w(), for_publish_rot.x(), for_publish_rot.y(), for_publish_rot.z()};
-        std::vector<double> t{ans_r.translation()[0], ans_r.translation()[1], ans_r.translation()[2]};
+        // cpp::RO_Array pose_result;
+        // Eigen::Quaterniond for_publish_rot{ans_r.rotation()};
+        // std::vector<double> R{for_publish_rot.w(), for_publish_rot.x(), for_publish_rot.y(), for_publish_rot.z()};
+        // std::vector<double> t{ans_r.translation()[0], ans_r.translation()[1], ans_r.translation()[2]};
 
-        pose_result.translation = t;
-        pose_result.euler = R;
+        // pose_result.translation = t;
+        // pose_result.euler = R;
 
-        rt_pub.publish(pose_result);
+        // rt_pub.publish(pose_result);
 
-        draw_rotation = ans_r.rotation();
-        draw_t = ans_r.translation();
-        status = 1;
+        // draw_rotation = ans_r.rotation();
+        // draw_t = ans_r.translation();
+        // status = 1;
 
         hyp_2d.clear();
         loop_2d.clear();
     }
 
     // NOTE GTSAMのsigmaはroll,pitch,yaw,x,y,z! なお、2Dの場合はx,y,theta
-    Eigen::Matrix4d compute_BA(std::vector<Eigen::Vector3d> local_pcd, Eigen::Matrix4d initial_pose,
-                               std::string who_detect,
-                               std::map<int, std::vector<Eigen::Vector2d>> hyp_2d,
-                               std::map<int, std::vector<Eigen::Vector2d>> loop_2d,
-                               std::vector<int> local_ids, std::vector<int> hyp_ids,
-                               std::vector<Eigen::Matrix4d> local_pose, std::vector<Eigen::Matrix4d> hyp_pose)
+    // Eigen::Matrix4d compute_BA(std::vector<Eigen::Vector3d> local_pcd, Eigen::Matrix4d initial_pose,
+    //                            std::string who_detect,
+    //                            std::map<int, std::vector<Eigen::Vector2d>> hyp_2d,
+    //                            std::map<int, std::vector<Eigen::Vector2d>> loop_2d,
+    //                            std::vector<int> local_ids, std::vector<int> hyp_ids,
+    //                            std::vector<Eigen::Matrix4d> local_pose, std::vector<Eigen::Matrix4d> hyp_pose)
+    void compute_BA(std::vector<Eigen::Vector3d> local_pcd, Eigen::Matrix4d initial_pose,
+                    std::string who_detect,
+                    std::map<int, std::vector<Eigen::Vector2d>> hyp_2d,
+                    std::map<int, std::vector<Eigen::Vector2d>> loop_2d,
+                    std::vector<int> local_ids, std::vector<int> hyp_ids,
+                    std::vector<Eigen::Matrix4d> local_pose, std::vector<Eigen::Matrix4d> hyp_pose)
     {
-        ROS_WARN("This is point cloud coordinate");
-        for (auto pcdhoge : local_pcd)
-        {
-            std::cout << pcdhoge << std::endl;
-            std::cout << "======================" << std::endl;
-        }
 
         ROS_WARN("This is local pose");
         for (auto each : local_pose)
@@ -428,45 +427,26 @@ public:
         }
         std::cout << std::endl;
 
-        ROS_WARN("Local id");
-        for (auto id : local_ids)
-        {
-            std::cout << id << std::endl;
-        }
+        // for (const auto [key, index] : loop_2d)
+        // {
+        //     std::cout << key << std::endl;
+        //     std::cout << "----------------------" << std::endl;
+        //     for (auto val : index)
+        //     {
+        //         std::cout << val << std::endl;
+        //     }
+        // }
+        // for (auto val : loop_2d[1])
+        // {
+        //     std::cout << val << std::endl;
+        // }
 
-        ROS_WARN("hyp ids");
-        for (auto id : hyp_ids)
-        {
-            std::cout << id << std::endl;
-        }
+        // std::cout << "================================" << std::endl;
 
-        ROS_WARN("loop id");
-        for (auto id : local_ids)
-        {
-            std::cout << id << std::endl;
-        }
-
-        for (const auto [key, index] : loop_2d)
-        {
-            std::cout << key << std::endl;
-            std::cout << "----------------------" << std::endl;
-            for (auto val : index)
-            {
-                std::cout << val << std::endl;
-            }
-        }
-
-        std::cout << "================================" << std::endl;
-
-        for (const auto [key, index] : hyp_2d)
-        {
-            std::cout << "----------------------" << std::endl;
-            std::cout << key << std::endl;
-            for (auto val : index)
-            {
-                std::cout << val << std::endl;
-            }
-        }
+        // for (auto val : hyp_2d[0])
+        // {
+        //     std::cout << val << std::endl;
+        // }
 
         auto initial_pose_noise = noiseModel::Diagonal::Sigmas((Vector(6) << Vector3::Constant(0.1), Vector3::Constant(0.3)).finished());
         auto measurementNoise = noiseModel::Isotropic::Sigma(2, 0.3);
@@ -550,12 +530,12 @@ public:
         for (int pixel_id{0}; pixel_id < loop_2d[0].size(); ++pixel_id)
         {
             Point2 measurement_ = hyp_2d[index_count][pixel_id];
-            std::cout << measurement_ << std::endl;
+            // std::cout << measurement_ << std::endl;
             graph.emplace_shared<GenericProjectionFactor<Pose3, Point3, Cal3_S2>>(
                 measurement_, measurementNoise, Symbol('x', index_count), Symbol('l', pixel_id), K);
         }
         index_count += 1;
-        std::cout << index_count << std::endl;
+        // std::cout << index_count << std::endl;
         // }
 
         // // Loop Closure constraint
@@ -602,11 +582,24 @@ public:
         for (size_t j{0}; j < local_pcd.size(); ++j)
             initialEstimate.insert<Point3>(Symbol('l', j), Point3(local_pcd[j]));
 
-        Values result = LevenbergMarquardtOptimizer(graph, initialEstimate).optimize();
-        // result.print("Final results:\n");
-        std::cout << result.at<Pose3>(Symbol('x', 2)).matrix() << std::endl;
-        Marginals marginals(graph, result);
-        return result.at<Pose3>(Symbol('x', 2)).matrix();
+        boost::shared_ptr<GaussianFactorGraph> gaussian = graph.linearize(initialEstimate);
+        VectorValues result = gaussian->optimizeDensely();
+        // std::cout << result.at<Pose3>(Symbol('x', 2)).matrix() << std::endl;
+
+        // Values result = LevenbergMarquardtOptimizer(graph, initialEstimate).optimize();
+        result.print("Final results:\n");
+        // std::cout << result.at<Pose3>(Symbol('x', 2)).matrix() << std::endl;
+        // Marginals marginals(graph, result);
+        // std::cout << "======================Marginals==============================" << std::endl;
+        // std::cout << marginals.marginalCovariance(pose_symbol[0]) << std::endl;
+        // std::cout << std::endl;
+        // std::cout << marginals.marginalCovariance(pose_symbol[1]) << std::endl;
+
+        // std::cout << "initial error = " << graph.error(initialEstimate) << std::endl;
+        // std::cout << "final error = " << graph.error(result) << std::endl;
+
+        // return result.at<Pose3>(Symbol('x', 2))
+        //     .matrix();
         // TODO hypの方はひとまずオドメトリによる拘束条件のみに限定して考える。余裕があればProx loop, loop closureによる影響も考慮すると良い。
     }
     // NOTE [[x,y,z,qx,qy,qz,qw],[..]]

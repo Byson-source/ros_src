@@ -195,7 +195,7 @@ def orbmatch(fileName1, fileName2, previous_features=False):
 ###############################################################################
 
 def avoid_duplication(hypothesises):
-    rospy.logerr(hypothesises)
+    # rospy.logerr(hypothesises)
     memory = []
     for hypothesis in hypothesises:
         if not hypothesis in memory:
@@ -204,7 +204,7 @@ def avoid_duplication(hypothesises):
             alternative = memory[-1]+2
             memory.append(alternative)
 
-    rospy.logerr(memory)
+    # rospy.logerr(memory)
 
     return memory
 
@@ -303,7 +303,7 @@ def derive_duplicated_indexes(indexes, values):
     survived_index, survived_backup = [], []
     # NOTE 枚数が多い場合減らす+大きく過去の写真を参照するようにする。
     indexes, values = image_manager(indexes, values)
-    rospy.logwarn(indexes)
+    # rospy.logwarn(indexes)
 
     second_kpt, feature_map, good = orbmatch(indexes[0], values[0])
     sorted_index, dict_list = [], [feature_map]
@@ -311,7 +311,7 @@ def derive_duplicated_indexes(indexes, values):
     for i in range(len(indexes)):
         sorted_index.append(indexes[i])
         sorted_index.append(values[i])
-        rospy.logwarn(str(indexes[i])+"->"+str(values[i]))
+        # rospy.logwarn(str(indexes[i])+"->"+str(values[i]))
 
     valid_img_index = [sorted_index[0], sorted_index[1]]
     for hogehoge in range(2, len(sorted_index)):
