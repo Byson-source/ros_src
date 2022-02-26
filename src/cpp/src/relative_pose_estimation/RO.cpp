@@ -60,8 +60,10 @@ private:
     ros::Publisher BA_pub;
     ros::Publisher rt_pub;
     ros::Publisher marker_pub;
+    ros::Publisher robot1_path_pub;
 
-    visualization_msgs::Marker points, line_strip, line_list;
+    visualization_msgs::Marker points, line_list;
+    visualization_msgs::Marker points_2, line_list_2;
 
     std::string loop_info;
     // NOTE xyz / xyzw
@@ -120,30 +122,59 @@ public:
         robot2cam = (cam2robot.block(0, 0, 3, 3)).transpose();
 
         marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 10);
+        robot1_path_pub = n.advertise<visualization_msgs::Marker>("robot1_path", 10);
+        // NOTE robot1's trajectory
+        {
+            points_2.header.frame_id = line_list_2.header.frame_id = "robot1/map";
+            points_2.header.stamp = line_list_2.header.stamp = ros::Time::now();
+            points_2.ns = line_list_2.ns = "robot1";
+            points_2.action = line_list_2.action = visualization_msgs::Marker::ADD;
+            points_2.pose.orientation.w = line_list_2.pose.orientation.w = 1.0;
 
-        points.header.frame_id = line_list.header.frame_id = "robot1/map";
-        points.header.stamp = line_list.header.stamp = ros::Time::now();
-        points.ns = line_list.ns = "robot1";
-        points.action = line_list.action = visualization_msgs::Marker::ADD;
-        points.pose.orientation.w = line_list.pose.orientation.w = 1.0;
+            points_2.id = 0;
+            line_list_2.id = 2;
 
-        points.id = 0;
-        line_list.id = 2;
+            points_2.type = visualization_msgs::Marker::POINTS;
+            line_list_2.type = visualization_msgs::Marker::LINE_LIST;
 
-        points.type = visualization_msgs::Marker::POINTS;
-        line_list.type = visualization_msgs::Marker::LINE_LIST;
+            // POINTS markers use x and y scale for width/height respectively
+            points_2.scale.x = 0.2;
+            points_2.scale.y = 0.2;
 
-        // POINTS markers use x and y scale for width/height respectively
-        points.scale.x = 0.2;
-        points.scale.y = 0.2;
+            // LINE_STRIP/LINE_LIST markers use only the x component of scale, for the line width
+            line_list_2.scale.x = 0.1;
 
-        // LINE_STRIP/LINE_LIST markers use only the x component of scale, for the line width
-        line_list.scale.x = 0.1;
+            points_2.color.b = 1.0f;
+            points_2.color.a = 1.0;
+            line_list_2.color.b = 1.0;
+            line_list_2.color.a = 1.0;
+        }
+        // NOTE robot2's trajectory
+        {
+            points.header.frame_id = line_list.header.frame_id = "robot2/map";
+            points.header.stamp = line_list.header.stamp = ros::Time::now();
+            points.ns = line_list.ns = "robot2";
+            points.action = line_list.action = visualization_msgs::Marker::ADD;
+            points.pose.orientation.w = line_list.pose.orientation.w = 1.0;
 
-        points.color.r = 1.0f;
-        points.color.a = 1.0;
-        line_list.color.r = 1.0;
-        line_list.color.a = 1.0;
+            points.id = 0;
+            line_list.id = 2;
+
+            points.type = visualization_msgs::Marker::POINTS;
+            line_list.type = visualization_msgs::Marker::LINE_LIST;
+
+            // POINTS markers use x and y scale for width/height respectively
+            points.scale.x = 0.2;
+            points.scale.y = 0.2;
+
+            // LINE_STRIP/LINE_LIST markers use only the x component of scale, for the line width
+            line_list.scale.x = 0.1;
+
+            points.color.r = 1.0f;
+            points.color.a = 1.0;
+            line_list.color.r = 1.0;
+            line_list.color.a = 1.0;
+        }
     }
     // FIXME odomの拘束条件しか考慮しない
     void info_CB1(const rtabmap_ros::MapGraph::ConstPtr &data)
@@ -222,7 +253,29 @@ public:
         mapPath_dict[info_index] = path_1.size() - 1;
         info_index += 1;
 
-        // std::vector<double> pose;
+        geometry_msgs::Point p;
+        geometry_msgs::Point p_prev;
+        points_2.points.clear();
+        line_list_2.points.clear();
+        for (size_t each{0}; each < path_1.size(); ++each)
+        {
+            Eigen::Vector3d p_mat(path_1[each][0], path_1[each][1], path_1[each][2]);
+            p.x = p_mat.x();
+            p.y = p_mat.y();
+            p.z = p_mat.z();
+            points.points.push_back(p);
+            if (each > 0)
+            {
+                Eigen::Vector3d p_prev_mat(path_1[each - 1][0], path_1[each - 1][1], path_1[each - 1][2]);
+                line_list_2.points.push_back(p);
+                p_prev.x = p_prev_mat.x();
+                p_prev.y = p_prev_mat.y();
+                p_prev.z = p_prev_mat.z();
+                line_list_2.points.push_back(p_prev);
+            }
+        }
+        marker_pub.publish(points_2);
+        marker_pub.publish(line_list_2);
     }
 
     void path2_CB(const nav_msgs::Path::ConstPtr &path)
@@ -755,31 +808,6 @@ public:
 
         translation_1 = origin2r1;
         translation_2 = origin2r2;
-        // Eigen::Vector3d r1_to_r2;
-        // Eigen::Vector3d origin2r1;
-        // Eigen::Vector3d origin2r2;
-
-        // int r1_img_index, r2_img_index;
-        // Eigen::Vector3d transfer_1_to_2;
-        // if (who_is_detect == "R1")
-        // {
-        //     r1_img_index = (valid[0] - 1) * 0.5 + 1;
-        //     r2_img_index = valid[1] / 2;
-        //     transfer_1_to_2 = transfer;
-        // }
-        // else
-        // {
-
-        //     r1_img_index = (valid[1] - 1) * 0.5 + 1;
-        //     r2_img_index = valid[0] / 2;
-        //     transfer_1_to_2 = Eigen::Vector3d::Zero() - transfer;
-        // }
-        // origin2r1 << path_1[mapPath_dict[r1_img_index]][0], path_1[mapPath_dict[r1_img_index]][1], path_1[mapPath_dict[r1_img_index]][2];
-
-        // origin2r2 << path_2[mapPath_dict_2[r2_img_index]][0], path_2[mapPath_dict_2[r2_img_index]][1], path_2[mapPath_dict_2[r2_img_index]][2];
-
-        // Eigen::Vector3d ans_t = transfer_1_to_2 - (origin2r2 - origin2r1);
-        // return ans_t;
     }
 
     Eigen::Affine3d turnout_R(Eigen::Matrix3d rotation_matrix, std::string who_is_detect, std::vector<int> valid,
@@ -788,9 +816,6 @@ public:
         Eigen::Translation3d origin2r1, origin2r2;
         Eigen::Translation3d transfer_aff(transfer.x(), transfer.y(), transfer.z());
         turnout_T(who_is_detect, valid, origin2r1, origin2r2);
-
-        Eigen::Quaterniond r1_q;
-        Eigen::Quaterniond r2_q;
 
         int r1_img_index, r2_img_index;
         Eigen::Quaterniond rotation_1TO2{rotation_matrix};
@@ -808,6 +833,8 @@ public:
             r2_img_index = valid[0] / 2;
         }
 
+        Eigen::Quaterniond r1_q;
+        Eigen::Quaterniond r2_q;
         r1_q.x() = path_1[mapPath_dict[r1_img_index]][3];
         r1_q.y() = path_1[mapPath_dict[r1_img_index]][4];
         r1_q.z() = path_1[mapPath_dict[r1_img_index]][5];
@@ -823,41 +850,6 @@ public:
         relative_measurement = origin_to_r1 * relative_measurement * (origin_to_r2.inverse());
 
         return relative_measurement;
-        // Eigen::Quaterniond r1_q;
-        // Eigen::Quaterniond r2_q;
-
-        // int r1_img_index, r2_img_index;
-        // Eigen::Quaterniond rotation_1TO2;
-
-        // if (who_is_detect == "R1")
-        // {
-        //     rotation_1TO2 = rotation_matrix;
-        //     r1_img_index = (valid[0] - 1) * 0.5 + 1;
-        //     r2_img_index = valid[1] / 2;
-        // }
-        // else
-        // {
-        //     rotation_1TO2 = rotation_matrix.transpose();
-        //     r1_img_index = (valid[1] - 1) * 0.5 + 1;
-        //     r2_img_index = valid[0] / 2;
-        //     r1_img_index = (loop_info[1] - 1) * 0.5 + 1;
-        //     r2_img_index = loop_info[0] / 2;
-        // }
-
-        // r1_q.x() = path_1[mapPath_dict[r1_img_index]][3];
-        // r1_q.y() = path_1[mapPath_dict[r1_img_index]][4];
-        // r1_q.z() = path_1[mapPath_dict[r1_img_index]][5];
-        // r1_q.w() = path_1[mapPath_dict[r1_img_index]][6];
-
-        // r2_q.x() = path_2[mapPath_dict_2[r2_img_index]][3];
-        // r2_q.y() = path_2[mapPath_dict_2[r2_img_index]][4];
-        // r2_q.z() = path_2[mapPath_dict_2[r2_img_index]][5];
-        // r2_q.w() = path_2[mapPath_dict_2[r2_img_index]][6];
-
-        // // NOTE クオータニオンの掛け算の方向は左側
-        // // Eigen::Matrix3d R2_origin2node = (r2_q.normalized()).toRotationMatrix();
-        // Eigen::Quaterniond q_r1_to_r2 = (r2_q.inverse()) * rotation_1TO2 * r1_q;
-        // return q_r1_to_r2.normalized();
     }
 };
 
