@@ -8,7 +8,6 @@ project(cpp)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-
 find_package(catkin REQUIRED COMPONENTS
   actionlib_msgs
   message_generation
@@ -22,7 +21,12 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_ros
 )
 ########################################################
-SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}")
+SET(CMAKE_MODULE_PATH  /home/ayumi/g2o/cmake_modules)
+# SET(CMAKE_PREFIX_PATH /usr/local)
+# SET(CMAKE_FIND_DEBUG_MODE 1)
+SET(CMAKE_BUILD_TYPE Release)
+# list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
 
 # set(opengv_DIR "/home/ayumi/okvis/build/lib/CMake/opengv/")
 
@@ -40,7 +44,26 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 FIND_PACKAGE(OpenCV REQUIRED)
 find_package(PCL 1.3 REQUIRED COMPONENTS common io)
 find_package(Open3D HINTS ${CMAKE_INSTALL_PREFIX}/lib/cmake)
+find_package(PkgConfig)
+pkg_search_module(Eigen3 REQUIRED eigen3)
+
 find_package(g2o REQUIRED)
+IF(g2o_FOUND)
+  MESSAGE(STATUS "Found g2o")
+  # SET(G2O_FOUND ${g2o_FOUND})
+	# SET(G2O_CPP11 1)
+ENDIF()
+
+SET(G2O_LIBS
+g2o::core
+g2o::solver_cholmod
+g2o::solver_eigen
+g2o::solver_pcg
+g2o::solver_csparse
+g2o::csparse_extension
+g2o::types_slam2d
+g2o::types_slam3d
+g2o::types_sba)
 
 # find_package(GTSAMCMakeTools)
 # find_package(GTSAM REQUIRED)
@@ -70,7 +93,7 @@ ${RTABMap_INCLUDE_DIRS}
 ${OpenCV_INCLUDE_DIRS}
 ${PCL_INCLUDE_DIRS}
 ${Open3D_INCLUDE_DIRS}
-${G2O_INCLUDE_DIRS}
+# ${G2O_INCLUDE_DIRS}
 # ${GTSAM_INCLUDE_DIRS}
 )
 
@@ -84,6 +107,9 @@ ${PCL_LIBRARIES}
 
 
 IF(octomap_FOUND)
+
+# SET(ADDITIONAL_INCLUDE
+# /usr/include/suitesparse/)
 
 SET(INCLUDE_DIRS
 ${INCLUDE_DIRS}
@@ -323,7 +349,6 @@ add_executable(frame_a_to_frame_b_broadcaster src/CPP_demo/tf_broadcaster.cpp)
 target_link_libraries(frame_a_to_frame_b_broadcaster ${catkin_LIBRARIES})
 
 add_executable(detection_checker src/loop_closure/LoopClosure.cpp)
-
 target_link_libraries(
   detection_checker
   ${catkin_LIBRARIES}
@@ -335,14 +360,16 @@ add_dependencies(
   ${cpp_EXPORTED_TARGETS}
 )
 
-# add_executable(RO_estimator 
-#               src/relative_pose_estimation/RO.cpp)
+add_executable(RO_estimator 
+src/relative_pose_estimation/RO.cpp)
 
-# target_link_libraries(
-#   RO_estimator
-#   ${catkin_LIBRARIES}
-#   gtsam
-#   )
+target_include_directories(RO_estimator PUBLIC /usr/include/suitesparse)
+
+target_link_libraries(
+  RO_estimator
+  ${catkin_LIBRARIES}
+  ${G2O_LIBS}
+  )
 # add_executable(gui src/gui/src/gui_2.cpp)
 # target_link_libraries(gui ${catkin_LIBRARIES})
 # add_dependencies(open3d_conversions_ex_sub ${open3d_conversions_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
