@@ -33,6 +33,8 @@ private:
     int pose_id{0};
     int point_id;
 
+    int local_num;
+
 public:
     G2o_ba(double pix_noise = 1) : pixel_noise(pix_noise)
     {
@@ -55,6 +57,7 @@ public:
     void setPose(std::vector<Eigen::Matrix4d> local_poses, std::vector<Eigen::Matrix4d> hyp_poses)
     {
         // idの順番を保持したままひとまとめにする。
+        local_num = local_poses.size();
         std::vector<Eigen::Matrix4d> all_poses;
         for (auto val : hyp_poses)
             local_poses.push_back(val);
@@ -84,7 +87,6 @@ public:
     void setPoint_and_measurement(std::vector<Eigen::Vector3d> pcds, std::map<int, std::vector<Eigen::Vector2d>> local_2d,
                                   std::map<int, std::vector<Eigen::Vector2d>> hyp_2d)
     {
-        // idの順番を保持したままひとまとめにする。
         std::vector<std::vector<Eigen::Vector2d>> all_pixels;
         for (const auto [key, val] : local_2d)
             all_pixels.push_back(val);
@@ -122,6 +124,39 @@ public:
             ++point_id;
         }
     }
+
+    void dict_from_vec(std::vector<Eigen::Matrix4d> &odom_vec,
+                       std::vector<Eigen::VectorXd> &info_vec,
+                       std::map<std::vector<int>, Eigen::VectorXd> odom_dict,
+                       std::map<std::vector<int>, Eigen::VectorXd> info_dict,
+                       std::vector<int> pose_ids)
+    {
+    }
+
+    void set_odometry_constraint(std::vector<Eigen::Matrix4d> odom_vec,
+                                 std::vector<Eigen::VectorXd> info_vec,
+                                 std::string which)
+    {
+        int initial_id;
+        if (which == "hyp")
+            initial_id = local_num;
+        else
+            initial_id = 0;
+
+        for (size_t pose_between{0}; pose_between < pose_ids.size() - 1; ++pose_between)
+        {
+            g2o::EdgeSE3 *odom_constraint = new g2o::EdgeSE3();
+
+            odom_constraint->vertices()[0] = optimizer.vertex(initial_id);
+            odom_constraint->vertices()[1] = optimizer.vertex(initial_id + 1);
+            odom_constraint->setMeasurement(odom_vec[pose_between]);
+            odometry->setInformation(info_vec[pose_between])
+                optimizer.addEdge(odom_constraint);
+            initial_id += 1;
+        }
+    }
+
+    void complete_all_constraint() {}
 
     Eigen::Matrix4d optimize(int iteration, int id)
     {

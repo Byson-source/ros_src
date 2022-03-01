@@ -348,12 +348,13 @@ public:
 
         std::vector<double> local_pcd = data_->r_3d;
         std::vector<Eigen::Vector3d> local_pcds = turnout_point_coord(local_pcd);
+
         // NOTE BA
         G2o_ba ba_optimizer;
         ba_optimizer.setPose(local_poses, hyp_poses);
         ba_optimizer.setPoint_and_measurement(local_pcds, loop_2d, hyp_2d);
 
-        Eigen::Matrix4d val2hyp_pose = ba_optimizer.optimize(30, locals.size());
+        Eigen::Matrix4d val2hyp_pose = ba_optimizer.optimize(10, locals.size());
 
         std::cout << val2hyp_pose << std::endl;
 
