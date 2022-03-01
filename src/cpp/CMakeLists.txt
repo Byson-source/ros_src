@@ -40,7 +40,8 @@ find_package(PCL 1.3 REQUIRED COMPONENTS common io)
 find_package(Open3D HINTS ${CMAKE_INSTALL_PREFIX}/lib/cmake)
 find_package(PkgConfig)
 pkg_search_module(Eigen3 REQUIRED eigen3)
-
+FIND_PACKAGE(CSparse REQUIRED)
+FIND_PACKAGE(Cholmod REQUIRED)
 find_package(G2O REQUIRED)
 
 
@@ -72,9 +73,12 @@ ${RTABMap_INCLUDE_DIRS}
 ${OpenCV_INCLUDE_DIRS}
 ${PCL_INCLUDE_DIRS}
 ${Open3D_INCLUDE_DIRS}
+${CMAKE_CURRENT_SOURCE_DIR}
+${EIGEN_INCLUDE_DIRS}
+${CSPARSE_INCLUDE_DIR}
+${Cholmod_INCLUDE_DIR}
 ${G2O_INCLUDE_DIR}
 /usr/include/suitesparse
-# ${GTSAM_INCLUDE_DIRS}
 )
 LIST(APPEND G2O_LIBS
   cxsparse
