@@ -19,7 +19,7 @@
     <node pkg="cpp" name="image_extractor" type="image_extractor.py" output="screen"/>
     <node pkg="cpp" name="loop_closure_server" type="detection_checker" output="screen"/>
 
-    <node pkg="cpp" name="feature_matcher" type="feature_matching.py" output="screen"/>
+    <!-- <node pkg="cpp" name="feature_matcher" type="feature_matching.py" output="screen"/> -->
     <!-- <node pkg="cpp" name="RO_node" type="RO_estimator" output="screen"/> -->
     <!-- <node pkg="cpp" name="gui" type="gui" output="screen"/>
 

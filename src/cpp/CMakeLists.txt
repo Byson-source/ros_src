@@ -21,15 +21,9 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_ros
 )
 ########################################################
-SET(CMAKE_MODULE_PATH  /home/ayumi/g2o/cmake_modules)
-# SET(CMAKE_PREFIX_PATH /usr/local)
-# SET(CMAKE_FIND_DEBUG_MODE 1)
+LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules/)
 SET(CMAKE_BUILD_TYPE Release)
-# list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-
-
-# set(opengv_DIR "/home/ayumi/okvis/build/lib/CMake/opengv/")
-
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Wall")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOUIC ON)
@@ -47,23 +41,8 @@ find_package(Open3D HINTS ${CMAKE_INSTALL_PREFIX}/lib/cmake)
 find_package(PkgConfig)
 pkg_search_module(Eigen3 REQUIRED eigen3)
 
-find_package(g2o REQUIRED)
-IF(g2o_FOUND)
-  MESSAGE(STATUS "Found g2o")
-  # SET(G2O_FOUND ${g2o_FOUND})
-	# SET(G2O_CPP11 1)
-ENDIF()
+find_package(G2O REQUIRED)
 
-SET(G2O_LIBS
-g2o::core
-g2o::solver_cholmod
-g2o::solver_eigen
-g2o::solver_pcg
-g2o::solver_csparse
-g2o::csparse_extension
-g2o::types_slam2d
-g2o::types_slam3d
-g2o::types_sba)
 
 # find_package(GTSAMCMakeTools)
 # find_package(GTSAM REQUIRED)
@@ -79,11 +58,11 @@ endif()
 
 # fix libproj.so not found on Xenial
 if(NOT "${PCL_LIBRARIES}" STREQUAL "")
-  list(REMOVE_ITEM PCL_LIBRARIES "vtkproj4")
+list(REMOVE_ITEM PCL_LIBRARIES "vtkproj4")
 endif()
 
 if(POLICY CMP0020)
-  cmake_policy(SET CMP0020 OLD)
+cmake_policy(SET CMP0020 OLD)
 endif()
 
 
@@ -93,8 +72,20 @@ ${RTABMap_INCLUDE_DIRS}
 ${OpenCV_INCLUDE_DIRS}
 ${PCL_INCLUDE_DIRS}
 ${Open3D_INCLUDE_DIRS}
-# ${G2O_INCLUDE_DIRS}
+${G2O_INCLUDE_DIR}
+/usr/include/suitesparse
 # ${GTSAM_INCLUDE_DIRS}
+)
+LIST(APPEND G2O_LIBS
+  cxsparse
+  cholmod
+  g2o_cli g2o_simulator
+  g2o_solver_slam2d_linear g2o_types_icp g2o_types_slam2d
+  g2o_core g2o_solver_csparse g2o_solver_structure_only
+  g2o_types_sba g2o_types_slam3d g2o_csparse_extension
+  g2o_solver_dense g2o_stuff
+  g2o_types_sclam2d g2o_parser g2o_solver_pcg
+  g2o_types_data g2o_types_sim3
 )
 
 # libraries
@@ -362,8 +353,6 @@ add_dependencies(
 
 add_executable(RO_estimator 
 src/relative_pose_estimation/RO.cpp)
-
-target_include_directories(RO_estimator PUBLIC /usr/include/suitesparse)
 
 target_link_libraries(
   RO_estimator
