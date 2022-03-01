@@ -356,7 +356,8 @@ add_dependencies(
 )
 
 add_executable(RO_estimator 
-src/relative_pose_estimation/RO.cpp)
+src/relative_pose_estimation/RO.cpp
+src/relative_pose_estimation/include/g2o_ba.h)
 
 target_link_libraries(
   RO_estimator
