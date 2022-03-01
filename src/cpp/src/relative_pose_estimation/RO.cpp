@@ -333,7 +333,7 @@ public:
 
         std::vector<int> hyps;
         std::vector<int> locals;
-        for (int idx{0}; idx < valids.size(); ++idx)
+        for (long unsigned int idx{0}; idx < valids.size(); ++idx)
         {
             if (idx % 2 == 0)
                 locals.push_back(valids[idx]);
@@ -349,6 +349,13 @@ public:
         std::vector<double> local_pcd = data_->r_3d;
         std::vector<Eigen::Vector3d> local_pcds = turnout_point_coord(local_pcd);
         // NOTE BA
+        G2o_ba ba_optimizer;
+        ba_optimizer.setPose(local_poses, hyp_poses);
+        ba_optimizer.setPoint_and_measurement(local_pcds, loop_2d, hyp_2d);
+
+        Eigen::Matrix4d val2hyp_pose = ba_optimizer.optimize(30, locals.size());
+
+        std::cout << val2hyp_pose << std::endl;
 
         // compute_BA(local_pcds, Eigen::Matrix4d::Identity(), who_detect, hyp_2d, loop_2d, locals, hyps, local_poses, hyp_poses);
         // Eigen::Matrix4d goal_transformation = compute_BA(local_pcds, Eigen::Matrix4d::Identity(), who_detect, hyp_2d, loop_2d, locals, hyps, local_poses, hyp_poses);
@@ -593,31 +600,31 @@ public:
     // }
     // NOTE [[x,y,z,qx,qy,qz,qw],[..]]
 
-    void
-    turnout_apartid_odom_info(int priorID, int targetID, Eigen::Matrix4d &goal_odom, Eigen::VectorXd &goal_info,
-                              std::map<std::vector<int>, std::vector<double>> *info_dict, std::map<std::vector<int>, Eigen::Matrix4d> *odom_dict)
-    {
-        for (int id{priorID}; id < targetID + 1; ++id)
-        {
-            std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-            Eigen::Matrix4d transfer_affine = (*odom_dict)[{priorID + 1, priorID}];
-            goal_odom = transfer_affine * goal_odom;
+    // void
+    // turnout_apartid_odom_info(int priorID, int targetID, Eigen::Matrix4d &goal_odom, Eigen::VectorXd &goal_info,
+    //                           std::map<std::vector<int>, std::vector<double>> *info_dict, std::map<std::vector<int>, Eigen::Matrix4d> *odom_dict)
+    // {
+    //     for (int id{priorID}; id < targetID + 1; ++id)
+    //     {
+    //         std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+    //         Eigen::Matrix4d transfer_affine = (*odom_dict)[{priorID + 1, priorID}];
+    //         goal_odom = transfer_affine * goal_odom;
 
-            Eigen::VectorXd cov(6);
-            std::vector<int> referred_id(priorID + 1, priorID);
+    //         Eigen::VectorXd cov(6);
+    //         std::vector<int> referred_id(priorID + 1, priorID);
 
-            std::cout << priorID << std::endl;
-            cov << 1 / ((*info_dict)[referred_id][0]), 1 / ((*info_dict)[referred_id][1]), 1 / ((*info_dict)[referred_id][2]),
-                1 / ((*info_dict)[referred_id][3]), 1 / ((*info_dict)[referred_id][4]), 1 / ((*info_dict)[referred_id][5]);
+    //         std::cout << priorID << std::endl;
+    //         cov << 1 / ((*info_dict)[referred_id][0]), 1 / ((*info_dict)[referred_id][1]), 1 / ((*info_dict)[referred_id][2]),
+    //             1 / ((*info_dict)[referred_id][3]), 1 / ((*info_dict)[referred_id][4]), 1 / ((*info_dict)[referred_id][5]);
 
-            std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+    //         std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
 
-            goal_info = goal_info + cov;
-        }
-        goal_odom = goal_odom * cam2robot.transpose();
-        goal_info << 1 / (goal_info(0)), 1 / (goal_info(1)), 1 / (goal_info(2)),
-            1 / (goal_info(3)), 1 / (goal_info(4)), 1 / (goal_info(5));
-    }
+    //         goal_info = goal_info + cov;
+    //     }
+    //     goal_odom = goal_odom * cam2robot.transpose();
+    //     goal_info << 1 / (goal_info(0)), 1 / (goal_info(1)), 1 / (goal_info(2)),
+    //         1 / (goal_info(3)), 1 / (goal_info(4)), 1 / (goal_info(5));
+    // }
 
     std::vector<Eigen::Vector3d> turnout_point_coord(std::vector<double> point_coord)
     {
@@ -630,11 +637,11 @@ public:
             // ３つ目の要素に差し掛かった時
             if (index % 3 == 0)
             {
-                Eigen::Vector4d kp_loc_r(point_coord[index - 3] / 1000, point_coord[index - 2] / 1000, point_coord[index - 1] / 1000, 1.0);
+                // Eigen::Vector4d kp_loc_r(point_coord[index - 3] / 1000, point_coord[index - 2] / 1000, point_coord[index - 1] / 1000, 1.0);
                 // std::cout << kp_loc_r << std::endl;
                 // NOTE GTSAMはcameraのcoordinate frameなのでそのままにしておく
                 // kp_loc_r = cam2robot * kp_loc_r;
-                Eigen::Vector3d input_loc(kp_loc_r[0], kp_loc_r[1], kp_loc_r[2]);
+                Eigen::Vector3d input_loc(point_coord[index - 3] / 1000, point_coord[index - 2] / 1000, point_coord[index - 1] / 1000);
                 kp_local.push_back(input_loc);
                 // NOTE ポイントのカメラ座標
             }
@@ -673,9 +680,8 @@ public:
         // std::cout << origin_xyz << std::endl;
         Eigen::Quaterniond origin_quat((*path_ptr)[path_idx][6], (*path_ptr)[path_idx][3], (*path_ptr)[path_idx][4], (*path_ptr)[path_idx][5]);
         Eigen::Matrix3d origin_rot = origin_quat.matrix();
-        // std::cout << origin_rot << std::endl;
 
-        for (int id{1}; id < local_pairs.size(); ++id)
+        for (long unsigned int id{1}; id < local_pairs.size(); ++id)
         {
             int local_id{translate_index(local_pairs[id], who_detect)};
             int local_path_idx{(*mapPath_dict_ptr)[local_id - 1]};
@@ -703,10 +709,6 @@ public:
     std::vector<Eigen::Matrix4d> turnout_hyps_pose(Eigen::Matrix4d odom_trans, std::vector<int> hyp_pairs, std::string robot_name)
     {
         std::vector<Eigen::Matrix4d> hyps_local_poses = turnout_Localpose(hyp_pairs, robot_name);
-        for (auto hyps_pose : hyps_local_poses)
-        {
-            // std::cout << hyps_pose << std::endl;
-        }
         std::vector<Eigen::Vector3d> t_s;
         std::vector<Eigen::Matrix3d> r_s;
         std::vector<Eigen::Matrix4d> answers;
@@ -725,7 +727,7 @@ public:
             r_s.push_back(each_rot);
         }
         // std::cout << "====================================================" << std::endl;
-        for (int iteration{0}; iteration < t_s.size(); ++iteration)
+        for (long unsigned int iteration{0}; iteration < t_s.size(); ++iteration)
         {
             Eigen::Vector3d ans_trans = rotation_mat * t_s[iteration] + translation_vec;
             Eigen::Translation3d ans_trans_(ans_trans.x(), ans_trans.y(), ans_trans.z());
