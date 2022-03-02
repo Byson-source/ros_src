@@ -176,27 +176,24 @@ public:
                 Eigen::VectorXd infos(6);
                 infos << each_link.information[21], each_link.information[28], each_link.information[35],
                     each_link.information[0], each_link.information[7], each_link.information[14];
+                // 座標変換
+                // ####################################################################
+                Eigen::Vector3d original_tr(each_link.transform.translation.x, each_link.transform.translation.y, each_link.transform.translation.z);
+                Eigen::Quaterniond original_rot(each_link.transform.rotation.w, each_link.transform.rotation.x, each_link.transform.rotation.y, each_link.transform.rotation.z);
+                Eigen::Vector3d converted_tr = robot2cam * original_tr;
+                Eigen::Matrix3d converted_rot = robot2cam * original_rot * robot2cam.transpose();
+                // ####################################################################
 
-                std::vector<double> info_spare{each_link.information[21], each_link.information[28], each_link.information[35],
-                                               each_link.information[0], each_link.information[7], each_link.information[14]};
-
-                Eigen::Translation3d odom_translation(each_link.transform.translation.x, each_link.transform.translation.y, each_link.transform.translation.z);
-                Eigen::Quaterniond odom_orientation(each_link.transform.rotation.w, each_link.transform.rotation.x, each_link.transform.rotation.y, each_link.transform.rotation.z);
+                Eigen::Translation3d odom_translation(converted_tr.x(), converted_tr.y(), converted_tr.z());
+                Eigen::Quaterniond odom_orientation{converted_rot};
 
                 Eigen::Affine3d transfer_affine;
                 transfer_affine = odom_translation * odom_orientation;
 
                 info_dict1[fromto] = infos;
                 odom_dict1[fromto] = transfer_affine;
-                // info1_spare[fromto] = info_spare;
             }
         }
-
-        // for (const auto [key, val] : odom_dict1)
-        // {
-        //     std::cout << key[0] << " " << key.at(1) << std::endl;
-        // }
-        // std::cout << "==============================================" << std::endl;
     }
     // FIXME odomの拘束条件しか考慮しない
 
@@ -209,21 +206,25 @@ public:
             if (each_link.fromId + 1 == each_link.toId)
             {
                 std::vector<int> fromto{each_link.fromId, each_link.toId};
-                Eigen::Translation3d odom_translation(each_link.transform.translation.x, each_link.transform.translation.y, each_link.transform.translation.z);
-                Eigen::Quaterniond odom_orientation(each_link.transform.rotation.w, each_link.transform.rotation.x, each_link.transform.rotation.y, each_link.transform.rotation.z);
+                // 座標変換
+                // ####################################################################
+                Eigen::Vector3d original_tr(each_link.transform.translation.x, each_link.transform.translation.y, each_link.transform.translation.z);
+                Eigen::Quaterniond original_rot(each_link.transform.rotation.w, each_link.transform.rotation.x, each_link.transform.rotation.y, each_link.transform.rotation.z);
+                Eigen::Vector3d converted_tr = robot2cam * original_tr;
+                Eigen::Matrix3d converted_rot = robot2cam * original_rot * robot2cam.transpose();
+                // ####################################################################
+                Eigen::Translation3d odom_translation(converted_tr.x(), converted_tr.y(), converted_tr.z());
+                Eigen::Quaterniond odom_orientation{converted_rot};
 
                 Eigen::Affine3d transfer_affine;
                 transfer_affine = odom_translation * odom_orientation;
 
                 Eigen::VectorXd infos(6);
-                std::vector<double> info_spare{each_link.information[21], each_link.information[28], each_link.information[35],
-                                               each_link.information[0], each_link.information[7], each_link.information[14]};
 
                 infos << each_link.information[21], each_link.information[28], each_link.information[35],
                     each_link.information[0], each_link.information[7], each_link.information[14];
                 info_dict2[fromto] = infos;
                 odom_dict2[fromto] = transfer_affine;
-                // info2_spare[fromto] = info_spare;
             }
         }
     }
@@ -363,13 +364,6 @@ public:
         for (size_t hyp_id; hyp_id < locals.size(); ++hyp_id)
             hyps.at(hyp_id) = translate_index(hyps.at(hyp_id), another_one);
 
-        // std::cout << "This is locals" << std::endl;
-        // std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-        // for (int local_hoge : locals)
-        //     std::cout << local_hoge << " ";
-        // std::cout << std::endl;
-        // std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-
         ba_optimizer.setPose(local_poses, hyp_poses);
         ba_optimizer.setPoint_and_measurement(local_pcds, loop_2d, hyp_2d);
         // local_odom_constraint
@@ -380,274 +374,9 @@ public:
         // ba_optimizer.optimize(15, locals.size());
         ba_optimizer.optimize(15, locals, hyps);
 
-        // compute_BA(local_pcds, Eigen::Matrix4d::Identity(), who_detect, hyp_2d, loop_2d, locals, hyps, local_poses, hyp_poses);
-        // Eigen::Matrix4d goal_transformation = compute_BA(local_pcds, Eigen::Matrix4d::Identity(), who_detect, hyp_2d, loop_2d, locals, hyps, local_poses, hyp_poses);
-        // -----------------------------------------------------------------------------
-        // Eigen::Vector3d transfer_;
-        // Eigen::Matrix3d rotation_;
-        // transfer_ = goal_transformation.block(0, 3, 3, 1);
-        // rotation_ = goal_transformation.block(0, 0, 3, 3);
-
-        // rotation_ = cam2robot.block(0, 0, 3, 3) * rotation_ * (cam2robot.block(0, 0, 3, 3)).transpose();
-        // transfer_ = cam2robot.block(0, 0, 3, 3) * transfer_;
-
-        // Eigen::Affine3d ans_r = turnout_R(rotation_, who_detect, valids, transfer_);
-
-        // status = 1;
-
-        // cpp::RO_Array pose_result;
-        // Eigen::Quaterniond for_publish_rot{ans_r.rotation()};
-        // std::vector<double> R{for_publish_rot.w(), for_publish_rot.x(), for_publish_rot.y(), for_publish_rot.z()};
-        // std::vector<double> t{ans_r.translation()[0], ans_r.translation()[1], ans_r.translation()[2]};
-
-        // pose_result.translation = t;
-        // pose_result.euler = R;
-
-        // rt_pub.publish(pose_result);
-
-        // draw_rotation = ans_r.rotation();
-        // draw_t = ans_r.translation();
-        // status = 1;
-
         hyp_2d.clear();
         loop_2d.clear();
     }
-
-    // NOTE GTSAMのsigmaはroll,pitch,yaw,x,y,z! なお、2Dの場合はx,y,theta
-    // Eigen::Matrix4d compute_BA(std::vector<Eigen::Vector3d> local_pcd, Eigen::Matrix4d initial_pose,
-    //                            std::string who_detect,
-    //                            std::map<int, std::vector<Eigen::Vector2d>> hyp_2d,
-    //                            std::map<int, std::vector<Eigen::Vector2d>> loop_2d,
-    //                            std::vector<int> local_ids, std::vector<int> hyp_ids,
-    //                            std::vector<Eigen::Matrix4d> local_pose, std::vector<Eigen::Matrix4d> hyp_pose)
-    // void compute_BA(std::vector<Eigen::Vector3d> local_pcd, Eigen::Matrix4d initial_pose,
-    //                 std::string who_detect,
-    //                 std::map<int, std::vector<Eigen::Vector2d>> hyp_2d,
-    //                 std::map<int, std::vector<Eigen::Vector2d>> loop_2d,
-    //                 std::vector<int> local_ids, std::vector<int> hyp_ids,
-    //                 std::vector<Eigen::Matrix4d> local_pose, std::vector<Eigen::Matrix4d> hyp_pose)
-    // {
-
-    //     ROS_WARN("This is local pose");
-    //     for (auto each : local_pose)
-    //     {
-    //         std::cout << each << std::endl;
-    //         std::cout << "======================" << std::endl;
-    //     }
-    //     std::cout << std::endl;
-
-    //     ROS_WARN("This is hyp pose");
-    //     for (auto each : hyp_pose)
-    //     {
-    //         std::cout << each << std::endl;
-    //         std::cout << "======================" << std::endl;
-    //     }
-    //     std::cout << std::endl;
-
-    // for (const auto [key, index] : loop_2d)
-    // {
-    //     std::cout << key << std::endl;
-    //     std::cout << "----------------------" << std::endl;
-    //     for (auto val : index)
-    //     {
-    //         std::cout << val << std::endl;
-    //     }
-    // }
-    // for (auto val : loop_2d[1])
-    // {
-    //     std::cout << val << std::endl;
-    // }
-
-    // std::cout << "================================" << std::endl;
-
-    // for (auto val : hyp_2d[0])
-    // {
-    //     std::cout << val << std::endl;
-    // }
-
-    // auto initial_pose_noise = noiseModel::Diagonal::Sigmas((Vector(6) << Vector3::Constant(0.001), Vector3::Constant(0.001)).finished());
-    // auto measurementNoise = noiseModel::Isotropic::Sigma(2, 0.3);
-
-    // NonlinearFactorGraph graph;
-
-    // std::map<std::vector<int>, Eigen::Matrix4d> *odom_local_ptr{nullptr};
-    // std::map<std::vector<int>, Eigen::VectorXd> *info_local_ptr{nullptr};
-    // std::map<std::vector<int>, Eigen::Matrix4d> *odom_hyp_ptr{nullptr};
-    // std::map<std::vector<int>, Eigen::VectorXd> *info_hyp_ptr{nullptr};
-    // std::string else_one;
-
-    // if (who_detect == "R1")
-    // {
-    //     odom_local_ptr = &odom_dict1;
-    //     info_local_ptr = &info_dict1;
-    //     odom_hyp_ptr = &odom_dict2;
-    //     info_hyp_ptr = &info_dict2;
-    //     else_one = "R2";
-    // }
-    // else
-    // {
-    //     odom_local_ptr = &odom_dict2;
-    //     info_local_ptr = &info_dict2;
-    //     odom_hyp_ptr = &odom_dict1;
-    //     info_hyp_ptr = &info_dict1;
-    //     else_one = "R1";
-    // }
-
-    // Pose3 initial_local_pose(initial_pose);
-
-    // graph.addPrior(Symbol('x', 0), initial_local_pose, initial_pose_noise);
-    // std::vector<Symbol> pose_symbol;
-    // int index_count{0};
-    // // local
-
-    // for (size_t idx{0}; idx < local_ids.size(); ++idx)
-    // {
-    //     if (idx > 0)
-    //     {
-    //         if (odom_local_ptr->count({translate_index(local_ids[idx - 1], who_detect), translate_index(local_ids[idx], who_detect)}))
-    //         {
-    //             Eigen::Matrix4d odom = (*odom_local_ptr)[{translate_index(local_ids[idx - 1], who_detect), translate_index(local_ids[idx], who_detect)}];
-    //             Eigen::Matrix3d odom_rot = odom.block(0, 0, 3, 3);
-    //             Eigen::Vector3d trans = odom.block(0, 3, 3, 1);
-    //             Eigen::Quaterniond quat_rot{odom_rot};
-    //             trans = robot2cam * trans;
-    //             // Eigen::Translation<double,3> tr(odom.block(0,3,1,3).x(),odom.block(0,3,1,3).y(),odom.block(0,3,1,3).z())
-    //             Eigen::Translation<double, 3> tr_(trans.x(), trans.y(), trans.z());
-
-    //             Eigen::Affine3d answer_tr = quat_rot * tr_;
-
-    //             // Pose3 odometry((*odom_local_ptr)[{translate_index(local_ids[idx - 1], who_detect), translate_index(local_ids[idx], who_detect)}]);
-    //             // Pose3 odometry(answer_tr.matrix());
-    //             // auto odometryNoise = noiseModel::Diagonal::Variances((*info_local_ptr)[{translate_index(local_ids[idx - 1], who_detect), translate_index(local_ids[idx], who_detect)}]);
-    //             // graph.emplace_shared<BetweenFactor<Pose3>>(Symbol('x', index_count - 1), Symbol('x', index_count), odometry, odometryNoise);
-    //         }
-    //         else
-    //         {
-    //             ROS_WARN("One of odom constraints missing its sequential indexes...");
-    //             // exit(1);
-    //         }
-    //     }
-
-    //     pose_symbol.push_back(Symbol('x', index_count));
-
-    //     for (int pixel_id{0}; pixel_id < loop_2d[0].size(); ++pixel_id)
-    //     {
-    //         Point2 measurement = loop_2d[index_count][pixel_id];
-    //         graph.emplace_shared<GenericProjectionFactor<Pose3, Point3, Cal3_S2>>(
-    //             measurement, measurementNoise, Symbol('x', index_count), Symbol('l', pixel_id), K);
-    //     }
-    //     index_count += 1;
-    // }
-
-    // // hyp
-    // // for (size_t idx{0}; idx < hyp_ids.size(); ++idx)
-    // // {
-    // pose_symbol.push_back(Symbol('x', index_count));
-
-    // for (int pixel_id{0}; pixel_id < loop_2d[0].size(); ++pixel_id)
-    // {
-    //     Point2 measurement_ = hyp_2d[index_count][pixel_id];
-    //     // std::cout << measurement_ << std::endl;
-    //     graph.emplace_shared<GenericProjectionFactor<Pose3, Point3, Cal3_S2>>(
-    //         measurement_, measurementNoise, Symbol('x', index_count), Symbol('l', pixel_id), K);
-    // }
-    // index_count += 1;
-    // // std::cout << index_count << std::endl;
-    // // }
-
-    // // // Loop Closure constraint
-    // auto loopNoise = noiseModel::Diagonal::Sigmas((Vector(6) << Vector3::Constant(0.1),
-    //                                                Vector3::Constant(0.1))
-    //                                                   .finished());
-
-    // graph.emplace_shared<BetweenFactor<Pose3>>(Symbol('x', 0), Symbol('x', local_ids.size()), Pose3(transformation_result), loopNoise);
-
-    // auto pointNoise = noiseModel::Isotropic::Sigma(3, 0.5);
-    // graph.addPrior(Symbol('l', 0), local_pcd[0], pointNoise);
-
-    // // graph.print("Factor Graph:\n");
-
-    // Values initialEstimate;
-    // Eigen::Translation<double, 3> z_noise(0, 0, 0.001);
-    // Eigen::Quaterniond no_rot{Eigen::Matrix3d::Identity()};
-    // Eigen::Affine3d slight_noise = z_noise * no_rot;
-    // // local_ids.insert(local_ids.end(), hyp_ids.begin(), hyp_ids.end());
-    // for (size_t j{0}; j < local_ids.size(); ++j)
-    // {
-    //     if ((j > 0) & (local_pose[j - 1] == local_pose[j]))
-    //     {
-    //         local_pose[j] = slight_noise.matrix() * local_pose[j];
-    //         initialEstimate.insert(Symbol('x', j), Pose3(local_pose[j]));
-    //     }
-    //     else
-    //         initialEstimate.insert(Symbol('x', j), Pose3(local_pose[j]));
-    // }
-
-    // // for (size_t j{0}; j < hyp_ids.size(); ++j)
-    // Key last_symbol;
-    // for (size_t j{0}; j < 1; ++j)
-
-    // {
-    //     if ((j > 0) & (hyp_pose[j - 1] == hyp_pose[j]))
-    //     {
-    //         hyp_pose[j] = slight_noise.matrix() * hyp_pose[j];
-    //         initialEstimate.insert(Symbol('x', j + local_ids.size()), Pose3(hyp_pose[j]));
-    //     }
-    //     else
-    //         initialEstimate.insert(Symbol('x', j + local_ids.size()), Pose3(hyp_pose[j]));
-    //     last_symbol = Symbol('x', j + local_ids.size());
-    // }
-
-    // for (size_t j{0}; j < local_pcd.size(); ++j)
-    //     initialEstimate.insert<Point3>(Symbol('l', j), Point3(local_pcd[j]));
-
-    // // boost::shared_ptr<GaussianFactorGraph> gaussian = graph.linearize(initialEstimate);
-    // // VectorValues result = gaussian->optimizeDensely();
-
-    // Values result = LevenbergMarquardtOptimizer(graph, initialEstimate).optimize();
-    // // std::cout << result.at(last_symbol) << std::endl;
-    // result.print("Final results:\n");
-    // std::cout << result.at<Pose3>(last_symbol).matrix() << std::endl;
-    // Marginals marginals(graph, result);
-    // std::cout << "======================Marginals==============================" << std::endl;
-    // std::cout << marginals.marginalCovariance(pose_symbol[0]) << std::endl;
-    // std::cout << std::endl;
-    // std::cout << marginals.marginalCovariance(pose_symbol[1]) << std::endl;
-
-    // std::cout << "initial error = " << graph.error(initialEstimate) << std::endl;
-    // std::cout << "final error = " << graph.error(result) << std::endl;
-
-    // return result.at<Pose3>(Symbol('x', 2))
-    //     .matrix();
-    // TODO hypの方はひとまずオドメトリによる拘束条件のみに限定して考える。余裕があればProx loop, loop closureによる影響も考慮すると良い。
-    // }
-    // NOTE [[x,y,z,qx,qy,qz,qw],[..]]
-
-    // void
-    // turnout_apartid_odom_info(int priorID, int targetID, Eigen::Matrix4d &goal_odom, Eigen::VectorXd &goal_info,
-    //                           std::map<std::vector<int>, std::vector<double>> *info_dict, std::map<std::vector<int>, Eigen::Matrix4d> *odom_dict)
-    // {
-    //     for (int id{priorID}; id < targetID + 1; ++id)
-    //     {
-    //         std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-    //         Eigen::Matrix4d transfer_affine = (*odom_dict)[{priorID + 1, priorID}];
-    //         goal_odom = transfer_affine * goal_odom;
-
-    //         Eigen::VectorXd cov(6);
-    //         std::vector<int> referred_id(priorID + 1, priorID);
-
-    //         std::cout << priorID << std::endl;
-    //         cov << 1 / ((*info_dict)[referred_id][0]), 1 / ((*info_dict)[referred_id][1]), 1 / ((*info_dict)[referred_id][2]),
-    //             1 / ((*info_dict)[referred_id][3]), 1 / ((*info_dict)[referred_id][4]), 1 / ((*info_dict)[referred_id][5]);
-
-    //         std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-
-    //         goal_info = goal_info + cov;
-    //     }
-    //     goal_odom = goal_odom * cam2robot.transpose();
-    //     goal_info << 1 / (goal_info(0)), 1 / (goal_info(1)), 1 / (goal_info(2)),
-    //         1 / (goal_info(3)), 1 / (goal_info(4)), 1 / (goal_info(5));
-    // }
 
     std::vector<Eigen::Vector3d> turnout_point_coord(std::vector<double> point_coord)
     {
@@ -660,10 +389,6 @@ public:
             // ３つ目の要素に差し掛かった時
             if (index % 3 == 0)
             {
-                // Eigen::Vector4d kp_loc_r(point_coord[index - 3] / 1000, point_coord[index - 2] / 1000, point_coord[index - 1] / 1000, 1.0);
-                // std::cout << kp_loc_r << std::endl;
-                // NOTE GTSAMはcameraのcoordinate frameなのでそのままにしておく
-                // kp_loc_r = cam2robot * kp_loc_r;
                 Eigen::Vector3d input_loc(point_coord[index - 3] / 1000, point_coord[index - 2] / 1000, point_coord[index - 1] / 1000);
                 kp_local.push_back(input_loc);
                 // NOTE ポイントのカメラ座標
