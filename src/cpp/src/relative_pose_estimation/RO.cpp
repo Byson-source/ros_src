@@ -359,17 +359,17 @@ public:
         // NOTE BA
         G2o_ba ba_optimizer;
         // convert locals and hyps into real robot id.
-        for (size_t local_id; local_id < locals.size(); ++local_id)
-            locals.at(local_id) = translate_index(locals.at(local_id), who_detect);
-        for (size_t hyp_id; hyp_id < locals.size(); ++hyp_id)
-            hyps.at(hyp_id) = translate_index(hyps.at(hyp_id), another_one);
+        // for (size_t local_id; local_id < locals.size(); ++local_id)
+        //     locals.at(local_id) = translate_index(locals.at(local_id), who_detect);
+        // for (size_t hyp_id; hyp_id < hyps.size(); ++hyp_id)
+        //     hyps.at(hyp_id) = translate_index(hyps.at(hyp_id), another_one);
 
         ba_optimizer.setPose(local_poses, hyp_poses);
         ba_optimizer.setPoint_and_measurement(local_pcds, loop_2d, hyp_2d);
         // local_odom_constraint
-        ba_optimizer.set_odometry_constraint(odom_dict1, info_dict1, locals, "local");
+        // ba_optimizer.set_odometry_constraint(odom_dict1, info_dict1, locals, "local");
         // hyp_odom_constraint
-        ba_optimizer.set_odometry_constraint(odom_dict2, info_dict2, hyps, "hyp");
+        // ba_optimizer.set_odometry_constraint(odom_dict2, info_dict2, hyps, "hyp");
 
         // ba_optimizer.optimize(15, locals.size());
         ba_optimizer.optimize(15, locals, hyps);

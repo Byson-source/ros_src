@@ -210,7 +210,7 @@ def avoid_duplication(hypothesises):
 
 
 def decrease_image(list_ind, list_val):
-    if len(list_ind) > 2:
+    if len(list_ind) > 3:
         list_ind = [list_ind[i] for i in range(3)]
         list_val = [list_val[i] for i in range(3)]
 
