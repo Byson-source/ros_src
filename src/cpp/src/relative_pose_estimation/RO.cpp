@@ -65,8 +65,8 @@ private:
     // std::map<std::vector<int>, std::vector<double>> info1_spare;
     // std::map<std::vector<int>, std::vector<double>> info2_spare;
 
-    std::map<std::vector<int>, Eigen::Matrix4d> odom_dict1;
-    std::map<std::vector<int>, Eigen::Matrix4d> odom_dict2;
+    std::map<std::vector<int>, Eigen::Affine3d> odom_dict1;
+    std::map<std::vector<int>, Eigen::Affine3d> odom_dict2;
     // NOTE {"R1":{1:[[x1,y1,z1],[x2,y2...]],2:...},"R2":...}
 
     std::map<int, std::vector<Eigen::Vector2d>> hyp_2d;
@@ -187,7 +187,7 @@ public:
                 transfer_affine = odom_translation * odom_orientation;
 
                 info_dict1[fromto] = infos;
-                odom_dict1[fromto] = transfer_affine.matrix();
+                odom_dict1[fromto] = transfer_affine;
                 // info1_spare[fromto] = info_spare;
             }
         }
@@ -216,7 +216,7 @@ public:
                 infos << each_link.information[21], each_link.information[28], each_link.information[35],
                     each_link.information[0], each_link.information[7], each_link.information[14];
                 info_dict2[fromto] = infos;
-                odom_dict2[fromto] = transfer_affine.matrix();
+                odom_dict2[fromto] = transfer_affine;
                 // info2_spare[fromto] = info_spare;
             }
         }
@@ -353,10 +353,13 @@ public:
         G2o_ba ba_optimizer;
         ba_optimizer.setPose(local_poses, hyp_poses);
         ba_optimizer.setPoint_and_measurement(local_pcds, loop_2d, hyp_2d);
+        // local_odom_constraint
+        ba_optimizer.set_odometry_constraint(odom_dict1, info_dict1, locals, "local");
+        // hyp_odom_constraint
+        ba_optimizer.set_odometry_constraint(odom_dict2, info_dict2, hyps, "hyp");
 
-        Eigen::Matrix4d val2hyp_pose = ba_optimizer.optimize(10, locals.size());
-
-        std::cout << val2hyp_pose << std::endl;
+        // ba_optimizer.optimize(15, locals.size());
+        ba_optimizer.optimize(15, locals, hyps);
 
         // compute_BA(local_pcds, Eigen::Matrix4d::Identity(), who_detect, hyp_2d, loop_2d, locals, hyps, local_poses, hyp_poses);
         // Eigen::Matrix4d goal_transformation = compute_BA(local_pcds, Eigen::Matrix4d::Identity(), who_detect, hyp_2d, loop_2d, locals, hyps, local_poses, hyp_poses);

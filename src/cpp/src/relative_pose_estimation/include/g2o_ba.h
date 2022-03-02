@@ -18,6 +18,7 @@
 #include "g2o/solvers/structure_only/structure_only_solver.h"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#include "g2o/types/slam3d/edge_se3.h"
 
 class G2o_ba
 {
@@ -34,6 +35,9 @@ private:
     int point_id;
 
     int local_num;
+    // search inlier
+    std::vector<g2o::EdgeProjectXYZ2UV *> project_edges;
+    // std::vector<g2o::SE3Quat> odometry_edges;
 
 public:
     G2o_ba(double pix_noise = 1) : pixel_noise(pix_noise)
@@ -120,23 +124,64 @@ public:
 
                 e->setParameterId(0, 0);
                 optimizer.addEdge(e);
+                project_edges.push_back(e);
             }
             ++point_id;
         }
     }
 
-    void dict_from_vec(std::vector<Eigen::Matrix4d> &odom_vec,
-                       std::vector<Eigen::VectorXd> &info_vec,
-                       std::map<std::vector<int>, Eigen::VectorXd> odom_dict,
+    Eigen::VectorXd info2cov(Eigen::VectorXd info)
+    {
+        Eigen::VectorXd cov(6);
+        cov << 1 / info(0), 1 / info(1), 1 / info(2), 1 / info(3), 1 / info(4), 1 / info(5);
+        return cov;
+    }
+
+    Eigen::VectorXd cov2info(Eigen::VectorXd cov)
+    {
+        Eigen::VectorXd info(6);
+        info << 1 / cov(0), 1 / cov(1), 1 / cov(2), 1 / cov(3), 1 / cov(4), 1 / cov(5);
+        return info;
+    }
+
+    void dict_from_vec(std::vector<Eigen::Affine3d> &odom_vec,
+                       std::vector<Eigen::MatrixXd> &info_vec,
+                       std::map<std::vector<int>, Eigen::Affine3d> odom_dict,
                        std::map<std::vector<int>, Eigen::VectorXd> info_dict,
                        std::vector<int> pose_ids)
     {
-    }
+        for (int pose_idx{0}; pose_idx < pose_ids.size() - 1; ++pose_idx)
+        {
+            Eigen::Affine3d appended_odom;
+            appended_odom.matrix() = Eigen::Matrix4d::Identity();
+            Eigen::VectorXd appended_cov(6);
 
-    void set_odometry_constraint(std::vector<Eigen::Matrix4d> odom_vec,
-                                 std::vector<Eigen::VectorXd> info_vec,
+            for (int idx_begin{pose_ids.at(pose_idx)}; idx_begin < pose_ids.at(pose_idx + 1); ++idx_begin)
+            {
+                // odom
+                appended_odom = appended_odom * odom_dict[{idx_begin, idx_begin + 1}];
+                // info
+                appended_cov += info2cov(info_dict[{idx_begin, idx_begin + 1}]);
+            }
+
+            odom_vec.push_back(appended_odom);
+
+            Eigen::MatrixXd appended_cov_matrix(6, 6);
+            appended_cov_matrix = cov2info(appended_cov).asDiagonal();
+            info_vec.push_back(appended_cov_matrix);
+        }
+    }
+    // local->hyp
+    void set_odometry_constraint(std::map<std::vector<int>, Eigen::Affine3d> odom_dict,
+                                 std::map<std::vector<int>, Eigen::VectorXd> info_dict,
+                                 std::vector<int> pose_ids,
                                  std::string which)
     {
+        std::vector<Eigen::Affine3d> odom_vec;
+        std::vector<Eigen::MatrixXd> info_vec;
+
+        dict_from_vec(odom_vec, info_vec, odom_dict, info_dict, pose_ids);
+
         int initial_id;
         if (which == "hyp")
             initial_id = local_num;
@@ -149,25 +194,58 @@ public:
 
             odom_constraint->vertices()[0] = optimizer.vertex(initial_id);
             odom_constraint->vertices()[1] = optimizer.vertex(initial_id + 1);
-            odom_constraint->setMeasurement(odom_vec[pose_between]);
-            odometry->setInformation(info_vec[pose_between])
-                optimizer.addEdge(odom_constraint);
+
+            // conert affine3d -> isometry3d
+            Eigen::Isometry3d transform;
+            transform.translation() = odom_vec[pose_between].translation();
+            transform.linear() = odom_vec[pose_between].rotation();
+
+            odom_constraint->setMeasurement(transform);
+            odom_constraint->setInformation(info_vec[pose_between]);
+            optimizer.addEdge(odom_constraint);
             initial_id += 1;
+
+            // odometry_edges.push_back(odom_constraint)
         }
     }
 
-    void complete_all_constraint() {}
-
-    Eigen::Matrix4d optimize(int iteration, int id)
+    void optimize(int iteration, std::vector<int> local_pose, std::vector<int> hyp_pose)
     {
         optimizer.initializeOptimization();
         optimizer.setVerbose(true);
         optimizer.optimize(iteration);
 
-        g2o::VertexSE3Expmap *v = dynamic_cast<g2o::VertexSE3Expmap *>(optimizer.vertex(id));
-        g2o::SE3Quat pose = v->estimate();
+        for (size_t vertex_id{0}; vertex_id < local_pose.size() + hyp_pose.size(); ++vertex_id)
+        {
+            g2o::VertexSE3Expmap *v = dynamic_cast<g2o::VertexSE3Expmap *>(optimizer.vertex(vertex_id));
+            g2o::SE3Quat pose = v->estimate();
+            std::cout << "------------------------------------" << std::endl;
+            std::cout << "vertex_id" << std::endl;
+            std::cout << "------------------------------------" << std::endl;
+            std::cout << pose.to_homogeneous_matrix() << std::endl;
+            std::cout << "====================================" << std::endl;
+        }
 
-        return pose.to_homogeneous_matrix();
+        int project_inliers, odom_inliers;
+
+        for (auto e : project_edges)
+        {
+            e->computeError();
+            if (e->chi2() <= 1)
+                project_inliers++;
+        }
+
+        // for (auto e : odometry_edges)
+        // {
+        //     e->computeError();
+        //     if (e->chi2() <= 1)
+        //         odom_inliers++;
+        // }
+
+        std::cout << "project inliers in totals: " << project_inliers << "/" << (point_id - pose_id) * 2 << std::endl;
+        // std::cout << "odom inliers in totals: " << odom_inliers << "/" << odometry_edges.size() << std::endl;
+
+        // return pose.to_homogeneous_matrix();
     }
 };
 
