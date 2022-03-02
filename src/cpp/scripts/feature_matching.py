@@ -521,9 +521,9 @@ def loop_CB(data):
                         intrinsics, [int(initial_kpt[0]), int(initial_kpt[1])], depth_r)
 
                     # NOTE opengl系に直す。
-                    point_coord = [result[0], -result[1], -result[2]]
-                    # for k in range(3):
-                    #     point_coord.append(result[k])
+                    point_coord.append(result[0])
+                    point_coord.append(-result[1])
+                    point_coord.append(-result[2])
                 answer.r_3d = point_coord
 
                 odometry_pub.publish(answer)

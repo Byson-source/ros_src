@@ -42,8 +42,8 @@ private:
 public:
     G2o_ba(double pix_noise = 1) : pixel_noise(pix_noise)
     {
-        // principal_point << 317.55502, 244.730865;
-        principal_point << 0.0, 0.0;
+        principal_point << 317.55502, 244.730865;
+        // principal_point << 0.0, 0.0;
         optimizer.setVerbose(false);
         linearSolver = g2o::make_unique<g2o::LinearSolverCholmod<g2o::BlockSolver_6_3::PoseMatrixType>>();
         g2o::OptimizationAlgorithmLevenberg *solver = new g2o::OptimizationAlgorithmLevenberg(
@@ -87,18 +87,18 @@ public:
             pose_id++;
         }
         point_id = pose_id;
-        std::cout << "Before optimization" << std::endl;
-        for (size_t vertex_id{0}; vertex_id < all_poses.size(); ++vertex_id)
-        {
-            g2o::VertexSE3Expmap *v = dynamic_cast<g2o::VertexSE3Expmap *>(optimizer.vertex(vertex_id));
-            g2o::SE3Quat pose = v->estimate();
-            std::cout << "------------------------------------" << std::endl;
-            std::cout << vertex_id << std::endl;
-            std::cout << "------------------------------------" << std::endl;
-            std::cout << pose.to_homogeneous_matrix() << std::endl;
-            std::cout << "====================================" << std::endl;
-        }
-        std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+        // std::cout << "Before optimization" << std::endl;
+        // for (size_t vertex_id{0}; vertex_id < all_poses.size(); ++vertex_id)
+        // {
+        //     g2o::VertexSE3Expmap *v = dynamic_cast<g2o::VertexSE3Expmap *>(optimizer.vertex(vertex_id));
+        //     g2o::SE3Quat pose = v->estimate();
+        //     std::cout << "------------------------------------" << std::endl;
+        //     std::cout << vertex_id << std::endl;
+        //     std::cout << "------------------------------------" << std::endl;
+        //     std::cout << pose.to_homogeneous_matrix() << std::endl;
+        //     std::cout << "====================================" << std::endl;
+        // }
+        // std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
     }
 
     void setPoint_and_measurement(std::vector<Eigen::Vector3d> pcds, std::map<int, std::vector<Eigen::Vector2d>> local_2d,
@@ -221,9 +221,6 @@ public:
             initial_id = local_num;
         else
             initial_id = 0;
-
-        std::cout << "succeed size is " << succeed.size() << std::endl;
-        std::cout << pose_ids.size() - 1 << std::endl;
 
         for (size_t pose_between{0}; pose_between < pose_ids.size() - 1; ++pose_between)
         {
