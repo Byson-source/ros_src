@@ -191,6 +191,12 @@ public:
                 // info1_spare[fromto] = info_spare;
             }
         }
+
+        // for (const auto [key, val] : odom_dict1)
+        // {
+        //     std::cout << key[0] << " " << key.at(1) << std::endl;
+        // }
+        // std::cout << "==============================================" << std::endl;
     }
     // FIXME odomの拘束条件しか考慮しない
 
@@ -351,6 +357,19 @@ public:
 
         // NOTE BA
         G2o_ba ba_optimizer;
+        // convert locals and hyps into real robot id.
+        for (size_t local_id; local_id < locals.size(); ++local_id)
+            locals.at(local_id) = translate_index(locals.at(local_id), who_detect);
+        for (size_t hyp_id; hyp_id < locals.size(); ++hyp_id)
+            hyps.at(hyp_id) = translate_index(hyps.at(hyp_id), another_one);
+
+        // std::cout << "This is locals" << std::endl;
+        // std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+        // for (int local_hoge : locals)
+        //     std::cout << local_hoge << " ";
+        // std::cout << std::endl;
+        // std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+
         ba_optimizer.setPose(local_poses, hyp_poses);
         ba_optimizer.setPoint_and_measurement(local_pcds, loop_2d, hyp_2d);
         // local_odom_constraint

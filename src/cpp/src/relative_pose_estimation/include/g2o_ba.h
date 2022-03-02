@@ -146,6 +146,8 @@ public:
 
     void dict_from_vec(std::vector<Eigen::Affine3d> &odom_vec,
                        std::vector<Eigen::MatrixXd> &info_vec,
+                       std::vector<int> &succeed,
+                       // NOTE 連番じゃない時のindexを記憶しておく。
                        std::map<std::vector<int>, Eigen::Affine3d> odom_dict,
                        std::map<std::vector<int>, Eigen::VectorXd> info_dict,
                        std::vector<int> pose_ids)
@@ -156,19 +158,36 @@ public:
             appended_odom.matrix() = Eigen::Matrix4d::Identity();
             Eigen::VectorXd appended_cov(6);
 
+            std::cout << "hey" << std::endl;
+
             for (int idx_begin{pose_ids.at(pose_idx)}; idx_begin < pose_ids.at(pose_idx + 1); ++idx_begin)
             {
-                // odom
-                appended_odom = appended_odom * odom_dict[{idx_begin, idx_begin + 1}];
-                // info
-                appended_cov += info2cov(info_dict[{idx_begin, idx_begin + 1}]);
+                // NOTE 時々、連番じゃないときがある。
+                if (odom_dict.count({idx_begin, idx_begin + 1}) != 0)
+                {
+                    // odom
+                    appended_odom = appended_odom * odom_dict[{idx_begin, idx_begin + 1}];
+                    // info
+                    appended_cov += info2cov(info_dict[{idx_begin, idx_begin + 1}]);
+                    if (idx_begin == pose_ids.at(pose_idx + 1) - 1)
+                        succeed.push_back(1);
+                }
+                else
+                {
+                    succeed.push_back(0);
+                    appended_cov << 1, 1, 1, 1, 1, 1;
+                    ROS_WARN("There is a lacked sequence. One of odom constaints is ignored.")
+                    break;
+                }
             }
+            std::cout << "hey2" << std::endl;
 
             odom_vec.push_back(appended_odom);
 
             Eigen::MatrixXd appended_cov_matrix(6, 6);
             appended_cov_matrix = cov2info(appended_cov).asDiagonal();
             info_vec.push_back(appended_cov_matrix);
+            std::cout << "hey3" << std::endl;
         }
     }
     // local->hyp
@@ -177,10 +196,13 @@ public:
                                  std::vector<int> pose_ids,
                                  std::string which)
     {
+
+        std::cout << "OK" << std::endl;
         std::vector<Eigen::Affine3d> odom_vec;
         std::vector<Eigen::MatrixXd> info_vec;
+        std::vector<int> succeed;
 
-        dict_from_vec(odom_vec, info_vec, odom_dict, info_dict, pose_ids);
+        dict_from_vec(odom_vec, info_vec, succeed, odom_dict, info_dict, pose_ids);
 
         int initial_id;
         if (which == "hyp")
@@ -190,23 +212,29 @@ public:
 
         for (size_t pose_between{0}; pose_between < pose_ids.size() - 1; ++pose_between)
         {
-            g2o::EdgeSE3 *odom_constraint = new g2o::EdgeSE3();
+            if (succeed.at(pose_between) == 1)
+            {
+                g2o::EdgeSE3 *odom_constraint = new g2o::EdgeSE3();
 
-            odom_constraint->vertices()[0] = optimizer.vertex(initial_id);
-            odom_constraint->vertices()[1] = optimizer.vertex(initial_id + 1);
+                odom_constraint->vertices()[0] = optimizer.vertex(initial_id);
+                odom_constraint->vertices()[1] = optimizer.vertex(initial_id + 1);
 
-            // conert affine3d -> isometry3d
-            Eigen::Isometry3d transform;
-            transform.translation() = odom_vec[pose_between].translation();
-            transform.linear() = odom_vec[pose_between].rotation();
+                // conert affine3d -> isometry3d
+                Eigen::Isometry3d transform;
+                transform.translation() = odom_vec[pose_between].translation();
+                transform.linear() = odom_vec[pose_between].rotation();
 
-            odom_constraint->setMeasurement(transform);
-            odom_constraint->setInformation(info_vec[pose_between]);
-            optimizer.addEdge(odom_constraint);
+                odom_constraint->setMeasurement(transform);
+                odom_constraint->setInformation(info_vec[pose_between]);
+
+                std::cout << "OK2" << std::endl;
+                optimizer.addEdge(odom_constraint);
+            }
             initial_id += 1;
 
             // odometry_edges.push_back(odom_constraint)
         }
+        std::cout << "OK3" << std::endl;
     }
 
     void optimize(int iteration, std::vector<int> local_pose, std::vector<int> hyp_pose)
