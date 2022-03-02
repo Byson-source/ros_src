@@ -78,6 +78,7 @@ private:
     Eigen::Matrix4d transformation_result;
     Eigen::Matrix4d cam2robot;
     Eigen::Matrix3d robot2cam;
+    Eigen::Matrix3d opengl2robot;
 
     Eigen::Matrix3d draw_rotation;
     Eigen::Vector3d draw_t;
@@ -105,6 +106,10 @@ public:
             -1.0, 0.0, 0.0, 0.0,
             0.0, -1.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 1.0;
+
+        opengl2robot << 0.0, -1.0, 0.0,
+            0.0, 0.0, 1.0,
+            -1.0, 0.0, 0.0;
 
         robot2cam = (cam2robot.block(0, 0, 3, 3)).transpose();
 
@@ -180,8 +185,8 @@ public:
                 // ####################################################################
                 Eigen::Vector3d original_tr(each_link.transform.translation.x, each_link.transform.translation.y, each_link.transform.translation.z);
                 Eigen::Quaterniond original_rot(each_link.transform.rotation.w, each_link.transform.rotation.x, each_link.transform.rotation.y, each_link.transform.rotation.z);
-                Eigen::Vector3d converted_tr = robot2cam * original_tr;
-                Eigen::Matrix3d converted_rot = robot2cam * original_rot * robot2cam.transpose();
+                Eigen::Vector3d converted_tr = opengl2robot * original_tr;
+                Eigen::Matrix3d converted_rot = opengl2robot * original_rot * opengl2robot.transpose();
                 // ####################################################################
 
                 Eigen::Translation3d odom_translation(converted_tr.x(), converted_tr.y(), converted_tr.z());
@@ -210,8 +215,8 @@ public:
                 // ####################################################################
                 Eigen::Vector3d original_tr(each_link.transform.translation.x, each_link.transform.translation.y, each_link.transform.translation.z);
                 Eigen::Quaterniond original_rot(each_link.transform.rotation.w, each_link.transform.rotation.x, each_link.transform.rotation.y, each_link.transform.rotation.z);
-                Eigen::Vector3d converted_tr = robot2cam * original_tr;
-                Eigen::Matrix3d converted_rot = robot2cam * original_rot * robot2cam.transpose();
+                Eigen::Vector3d converted_tr = opengl2robot * original_tr;
+                Eigen::Matrix3d converted_rot = opengl2robot * original_rot * opengl2robot.transpose();
                 // ####################################################################
                 Eigen::Translation3d odom_translation(converted_tr.x(), converted_tr.y(), converted_tr.z());
                 Eigen::Quaterniond odom_orientation{converted_rot};
@@ -326,10 +331,16 @@ public:
     void odom_CB(const cpp::HomogeneousArray::ConstPtr &data_)
     {
 
-        transformation_result << data_->data[0], data_->data[1], data_->data[2], data_->data[3],
-            data_->data[4], data_->data[5], data_->data[6], data_->data[7],
-            data_->data[8], data_->data[9], data_->data[10], data_->data[11],
+        // transformation_result << data_->data[0], data_->data[1], data_->data[2], data_->data[3],
+        //     data_->data[4], data_->data[5], data_->data[6], data_->data[7],
+        //     data_->data[8], data_->data[9], data_->data[10], data_->data[11],
+        //     0.0, 0.0, 0.0, 1.0;
+        // NOTE opengl系に直す。
+        transformation_result << data_->data[0], -data_->data[1], -data_->data[2], data_->data[3],
+            -data_->data[4], data_->data[5], data_->data[6], -data_->data[7],
+            -data_->data[8], data_->data[9], data_->data[10], -data_->data[11],
             0.0, 0.0, 0.0, 1.0;
+
         valids = data_->valid_img;
         std::string who_detect = data_->who_detect;
         std::string another_one;
@@ -439,9 +450,11 @@ public:
 
             // rot
             local_rot = origin_rot.transpose() * local_rot;
-            local_rot = robot2cam * local_rot * robot2cam.transpose();
+            // local_rot = robot2cam * local_rot * robot2cam.transpose();
+            // NOTE opengl座標系にする
+            local_rot = opengl2robot * local_rot * opengl2robot.transpose();
 
-            local_xyz = robot2cam * (local_xyz - origin_xyz);
+            local_xyz = opengl2robot * (local_xyz - origin_xyz);
             Eigen::Translation3d local_xyz_(local_xyz.x(), local_xyz.y(), local_xyz.z());
             Eigen::Quaterniond hoge{local_rot};
 
