@@ -65,6 +65,7 @@ def info_CB(data):
     global intrinsics
 
     intrinsics.width = data.width
+    intrinsics.width = data.width
     intrinsics.height = data.height
     intrinsics.ppx = data.K[2]
     intrinsics.ppy = data.K[5]
@@ -258,7 +259,7 @@ def derive_duplicated_index(list1, list2, sorted_keys=None):
 
     error_list = []
 
-    for i in range(2):
+    for i in range(4):
         error_list.append(i+1)
         error_list.append(-i-1)
 
@@ -323,6 +324,21 @@ def derive_duplicated_indexes(indexes, values):
         else:
             survived_index, local_survivor = derive_duplicated_index(
                 second_kpt, first_kpt)
+        # rospy.logwarn("Survived index!")
+        # rospy.logwarn("==============================")
+        # rospy.logwarn(survived_index)
+        # rospy.logwarn("==============================")
+        # rospy.logwarn("first map")
+        # rospy.logwarn("==============================")
+        # rospy.logwarn(feature_map)
+        # rospy.logwarn("==============================")
+        # rospy.logwarn("local index")
+        # rospy.logwarn("==============================")
+        # rospy.logwarn(local_survivor)
+        # rospy.logwarn("==============================")
+        # rospy.logwarn("second map")
+        # rospy.logwarn("==============================")
+        # rospy.logwarn(feature_map_)
 
         # NOTE 共通の特徴点が見つからなかった時
         if len(survived_index) < 3:
@@ -358,6 +374,9 @@ def derive_duplicated_indexes(indexes, values):
     # 上位のdictの間引きを行う
     new_map = []
     second_map = []
+
+    # print(dict_list)
+    # rospy.logerr(survived_index)
 
     for srv in survived_index:
         new_map.append(dict_list[0][srv][0])
@@ -396,8 +415,6 @@ def arrange_ids(length):
 
 
 def loop_CB(data):
-    cx = 318
-    cy = 245
 
     loop_dict = {"R1": {"R1": {}, "R2": {}},
                  "R2": {"R1": {}, "R2": {}}}
@@ -457,9 +474,9 @@ def loop_CB(data):
 
                 for point in range(len(r_feature)):
                     # elif(container[indice][int(r_feature[point][1]), int(r_feature[point][0])] != 0):
-                    # NOTE opengl系に直す。座標系は画像の中心である。
-                    img_coord.append(int(r_feature[point][0])-cx)
-                    img_coord.append((int(r_feature[point][1])-cy)*(-1))
+
+                    img_coord.append(int(r_feature[point][0]))
+                    img_coord.append(int(r_feature[point][1]))
                     img_coord.append(0)
 
                 # rospy.logerr(point_coord)
@@ -520,10 +537,8 @@ def loop_CB(data):
                     result = rs2.rs2_deproject_pixel_to_point(
                         intrinsics, [int(initial_kpt[0]), int(initial_kpt[1])], depth_r)
 
-                    # NOTE opengl系に直す。
-                    point_coord.append(result[0])
-                    point_coord.append(-result[1])
-                    point_coord.append(-result[2])
+                    for k in range(3):
+                        point_coord.append(result[k])
                 answer.r_3d = point_coord
 
                 odometry_pub.publish(answer)
