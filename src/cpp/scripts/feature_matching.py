@@ -259,7 +259,7 @@ def derive_duplicated_index(list1, list2, sorted_keys=None):
 
     error_list = []
 
-    for i in range(4):
+    for i in range(1):
         error_list.append(i+1)
         error_list.append(-i-1)
 

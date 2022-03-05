@@ -65,11 +65,16 @@ public:
         std::vector<Eigen::Matrix4d> all_poses;
         // NOTE カメラ座標から世界座標系を見た座標を入力する。
         for (auto val : local_poses)
+        {
             all_poses.push_back(val.inverse());
+            std::cout << val.inverse() << std::endl;
+        }
 
         for (auto val : hyp_poses)
+        {
             all_poses.push_back(val.inverse());
-        all_poses = local_poses;
+            std::cout << val.inverse() << std::endl;
+        }
 
         for (auto pose : all_poses)
         {
@@ -213,9 +218,6 @@ public:
         else
             initial_id = 0;
 
-        std::cout << "succeed size is " << succeed.size() << std::endl;
-        std::cout << pose_ids.size() - 1 << std::endl;
-
         for (size_t pose_between{0}; pose_between < pose_ids.size() - 1; ++pose_between)
         {
             if (succeed.at(pose_between) == 1)
@@ -274,7 +276,7 @@ public:
         //         odom_inliers++;
         // }
 
-        std::cout << "project inliers in totals: " << project_inliers << "/" << (point_id - pose_id) * 2 << std::endl;
+        // std::cout << "project inliers in totals: " << project_inliers << "/" << (point_id - pose_id) * 2 << std::endl;
         // std::cout << "odom inliers in totals: " << odom_inliers << "/" << odometry_edges.size() << std::endl;
 
         // return pose.to_homogeneous_matrix();
