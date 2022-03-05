@@ -63,9 +63,13 @@ public:
         // idの順番を保持したままひとまとめにする。
         local_num = local_poses.size();
         std::vector<Eigen::Matrix4d> all_poses;
-        for (auto val : hyp_poses)
-            local_poses.push_back(val);
-        all_poses = local_poses;
+        // NOTE カメラ座標から世界座標系を見た座標を入力する。
+        // for (auto val : local_poses)
+        //     all_poses.push_back(val.inverse());
+
+        // for (auto val : hyp_poses)
+        //     all_poses.push_back(val.inverse());
+        // all_poses = local_poses;
 
         for (auto pose : all_poses)
         {
