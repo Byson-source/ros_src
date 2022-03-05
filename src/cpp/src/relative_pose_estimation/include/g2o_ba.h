@@ -64,12 +64,12 @@ public:
         local_num = local_poses.size();
         std::vector<Eigen::Matrix4d> all_poses;
         // NOTE カメラ座標から世界座標系を見た座標を入力する。
-        // for (auto val : local_poses)
-        //     all_poses.push_back(val.inverse());
+        for (auto val : local_poses)
+            all_poses.push_back(val.inverse());
 
-        // for (auto val : hyp_poses)
-        //     all_poses.push_back(val.inverse());
-        // all_poses = local_poses;
+        for (auto val : hyp_poses)
+            all_poses.push_back(val.inverse());
+        all_poses = local_poses;
 
         for (auto pose : all_poses)
         {
@@ -254,7 +254,7 @@ public:
             std::cout << "------------------------------------" << std::endl;
             std::cout << vertex_id << std::endl;
             std::cout << "------------------------------------" << std::endl;
-            std::cout << pose.to_homogeneous_matrix() << std::endl;
+            std::cout << (pose.to_homogeneous_matrix()).inverse() << std::endl;
             std::cout << "====================================" << std::endl;
         }
 
