@@ -67,13 +67,13 @@ public:
         for (auto val : local_poses)
         {
             all_poses.push_back(val.inverse());
-            std::cout << val.inverse() << std::endl;
+            // std::cout << val.inverse() << std::endl;
         }
 
         for (auto val : hyp_poses)
         {
             all_poses.push_back(val.inverse());
-            std::cout << val.inverse() << std::endl;
+            // std::cout << val.inverse() << std::endl;
         }
 
         for (auto pose : all_poses)
@@ -86,7 +86,7 @@ public:
             // poseのSymbol('x',i)みたいな感じ？？
             g2o::VertexSE3Expmap *v_se3 = new g2o::VertexSE3Expmap();
             v_se3->setId(pose_id);
-            if (pose_id == 0)
+            if (pose_id < 2)
             {
                 v_se3->setFixed(true);
             }
@@ -102,9 +102,12 @@ public:
     {
         std::vector<std::vector<Eigen::Vector2d>> all_pixels;
         for (const auto [key, val] : local_2d)
+
             all_pixels.push_back(val);
         for (const auto [key, val] : hyp_2d)
             all_pixels.push_back(val);
+
+        double chi2_th = 5.991;
 
         for (size_t point_idx{0}; point_idx < pcds.size(); ++point_idx)
         {
@@ -125,10 +128,12 @@ public:
                 e->setVertex(1, dynamic_cast<g2o::OptimizableGraph::Vertex *>(optimizer.vertices().find(j)->second));
 
                 e->setMeasurement(observed_pixel);
+                // std::cout << observed_pixel << std::endl;
                 e->information() = Eigen::Matrix2d::Identity();
 
                 // robust kernel
                 g2o::RobustKernelHuber *rk = new g2o::RobustKernelHuber;
+                rk->setDelta(chi2_th);
                 e->setRobustKernel(rk);
 
                 e->setParameterId(0, 0);
@@ -243,10 +248,13 @@ public:
         }
     }
 
-    void optimize(int iteration, std::vector<int> local_pose, std::vector<int> hyp_pose)
+    void optimize(int iteration, std::vector<int> local_pose, std::vector<int> hyp_pose, int index)
     {
         optimizer.initializeOptimization();
         optimizer.setVerbose(true);
+        std::string save_index = std::to_string(index);
+        std::string file_encoder{".g2o"};
+
         optimizer.optimize(iteration);
 
         for (size_t vertex_id{0}; vertex_id < local_pose.size() + hyp_pose.size(); ++vertex_id)
@@ -268,13 +276,6 @@ public:
             if (e->chi2() <= 1)
                 project_inliers++;
         }
-
-        // for (auto e : odometry_edges)
-        // {
-        //     e->computeError();
-        //     if (e->chi2() <= 1)
-        //         odom_inliers++;
-        // }
 
         // std::cout << "project inliers in totals: " << project_inliers << "/" << (point_id - pose_id) * 2 << std::endl;
         // std::cout << "odom inliers in totals: " << odom_inliers << "/" << odometry_edges.size() << std::endl;

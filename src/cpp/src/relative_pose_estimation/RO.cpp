@@ -84,6 +84,7 @@ private:
     Eigen::Vector3d draw_t;
 
     int status{0};
+    int optimize_index{0};
 
     // NOTE node_map...{time;{1:[]}
     // points location
@@ -372,9 +373,8 @@ public:
         // hyp_odom_constraint
         // ba_optimizer.set_odometry_constraint(odom_dict2, info_dict2, hyps, "hyp");
 
-        // ba_optimizer.optimize(15, locals.size());
-        ba_optimizer.optimize(15, locals, hyps);
-
+        // ba_optimizer.optimize(5, locals.size(),optimize_index);
+        ba_optimizer.optimize(5, locals, hyps, optimize_index);
         hyp_2d.clear();
         loop_2d.clear();
     }
